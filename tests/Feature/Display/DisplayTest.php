@@ -12,14 +12,30 @@ class DisplayTest extends TestCase
 
   private Display $display;
 
+  public function setUp(): void
+  {
+    parent::setUp();
+
+    $this->display = $this->_createDisplay();
+  }
+
+  private function _createDisplay(array $data = null): Display
+  {
+    Display::factory()->create($data);
+    return Display::first();
+  }
+
   /** @test */
   public function create_display()
   {
-    $this->display = $this->_makeDisplay();
-    $response = $this->postJson(route('displays.store'), $this->display->toArray());
+    $display_data = $this->_makeDisplay()->toArray();
 
-    $this->assertDatabaseHas('displays', $this->display->toArray())->assertDatabaseCount('displays', 1);
-    $response->assertCreated()->assertJson($this->display->toArray());
+    $response = $this->postJson(route('displays.store'), $display_data);
+
+    $this->assertDatabaseHas('displays', $display_data);
+
+    $display = Display::find($response->json()['id']);
+    $response->assertCreated()->assertJson($display->toArray());
   }
 
   private function _makeDisplay(array $data = null): Display
@@ -28,15 +44,35 @@ class DisplayTest extends TestCase
   }
 
   /** @test */
-  public function observation_can_be_null()
+  public function update_display()
   {
-    $this->display = $this->_createDisplay(['observation' => null]);
+    $update_values = $this->_makeDisplay()->toArray();
 
-    $this->assertDatabaseCount('displays', 1);
+    $response = $this->putJson(route('displays.update', $this->display->id), $update_values);
+
+    $this->assertDatabaseHas('displays', $response->json());
+    $response->assertJson($update_values)->assertOk();
   }
 
-  private function _createDisplay(array $data = null): Display
+  /** @test */
+  public function delete_display()
   {
-    return Display::factory()->create($data);
+    $response = $this->deleteJson(route('displays.destroy', $this->display->id));
+    $this->assertDatabaseMissing('displays', ['id' => $this->display->id]);
+    $response->assertOk();
+  }
+
+  /** @test */
+  public function fetch_single_display()
+  {
+    $this->getJson(route('displays.show', $this->display->id))->assertOk()->assertJson($this->display->toArray());
+  }
+
+  /** @test */
+  public function fetch_all_displays()
+  {
+    $this->_createDisplay();
+
+    $this->getJson(route('displays.index'))->assertOk()->assertJsonCount(2)->assertJsonFragment($this->display->toArray());
   }
 }

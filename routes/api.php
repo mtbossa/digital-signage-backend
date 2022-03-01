@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DisplayController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,9 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/displays', function (Request $request) {
-  return \App\Models\Display::create($request->all());
-})->name('displays.store');
+Route::apiResource('displays', DisplayController::class);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
   return $request->user();
