@@ -28,7 +28,6 @@ class RaspberryTest extends TestCase
   /** @test */
   public function create_raspberry()
   {
-    $this->withoutExceptionHandling();
     $raspberry_data = $this->_makeRaspberry()->toArray();
 
     $response = $this->postJson(route('raspberries.store'), $raspberry_data);
