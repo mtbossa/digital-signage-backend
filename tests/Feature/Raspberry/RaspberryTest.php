@@ -34,8 +34,7 @@ class RaspberryTest extends TestCase
 
     $this->assertDatabaseHas('raspberries', $raspberry_data);
 
-    $raspberry = Raspberry::find($response->json()['id']);
-    $response->assertCreated()->assertJson($raspberry->toArray());
+    $response->assertCreated()->assertJson($raspberry_data);
   }
 
   private function _makeRaspberry(array $data = null): Raspberry
