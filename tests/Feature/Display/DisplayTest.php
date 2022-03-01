@@ -16,7 +16,7 @@ class DisplayTest extends TestCase
   public function create_display()
   {
     $this->display = $this->_makeDisplay();
-    $response = $this->postJson('api/displays', $this->display->toArray());
+    $response = $this->postJson(route('displays.store'), $this->display->toArray());
 
     $this->assertDatabaseHas('displays', $this->display->toArray())->assertDatabaseCount('displays', 1);
     $response->assertCreated()->assertJson($this->display->toArray());
