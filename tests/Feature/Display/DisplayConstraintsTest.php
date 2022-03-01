@@ -16,4 +16,11 @@ class DisplayConstraintsTest extends TestCase
     Display::factory()->create(['observation' => null]);
     $this->assertDatabaseCount('displays', 1);
   }
+
+  /** @test */
+  public function touch_is_false_by_default()
+  {
+    Display::factory()->create();
+    $this->assertDatabaseHas('displays', ['touch' => 'false']);
+  }
 }
