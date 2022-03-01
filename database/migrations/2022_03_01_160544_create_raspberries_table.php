@@ -19,6 +19,11 @@ return new class extends Migration {
       $table->string('serial_number', 50);
       $table->dateTime('last_boot')->nullable();
       $table->text('observation')->nullable();
+      $table->foreignId('display_id')
+        ->nullable()
+        ->constrained()
+        ->cascadeOnUpdate()
+        ->nullOnDelete();
       $table->timestamps();
     });
   }

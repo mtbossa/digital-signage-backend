@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Display;
 use App\Models\Raspberry;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -16,7 +17,12 @@ class RaspberryController extends Controller
 
   public function store(Request $request): Raspberry
   {
-    return Raspberry::create($request->all());
+    $raspberry = Raspberry::create($request->except(['display_id']));
+    if ($request->display_id) {
+      $display = Display::findOrFail($request->display_id);
+      $display->raspberry()->save($raspberry);
+    }
+    return $raspberry;
   }
 
   public function show(Raspberry $raspberry): Raspberry
@@ -27,6 +33,14 @@ class RaspberryController extends Controller
   public function update(Request $request, Raspberry $raspberry): Raspberry
   {
     $raspberry->update($request->all());
+    if ($request->display_id) {
+      $display = Display::findOrFail($request->display_id);
+      $display->raspberry()->save($raspberry);
+    } else {
+      $raspberry->display_id = null;
+      $raspberry->save();
+    }
+
     return $raspberry;
   }
 

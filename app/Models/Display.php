@@ -37,4 +37,9 @@ class Display extends Model
   use HasFactory;
 
   protected $fillable = ['name', 'size', 'width', 'height', 'touch', 'observation'];
+
+  public function raspberry()
+  {
+    return $this->hasOne(Raspberry::class);
+  }
 }

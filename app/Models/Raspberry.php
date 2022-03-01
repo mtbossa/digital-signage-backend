@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * App\Models\Raspberry
@@ -25,4 +26,10 @@ class Raspberry extends Model
   use HasFactory;
 
   protected $fillable = ['mac_address', 'short_name', 'serial_number', 'last_boot', 'observation'];
+
+  public function display(): BelongsTo
+  {
+    return $this->belongsTo(Display::class);
+  }
+
 }
