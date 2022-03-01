@@ -2,27 +2,19 @@
 
 namespace Tests\Feature\Raspberry;
 
-use App\Models\Raspberry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Feature\Raspberry\Traits\RaspberryTestsTrait;
 use Tests\TestCase;
 
 class RaspberryTest extends TestCase
 {
-  use RefreshDatabase;
-
-  private Raspberry $raspberry;
+  use RefreshDatabase, RaspberryTestsTrait;
 
   public function setUp(): void
   {
     parent::setUp();
 
     $this->raspberry = $this->_createRaspberry();
-  }
-
-  private function _createRaspberry(array $data = null): Raspberry
-  {
-    Raspberry::factory()->create($data);
-    return Raspberry::first();
   }
 
   /** @test */
@@ -35,11 +27,6 @@ class RaspberryTest extends TestCase
     $this->assertDatabaseHas('raspberries', $raspberry_data);
 
     $response->assertCreated()->assertJson($raspberry_data);
-  }
-
-  private function _makeRaspberry(array $data = null): Raspberry
-  {
-    return Raspberry::factory()->make($data);
   }
 
   /** @test */
