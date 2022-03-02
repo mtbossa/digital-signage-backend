@@ -27,7 +27,7 @@ class RaspberryRelationshipsTest extends TestCase
   }
 
   /** @test */
-  public function update_raspberry_display()
+  public function update_raspberrys_display()
   {
     Display::factory(2)->create();
     $this->raspberry = $this->_createRaspberry(['display_id' => Display::first()->id]);
