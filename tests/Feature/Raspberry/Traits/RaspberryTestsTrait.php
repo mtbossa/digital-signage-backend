@@ -15,7 +15,6 @@ trait RaspberryTestsTrait
 
   private function _createRaspberry(array $data = null): Raspberry
   {
-    Raspberry::factory()->create($data);
-    return Raspberry::first();
+    return Raspberry::factory()->create($data);
   }
 }
