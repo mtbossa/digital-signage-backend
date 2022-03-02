@@ -20,7 +20,7 @@ class DisplayConstraintsTest extends TestCase
   /** @test */
   public function touch_is_false_by_default()
   {
-    Display::factory()->create();
+    Display::create(['name' => 'oi', 'size' => 250, 'width' => 250, 'height' => 250]);
     $this->assertDatabaseHas('displays', ['touch' => 'false']);
   }
 }

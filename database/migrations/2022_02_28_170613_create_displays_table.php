@@ -18,7 +18,7 @@ return new class extends Migration {
       $table->unsignedDecimal('size');
       $table->unsignedInteger('width');
       $table->unsignedInteger('height');
-      $table->boolean('touch');
+      $table->boolean('touch')->default(false);
       $table->text('observation')->nullable();
       $table->timestamps();
     });
