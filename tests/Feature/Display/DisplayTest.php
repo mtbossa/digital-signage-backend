@@ -4,25 +4,18 @@ namespace Tests\Feature\Display;
 
 use App\Models\Display;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Feature\Display\Traits\DisplayTestsTrait;
 use Tests\TestCase;
 
 class DisplayTest extends TestCase
 {
-  use RefreshDatabase;
-
-  private Display $display;
+  use RefreshDatabase, DisplayTestsTrait;
 
   public function setUp(): void
   {
     parent::setUp();
 
     $this->display = $this->_createDisplay();
-  }
-
-  private function _createDisplay(array $data = null): Display
-  {
-    Display::factory()->create($data);
-    return Display::first();
   }
 
   /** @test */
@@ -38,11 +31,6 @@ class DisplayTest extends TestCase
     $response->assertCreated()->assertJson($display->toArray());
   }
 
-  private function _makeDisplay(array $data = null): Display
-  {
-    return Display::factory()->make($data);
-  }
-
   /** @test */
   public function update_display()
   {
@@ -50,7 +38,8 @@ class DisplayTest extends TestCase
 
     $response = $this->putJson(route('displays.update', $this->display->id), $update_values);
 
-    $this->assertDatabaseHas('displays', $response->json());
+
+    $this->assertDatabaseHas('displays', $update_values);
     $response->assertJson($update_values)->assertOk();
   }
 
