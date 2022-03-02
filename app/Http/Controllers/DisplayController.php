@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Display\StoreDisplayAction;
+use App\Actions\Display\UpdateDisplayAction;
 use App\Models\Display;
-use App\Models\Raspberry;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
@@ -15,16 +16,9 @@ class DisplayController extends Controller
     return Display::all();
   }
 
-  public function store(Request $request): Display
+  public function store(Request $request, StoreDisplayAction $action): Display
   {
-    $display = Display::create($request->except(['raspberry_id']));
-
-    if ($request->raspberry_id) {
-      $raspberry = Raspberry::findOrFail($request->raspberry_id);
-      $display->raspberry()->save($raspberry);
-    }
-
-    return $display;
+    return $action->handle($request);
   }
 
   public function show(Display $display): Display
@@ -32,29 +26,9 @@ class DisplayController extends Controller
     return $display;
   }
 
-  public function update(Request $request, Display $display): Display
+  public function update(Request $request, Display $display, UpdateDisplayAction $action): Display
   {
-    $display->update($request->all());
-
-    if ($request->raspberry_id) {
-      $current_raspberry = $display->raspberry;
-
-      if ($current_raspberry->id !== $request->raspberry_id) {
-        $current_raspberry->display_id = null;
-        $current_raspberry->save();
-
-        $raspberry = Raspberry::findOrFail($request->raspberry_id);
-        $display->raspberry()->save($raspberry);
-      }
-    } else {
-      if ($display->raspberry) {
-        $current_raspberry = $display->raspberry;
-        $current_raspberry->display_id = null;
-        $current_raspberry->save();
-      }
-    }
-
-    return $display;
+    return $action->handle($request, $display);
   }
 
   public function destroy(Display $display): ?bool
