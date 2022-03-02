@@ -24,6 +24,10 @@ class StoreDisplayRequest extends FormRequest
   public function rules()
   {
     return [
+      'name' => 'required|max:100',
+      'size' => 'required|numeric|min:1|max:1000',
+      'width' => 'required|numeric|min:1|max:20000',
+      'height' => 'required|numeric|min:1|max:20000',
       'touch' => 'boolean'
     ];
   }
