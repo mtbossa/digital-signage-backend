@@ -22,23 +22,6 @@ class DisplayValidationTest extends TestCase
     $this->assertDatabaseHas('displays', ['touch' => false]);
   }
 
-  /** @test */
-  public function touch_must_be_boolean()
-  {
-    $display_data = $this->_makeDisplay()->toArray();
-    // Number
-    $display_data['touch'] = 2;
-    $response = $this->postJson(route('displays.store'), $display_data);
-    $this->assertDatabaseCount('displays', 0);
-    $response->assertUnprocessable()->assertJsonValidationErrorFor('touch');
-
-    // String
-    $display_data['touch'] = 'false';
-    $response = $this->postJson(route('displays.store'), $display_data);
-    $this->assertDatabaseCount('displays', 0);
-    $response->assertUnprocessable()->assertJsonValidationErrorFor('touch');
-  }
-
   /**
    * @test
    * @dataProvider invalidDisplays
