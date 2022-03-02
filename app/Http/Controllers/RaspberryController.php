@@ -20,7 +20,7 @@ class RaspberryController extends Controller
     $raspberry = Raspberry::create($request->except(['display_id']));
     if ($request->display_id) {
       $display = Display::findOrFail($request->display_id);
-      $display->raspberry()->save($raspberry);
+      $raspberry->display()->associate($display)->save();
     }
     return $raspberry;
   }
