@@ -32,11 +32,7 @@ class RaspberryController extends Controller
 
   public function update(Request $request, Raspberry $raspberry): Raspberry
   {
-    $test = $request->all();
-
     $raspberry->update($request->all());
-    $raspberry->update(['teste' => 'teste']);
-
 
     if ($request->display_id) {
       $display = Display::findOrFail($request->display_id);
