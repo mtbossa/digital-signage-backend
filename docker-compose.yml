@@ -17,6 +17,7 @@ services:
             LARAVEL_SAIL: 1
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
+            PHP_IDE_CONFIG: serverName=Docker
         volumes:
             - '.:/var/www/html'
         networks:
@@ -37,7 +38,7 @@ services:
         networks:
             - sail
         healthcheck:
-            test: ["CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}"]
+            test: [ "CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}" ]
             retries: 3
             timeout: 5s
 networks:
