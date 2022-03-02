@@ -56,18 +56,21 @@ class DisplayValidationTest extends TestCase
   {
     $display_data = ['name' => 'teste', 'size' => 42, 'width' => 1920, 'height' => 1080, 'touch' => true];
     return [
-      [
-        [...$display_data, 'touch' => 'false'], // string
-        ['touch']
-      ],
-      [
-        [...$display_data, 'touch' => 2], // number != 0/1
-        ['touch']
-      ],
-      [
-        [...$display_data, 'touch' => -1], // number != 0/1
-        ['touch']
-      ],
+      'touch as string' =>
+        [
+          [...$display_data, 'touch' => 'false'], // string
+          ['touch']
+        ],
+      'touch greater than 1' =>
+        [
+          [...$display_data, 'touch' => 2], // number != 0/1
+          ['touch']
+        ],
+      'touch lower than 0' =>
+        [
+          [...$display_data, 'touch' => -1], // number != 0/1
+          ['touch']
+        ],
     ];
   }
 
