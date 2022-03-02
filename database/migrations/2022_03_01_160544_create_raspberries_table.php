@@ -20,6 +20,7 @@ return new class extends Migration {
       $table->dateTime('last_boot')->nullable();
       $table->text('observation')->nullable();
       $table->foreignId('display_id')
+        ->unique()
         ->nullable()
         ->constrained()
         ->cascadeOnUpdate()
