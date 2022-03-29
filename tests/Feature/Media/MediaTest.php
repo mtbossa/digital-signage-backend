@@ -64,7 +64,7 @@ class MediaTest extends TestCase
   }
 
   /** @test */
-  public function update_media()
+  public function update_media_description()
   {
     $update_values = ['description' => 'Alterando a descrição'];
 
