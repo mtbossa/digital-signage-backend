@@ -7,5 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Media extends Model
 {
-    use HasFactory;
+  use HasFactory;
+
+  protected $table = 'medias';
+
+  protected $fillable = ['description', 'type', 'filename', 'extension', 'path', 'size_kb'];
 }

@@ -3,36 +3,70 @@
 namespace Tests\Feature\Media;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\Feature\Media\Traits\MediaTestsTrait;
 use Tests\TestCase;
 
 class MediaTest extends TestCase
 {
-  use RefreshDatabase, MediaTestsTrait;
+  use RefreshDatabase, MediaTestsTrait, WithFaker;
 
   public function setUp(): void
   {
     parent::setUp();
 
+    $this->defaultLocation = [
+      'image' => 'intus/caxias/images',
+      'video' => 'intus/caxias/videos'
+    ];
+
     $this->media = $this->_createMedia();
   }
 
   /** @test */
-  public function create_media()
+  public function create_image_media_and_store_file_under_images_folder()
   {
-    $media_data = $this->_makeMedia()->toArray();
+    Storage::fake('local');
 
-    $response = $this->postJson(route('medias.store'), $media_data);
+    $description = 'Imagem de teste';
 
-    $this->assertDatabaseHas('medias', $media_data);
+    $file = UploadedFile::fake()->image('image_test.jpg');
+    $response = $this->postJson(route('medias.store'), ['description' => $description, 'file' => $file]);
 
-    $response->assertCreated()->assertJson($media_data);
+    $response_data = $response->json();
+
+    Storage::disk('local')->assertExists($this->defaultLocation['image'].'/'.$response_data['filename']);
+
+    $this->assertDatabaseHas('medias', $response_data);
+
+    $response->assertCreated()->assertJson($response_data);
+  }
+
+  /** @test */
+  public function create_video_media_and_store_file_under_videos_folder()
+  {
+    Storage::fake('local');
+
+    $description = 'Video de teste';
+
+    $file = UploadedFile::fake()->create('image_test.mp4', 50000, 'video/mp4');
+    $response = $this->postJson(route('medias.store'), ['description' => $description, 'file' => $file]);
+
+    $response_data = $response->json();
+
+    Storage::disk('local')->assertExists($this->defaultLocation['video'].'/'.$response_data['filename']);
+
+    $this->assertDatabaseHas('medias', $response_data);
+
+    $response->assertCreated()->assertJson($response_data);
   }
 
   /** @test */
   public function update_media()
   {
-    $update_values = $this->_makeMedia()->toArray();
+    $update_values = ['description' => 'Alterando a descrição'];
 
     $response = $this->putJson(route('medias.update', $this->media->id), $update_values);
 
