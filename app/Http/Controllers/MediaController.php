@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Media\StoreMediaAction;
+use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -34,16 +35,10 @@ class MediaController extends Controller
     //
   }
 
-  /**
-   * Update the specified resource in storage.
-   *
-   * @param  Request  $request
-   * @param  int  $id
-   * @return Response
-   */
-  public function update(Request $request, $id)
+  public function update(Request $request, Media $media): Media
   {
-    //
+    $media->update($request->all());
+    return $media;
   }
 
   /**

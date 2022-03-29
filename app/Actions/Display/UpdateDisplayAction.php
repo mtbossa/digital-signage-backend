@@ -16,10 +16,11 @@ class UpdateDisplayAction
       $current_raspberry = $display->raspberry;
 
       if ($current_raspberry->id !== $request->raspberry_id) {
+        $raspberry = Raspberry::findOrFail($request->raspberry_id);
+
         $current_raspberry->display_id = null;
         $current_raspberry->save();
 
-        $raspberry = Raspberry::findOrFail($request->raspberry_id);
         $display->raspberry()->save($raspberry);
       }
     } else {
