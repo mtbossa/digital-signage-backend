@@ -16,6 +16,10 @@ class MediaController extends Controller
 
   public function store(Request $request, StoreMediaAction $action): Media
   {
+    $request->validate([
+      'description' => ['required', 'string', 'max:50'],
+      'file' => ['required', 'file', 'max:150000', 'mimes:png,jpg,jpeg,mp4,avi']
+    ]);
     return $action->handle($request);
   }
 
