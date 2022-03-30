@@ -15,8 +15,11 @@ return new class extends Migration {
     Schema::create('posts', function (Blueprint $table) {
       $table->id();
       $table->string('description', 100);
-      $table->date('start_date');
-      $table->date('end_date');
+
+      // nullable because could have a recurrence, so it will now when to show by recurrence
+      $table->date('start_date')->nullable();
+      $table->date('end_date')->nullable();
+
       $table->time('start_time');
       $table->time('end_time');
       $table->mediumInteger('expose_time');
