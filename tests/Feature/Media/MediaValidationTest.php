@@ -7,10 +7,18 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Tests\Feature\Media\Traits\MediaTestsTrait;
 use Tests\TestCase;
+use Tests\Traits\AuthUserTrait;
 
 class MediaValidationTest extends TestCase
 {
-  use RefreshDatabase, MediaTestsTrait;
+  use RefreshDatabase, MediaTestsTrait, AuthUserTrait;
+
+  public function setUp(): void
+  {
+    parent::setUp();
+
+    $this->_authUser();
+  }
 
   /**
    * @test
@@ -49,7 +57,7 @@ class MediaValidationTest extends TestCase
       ],
       'file as bmp' => [
         [...$media_data, 'file' => UploadedFile::fake()->create('image.bmp')], ['file']
-      ],   
+      ],
       'file as mob' => [
         [...$media_data, 'file' => UploadedFile::fake()->create('image.mob')], ['file']
       ],

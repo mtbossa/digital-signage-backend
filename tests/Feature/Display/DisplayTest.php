@@ -6,15 +6,17 @@ use App\Models\Display;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Display\Traits\DisplayTestsTrait;
 use Tests\TestCase;
+use Tests\Traits\AuthUserTrait;
 
 class DisplayTest extends TestCase
 {
-  use RefreshDatabase, DisplayTestsTrait;
+  use RefreshDatabase, DisplayTestsTrait, AuthUserTrait;
 
   public function setUp(): void
   {
     parent::setUp();
 
+    $this->_authUser();
     $this->display = $this->_createDisplay();
   }
 

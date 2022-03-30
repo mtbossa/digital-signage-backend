@@ -7,11 +7,19 @@ use App\Models\Raspberry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Display\Traits\DisplayTestsTrait;
 use Tests\TestCase;
+use Tests\Traits\AuthUserTrait;
 
 class DisplayRelationshipsTest extends TestCase
 {
-  use RefreshDatabase, DisplayTestsTrait;
+  use RefreshDatabase, DisplayTestsTrait, AuthUserTrait;
 
+  public function setUp(): void
+  {
+    parent::setUp();
+
+    $this->_authUser();
+  }
+  
   /** @test */
   public function create_display_and_relation_to_raspberry()
   {

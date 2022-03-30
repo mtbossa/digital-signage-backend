@@ -7,10 +7,18 @@ use App\Models\Raspberry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Raspberry\Traits\RaspberryTestsTrait;
 use Tests\TestCase;
+use Tests\Traits\AuthUserTrait;
 
 class RaspberryRelationshipsTest extends TestCase
 {
-  use RefreshDatabase, RaspberryTestsTrait;
+  use RefreshDatabase, RaspberryTestsTrait, AuthUserTrait;
+
+  public function setUp(): void
+  {
+    parent::setUp();
+
+    $this->_authUser();
+  }
 
   /** @test */
   public function create_raspberry_with_display()

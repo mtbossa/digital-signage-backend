@@ -5,15 +5,17 @@ namespace Tests\Feature\recurrence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Recurrence\Traits\RecurrenceTestsTrait;
 use Tests\TestCase;
+use Tests\Traits\AuthUserTrait;
 
 class RecurrenceTest extends TestCase
 {
-  use RefreshDatabase, RecurrenceTestsTrait;
+  use RefreshDatabase, RecurrenceTestsTrait, AuthUserTrait;
 
   public function setUp(): void
   {
     parent::setUp();
 
+    $this->_authUser();
     $this->recurrence = $this->_createRecurrence();
   }
 

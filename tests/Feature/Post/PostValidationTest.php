@@ -7,10 +7,18 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\Feature\Post\Traits\PostTestsTrait;
 use Tests\TestCase;
+use Tests\Traits\AuthUserTrait;
 
 class PostValidationTest extends TestCase
 {
-  use RefreshDatabase, PostTestsTrait;
+  use RefreshDatabase, PostTestsTrait, AuthUserTrait;
+
+  public function setUp(): void
+  {
+    parent::setUp();
+
+    $this->_authUser();
+  }
 
   /**
    * @test

@@ -6,11 +6,19 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\Feature\Display\Traits\DisplayTestsTrait;
 use Tests\TestCase;
+use Tests\Traits\AuthUserTrait;
 
 class DisplayValidationTest extends TestCase
 {
-  use RefreshDatabase, DisplayTestsTrait;
+  use RefreshDatabase, DisplayTestsTrait, AuthUserTrait;
 
+  public function setUp(): void
+  {
+    parent::setUp();
+
+    $this->_authUser();
+  }
+  
   /** @test */
   public function touch_if_false_by_default()
   {

@@ -5,15 +5,17 @@ namespace Tests\Feature\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Post\Traits\PostTestsTrait;
 use Tests\TestCase;
+use Tests\Traits\AuthUserTrait;
 
 class PostTest extends TestCase
 {
-  use RefreshDatabase, PostTestsTrait;
+  use RefreshDatabase, PostTestsTrait, AuthUserTrait;
 
   public function setUp(): void
   {
     parent::setUp();
 
+    $this->_authUser();
     $this->post = $this->_createPost();
   }
 

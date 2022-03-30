@@ -19,11 +19,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::apiResources([
-  'displays' => DisplayController::class, 'raspberries' => RaspberryController::class, 'posts' => PostController::class,
-  'medias' => MediaController::class, 'recurrences' => RecurrenceController::class
-]);
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-  return $request->user();
+Route::middleware('auth:sanctum')->group(function () {
+  
+  Route::get('/user', function (Request $request) {
+    return $request->user();
+  });
+
+  Route::apiResources([
+    'displays' => DisplayController::class, 'raspberries' => RaspberryController::class,
+    'posts' => PostController::class,
+    'medias' => MediaController::class, 'recurrences' => RecurrenceController::class
+  ]);
 });
+

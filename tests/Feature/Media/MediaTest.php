@@ -8,15 +8,17 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\Feature\Media\Traits\MediaTestsTrait;
 use Tests\TestCase;
+use Tests\Traits\AuthUserTrait;
 
 class MediaTest extends TestCase
 {
-  use RefreshDatabase, MediaTestsTrait, WithFaker;
+  use RefreshDatabase, MediaTestsTrait, WithFaker, AuthUserTrait;
 
   public function setUp(): void
   {
     parent::setUp();
 
+    $this->_authUser();
     $this->defaultLocation = [
       'image' => 'intus/caxias/images',
       'video' => 'intus/caxias/videos'
