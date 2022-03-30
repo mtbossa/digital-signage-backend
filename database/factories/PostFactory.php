@@ -28,6 +28,7 @@ class PostFactory extends Factory
       59));
 
     return [
+      'description' => $this->faker->text(100),
       'start_date' => $start_date->format('Y-m-d'),
       'end_date' => $end_date->format('Y-m-d'),
       'start_time' => $start_time->format('H:i:s'),
