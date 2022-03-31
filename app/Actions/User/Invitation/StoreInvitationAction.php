@@ -3,10 +3,12 @@
 
 namespace App\Actions\User\Invitation;
 
+use App\Mail\UserInvitation;
 use App\Models\Invitation;
 use Auth;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class StoreInvitationAction
 {
@@ -14,10 +16,12 @@ class StoreInvitationAction
 
   public function handle(Request $request): Invitation
   {
-    $email = $request->email;
-    return Invitation::create([
-      'email' => $email, 'inviter' => Auth::user()->id, 'token' => $this->generateInvitationToken($email)
+    $invited_email = $request->email;
+    $invitation = Invitation::create([
+      'email' => $invited_email, 'inviter' => Auth::user()->id, 'token' => $this->generateInvitationToken($invited_email)
     ]);
+    Mail::to($invited_email)->send(new UserInvitation($invitation));
+    return $invitation;
   }
 
   public function generateInvitationToken(string $email): string

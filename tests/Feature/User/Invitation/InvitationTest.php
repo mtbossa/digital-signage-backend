@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\User\Invitation;
 
+use App\Mail\UserInvitation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Mail;
@@ -27,6 +28,8 @@ class InvitationTest extends TestCase
     $email_data = ['email' => $this->faker->email()];
     $response = $this->postJson(route('invitations.store'), $email_data)->assertCreated()->assertJson($email_data);
     $this->assertDatabaseHas('invitations', $response->json());
+    Mail::assertQueued(UserInvitation::class);
   }
+  
 
 }
