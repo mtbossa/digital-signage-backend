@@ -39,9 +39,12 @@ class InvitationTest extends TestCase
     $inviter = User::factory()->create();
     $invitation = Invitation::factory()->unaccepted()->create(['inviter' => $inviter]);
 
-    $user_data = ['name' => $this->faker()->name, 'password' => 'A@oitudob3m', 'password_confirmation' => 'A@oitudob3m'];
+    $user_data = [
+      'name' => $this->faker()->name, 'password' => 'A@oitudob3m', 'password_confirmation' => 'A@oitudob3m'
+    ];
 
-    $this->patchJson(route('invitations.update', $invitation->token), $user_data)->assertCreated()->assertJson(['name' => $user_data['name'], 'email' => $invitation->email]);
+    $this->patchJson(route('invitations.update', $invitation->token),
+      $user_data)->assertCreated()->assertJson(['name' => $user_data['name'], 'email' => $invitation->email]);
 
     $this->assertDatabaseHas('users', ['name' => $user_data['name'], 'email' => $invitation->email]);
     $this->assertDatabaseHas('invitations', ['registered_at' => Carbon::now()->format('Y-m-d H:i:s')]);
