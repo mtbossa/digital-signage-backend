@@ -18,14 +18,14 @@ class StoreInvitationAction
   {
     $invited_email = $request->email;
     $invitation = Invitation::create([
-      'email' => $invited_email, 'inviter' => Auth::user()->id, 'token' => $this->generateInvitationToken($invited_email)
+      'email' => $invited_email, 'inviter' => Auth::user()->id, 'token' => $this->_generateInvitationToken($invited_email)
     ]);
     Mail::to($invited_email)->send(new UserInvitation($invitation));
     return $invitation;
   }
 
-  public function generateInvitationToken(string $email): string
+  private function _generateInvitationToken(string $email): string
   {
-    return substr(md5(rand(0, 9).$email.time()), 0, 32);
+    return substr(md5(rand(0, 9) . $email . time()), 0, 32);
   }
 }
