@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\User\Invitation\StoreInvitationAction;
+use App\Actions\Fortify\CreateNewUser;
 use App\Models\Invitation;
 use App\Models\User;
 use Carbon\Carbon;
@@ -28,10 +28,9 @@ class InvitationController extends Controller
    * @param  Request  $request
    * @return Response
    */
-  public function store(Request $request, StoreInvitationAction $action)
+  public function store(Request $request, CreateNewUser $action)
   {
-    $request->validate(['email' => ['required', 'email', 'unique:invitations']]);
-    return $action->handle($request);
+    return $action->create($request->all());
   }
 
   /**
@@ -58,7 +57,9 @@ class InvitationController extends Controller
     $invitation->registered_at = Carbon::now()->format('Y-m-d H:i:s');
     $invitation->save();
 
-    return User::create(['email' => $invitation->email, 'name' => $request->name, 'password' => Hash::make($request->password)]);
+    return User::create([
+      'email' => $invitation->email, 'name' => $request->name, 'password' => Hash::make($request->password)
+    ]);
   }
 
   /**

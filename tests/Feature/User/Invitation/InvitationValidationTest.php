@@ -4,6 +4,7 @@ namespace Tests\Feature\User\Invitation;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Str;
 use Tests\Feature\User\Invitation\Traits\InvitationTestsTrait;
 use Tests\TestCase;
 use Tests\Traits\AuthUserTrait;
@@ -47,8 +48,16 @@ class InvitationValidationTest extends TestCase
   public function invalidInvitations(): array
   {
     return [
-      'email can\'t be null' => [['email' => null], ['email']],
+      'name as null' => [['name' => null], ['name']],
+      'name as number' => [['name' => 1], ['name']],
+      'name greater than 255' => [['name' => Str::random(256)], ['name']],
+      'email as null' => [['email' => null], ['email']],
       'email as number' => [['email' => 1], ['email']],
+      'email as not email' => [['email' => Str::random(20)], ['email']],
+      'email greater than 255' => [['email' => Str::random(255).'@gmail.com'], ['email']],
+      'password as null' => [['password' => null], ['password']],
+      'password as number' => [['password' => 1], ['password']],
+      'password lower then 8 char' => [['password' => 'A1boi'], ['password']],
     ];
   }
 
