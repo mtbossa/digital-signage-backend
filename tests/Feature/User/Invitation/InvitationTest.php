@@ -36,6 +36,9 @@ class InvitationTest extends TestCase
   /** @test */
   public function invited_user_should_be_able_to_accept_invitation_and_have_his_user_created()
   {
+    $test_date = Carbon::now();
+    Carbon::setTestNow($test_date);
+    
     $inviter = User::factory()->create();
     $invitation = Invitation::factory()->unaccepted()->create(['inviter' => $inviter]);
 
