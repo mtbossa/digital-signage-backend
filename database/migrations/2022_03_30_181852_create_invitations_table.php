@@ -12,7 +12,7 @@ class CreateInvitationsTable extends Migration
     Schema::create('invitations', function (Blueprint $table) {
       $table->id();
       $table->string('email', 255);
-      $table->string('token', 255);
+      $table->string('token', 32);
       $table->dateTime('registered_at')->nullable();
       $table->foreignIdFor(User::class, 'inviter'); // User how send the invitation email
       $table->timestamps();
