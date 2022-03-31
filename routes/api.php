@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DisplayController;
+use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RaspberryController;
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::middleware('auth:sanctum')->group(function () {
-  
+
   Route::get('/user', function (Request $request) {
     return $request->user();
   });
@@ -29,7 +30,8 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::apiResources([
     'displays' => DisplayController::class, 'raspberries' => RaspberryController::class,
     'posts' => PostController::class,
-    'medias' => MediaController::class, 'recurrences' => RecurrenceController::class
+    'medias' => MediaController::class, 'recurrences' => RecurrenceController::class,
+    'invitations' => InvitationController::class
   ]);
 });
 
