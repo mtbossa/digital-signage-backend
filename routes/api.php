@@ -31,7 +31,10 @@ Route::middleware('auth:sanctum')->group(function () {
     'displays' => DisplayController::class, 'raspberries' => RaspberryController::class,
     'posts' => PostController::class,
     'medias' => MediaController::class, 'recurrences' => RecurrenceController::class,
-    'invitations' => InvitationController::class
   ]);
+
+  Route::apiResource('invitations', InvitationController::class, ['except' => ['update']]);
 });
+
+Route::patch('invitations/{token}', [InvitationController::class, 'update'])->name('invitations.update');
 

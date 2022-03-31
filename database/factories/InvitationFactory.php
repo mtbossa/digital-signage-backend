@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Invitation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,17 +19,14 @@ class InvitationFactory extends Factory
   {
     return [
       'email' => $this->faker->email,
-      'token' => $this->faker->uuid(),
-      'registered_at' => $this->faker->dateTimeBetween('-60 days', 'now'),
     ];
   }
 
-  public function unregistered()
+  public function unaccepted()
   {
     return $this->state(function (array $attributes) {
       return [
-        'token' => null,
-        'registered_at' => null,
+        'token' => Invitation::generateInvitationToken($attributes['email']),
       ];
     });
   }
