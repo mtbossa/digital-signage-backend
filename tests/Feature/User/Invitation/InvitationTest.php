@@ -36,10 +36,6 @@ class InvitationTest extends TestCase
   /** @test */
   public function invited_user_should_be_able_to_accept_invitation_and_have_his_user_created()
   {
-    $this->withoutExceptionHandling();
-    $knownDate = Carbon::create(2022, 5, 21, 12);
-    Carbon::setTestNow($knownDate);
-
     $inviter = User::factory()->create();
     $invitation = Invitation::factory()->unaccepted()->create(['inviter' => $inviter]);
 
@@ -48,7 +44,7 @@ class InvitationTest extends TestCase
     $this->patchJson(route('invitations.update', $invitation->token), $user_data)->assertCreated()->assertJson(['name' => $user_data['name'], 'email' => $invitation->email]);
 
     $this->assertDatabaseHas('users', ['name' => $user_data['name'], 'email' => $invitation->email]);
-    $this->assertDatabaseHas('invitations', ['registered_at' => $knownDate->format('Y-m-d H:i:s')]);
+    $this->assertDatabaseHas('invitations', ['registered_at' => Carbon::now()->format('Y-m-d H:i:s')]);
   }
 
 }
