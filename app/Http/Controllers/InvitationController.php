@@ -30,6 +30,7 @@ class InvitationController extends Controller
    */
   public function store(Request $request, StoreInvitationAction $action)
   {
+    $request->validate(['email' => ['required', 'email', 'unique:invitations']]);
     return $action->handle($request);
   }
 
