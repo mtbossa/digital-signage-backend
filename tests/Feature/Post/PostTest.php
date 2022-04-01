@@ -16,13 +16,14 @@ class PostTest extends TestCase
     parent::setUp();
 
     $this->_authUser();
-    $this->post = $this->_createPost();
+    $this->media = $this->_createMedia();
+    $this->post = $this->_createPost(['media_id' => $this->media->id]);
   }
 
   /** @test */
   public function create_post()
   {
-    $post_data = $this->_makePost()->toArray();
+    $post_data = $this->_makePost(['media_id' => $this->media->id])->toArray();
 
     $response = $this->postJson(route('posts.store'), $post_data);
 
@@ -60,7 +61,7 @@ class PostTest extends TestCase
   /** @test */
   public function fetch_all_posts()
   {
-    $this->_createPost();
+    $this->_createPost(['media_id' => $this->media->id]);
 
     $this->getJson(route('posts.index'))->assertOk()->assertJsonCount(2)->assertJsonFragment($this->post->toArray());
   }

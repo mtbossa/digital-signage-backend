@@ -24,10 +24,9 @@ return new class extends Migration {
       $table->time('end_time');
       $table->mediumInteger('expose_time');
       $table->foreignId('media_id')
-        ->nullable()
         ->constrained('medias', 'id')
         ->cascadeOnUpdate()
-        ->nullOnDelete();
+        ->cascadeOnDelete();
       $table->timestamps();
     });
   }
