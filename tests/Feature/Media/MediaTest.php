@@ -7,8 +7,8 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\Feature\Media\Traits\MediaTestsTrait;
+use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
-use Tests\Traits\AuthUserTrait;
 
 class MediaTest extends TestCase
 {

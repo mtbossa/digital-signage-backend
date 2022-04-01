@@ -5,8 +5,8 @@ namespace Tests\Feature\Display;
 use App\Models\Display;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Display\Traits\DisplayTestsTrait;
+use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
-use Tests\Traits\AuthUserTrait;
 
 class DisplayTest extends TestCase
 {

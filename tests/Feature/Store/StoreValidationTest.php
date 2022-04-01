@@ -6,8 +6,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
 use Tests\Feature\Store\Traits\StoreTestsTrait;
+use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
-use Tests\Traits\AuthUserTrait;
 
 class StoreValidationTest extends TestCase
 {

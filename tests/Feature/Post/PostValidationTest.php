@@ -6,8 +6,8 @@ use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\Feature\Post\Traits\PostTestsTrait;
+use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
-use Tests\Traits\AuthUserTrait;
 
 class PostValidationTest extends TestCase
 {

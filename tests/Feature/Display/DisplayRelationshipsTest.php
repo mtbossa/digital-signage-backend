@@ -6,8 +6,8 @@ use App\Models\Display;
 use App\Models\Raspberry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Display\Traits\DisplayTestsTrait;
+use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
-use Tests\Traits\AuthUserTrait;
 
 class DisplayRelationshipsTest extends TestCase
 {

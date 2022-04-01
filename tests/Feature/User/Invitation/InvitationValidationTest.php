@@ -5,9 +5,9 @@ namespace Tests\Feature\User\Invitation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
+use Tests\Feature\Traits\AuthUserTrait;
 use Tests\Feature\User\Invitation\Traits\InvitationTestsTrait;
 use Tests\TestCase;
-use Tests\Traits\AuthUserTrait;
 
 class InvitationValidationTest extends TestCase
 {

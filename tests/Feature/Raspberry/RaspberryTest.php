@@ -4,8 +4,8 @@ namespace Tests\Feature\Raspberry;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Raspberry\Traits\RaspberryTestsTrait;
+use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
-use Tests\Traits\AuthUserTrait;
 
 class RaspberryTest extends TestCase
 {

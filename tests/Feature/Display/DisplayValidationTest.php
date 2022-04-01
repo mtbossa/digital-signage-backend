@@ -5,8 +5,8 @@ namespace Tests\Feature\Display;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\Feature\Display\Traits\DisplayTestsTrait;
+use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
-use Tests\Traits\AuthUserTrait;
 
 class DisplayValidationTest extends TestCase
 {

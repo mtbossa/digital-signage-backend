@@ -4,8 +4,8 @@ namespace Tests\Feature\recurrence;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Recurrence\Traits\RecurrenceTestsTrait;
+use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
-use Tests\Traits\AuthUserTrait;
 
 class RecurrenceTest extends TestCase
 {

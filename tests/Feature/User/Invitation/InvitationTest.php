@@ -6,9 +6,9 @@ use App\Mail\UserInvitation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Mail;
+use Tests\Feature\Traits\AuthUserTrait;
 use Tests\Feature\User\Invitation\Traits\InvitationTestsTrait;
 use Tests\TestCase;
-use Tests\Traits\AuthUserTrait;
 
 class InvitationTest extends TestCase
 {

@@ -7,9 +7,9 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
+use Tests\Feature\Traits\AuthUserTrait;
 use Tests\Feature\User\Traits\UserTestsTrait;
 use Tests\TestCase;
-use Tests\Traits\AuthUserTrait;
 
 class UserValidationTest extends TestCase
 {
