@@ -21,6 +21,17 @@ class RaspberryRelationshipsTest extends TestCase
   }
 
   /** @test */
+  public function a_raspberry_may_belong_to_a_display()
+  {
+    $display = Display::factory()->create();
+    $raspberry = Raspberry::factory()->create(['display_id' => $display->id]);
+
+    $this->assertInstanceOf(Display::class, $raspberry->display);
+    $this->assertEquals(1, $raspberry->display->count());
+    $this->assertDatabaseHas('raspberries', ['display_id' => $display->id]);
+  }
+
+  /** @test */
   public function create_raspberry_with_display()
   {
     $display = Display::factory()->create();
