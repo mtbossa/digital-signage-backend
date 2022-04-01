@@ -16,13 +16,18 @@ return new class extends Migration {
       $table->id();
       $table->string('description', 100);
 
-      // nullable because could have a recurrence, so it will now when to show by recurrence
+      // nullable because could have a recurrence, so it will know when to show by recurrence
       $table->date('start_date')->nullable();
       $table->date('end_date')->nullable();
 
       $table->time('start_time');
       $table->time('end_time');
       $table->mediumInteger('expose_time');
+      $table->foreignId('media_id')
+        ->nullable()
+        ->constrained('medias', 'id')
+        ->cascadeOnUpdate()
+        ->nullOnDelete();
       $table->timestamps();
     });
   }
