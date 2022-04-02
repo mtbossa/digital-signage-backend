@@ -17,13 +17,13 @@ class StorePostRequest extends FormRequest
 
       'description' => ['required', 'string', 'max:100'],
       'start_date' => [
-        'nullable', 'date_format:Y-m-d', 'required_with:end_date'
+        'nullable', 'date_format:Y-m-d', 'required_with:end_date',
       ],
-      'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:start_date', 'required_with:start_date'],
+      'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:start_date', 'required_with:start_date',],
       'start_time' => ['required', 'date_format:H:i:s'],
       'end_time' => ['required', 'date_format:H:i:s', 'after:start_time'],
-      'media_id' => ['required', 'integer']
-
+      'media_id' => ['required', 'integer'],
+      'recurrence_id' => ['prohibits:start_date,end_date'],
     ];
   }
 }

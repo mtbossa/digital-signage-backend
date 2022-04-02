@@ -73,6 +73,4 @@ class PostRelationshipsTest extends TestCase
     $this->assertNull($post->start_date);
     $this->assertNull($post->end_date);
   }
-
-
 }
