@@ -27,7 +27,9 @@ class PostValidationTest extends TestCase
    */
   public function end_date_can_be_same_as_start_date()
   {
-    $post_data = Post::factory()->make(['start_date' => '2022-01-01', 'end_date' => '2022-01-01', 'media_id' => $this->media->id])->toArray();
+    $post_data = Post::factory()->make([
+      'start_date' => '2022-01-01', 'end_date' => '2022-01-01', 'media_id' => $this->media->id
+    ])->toArray();
     $this->postJson(route('posts.store'), $post_data)
       ->assertCreated()->assertJson($post_data);
 
@@ -37,28 +39,46 @@ class PostValidationTest extends TestCase
   /**
    * @test
    */
-  public function start_date_and_end_date_can_be_null_if_both_are_null()
-  {
-    $post_data = Post::factory()->make(['start_date' => null, 'end_date' => null, 'media_id' => $this->media->id])->toArray();
-    $this->postJson(route('posts.store'), $post_data)
-      ->assertCreated()->assertJson($post_data);
-
-    $this->assertDatabaseCount('posts', 1);
-  }
-
-  /**
-   * @test
-   */
-  public function start_date_and_end_date_must_be_null_if_recurrence_id_is_passed()
+  public function start_date_and_end_date_must_not_be_passed_even_as_null_if_recurrence_id_is_present()
   {
     $recurrence = Recurrence::factory()->create();
-    $post_data = Post::factory()->make(['media_id' => $this->media->id, 'recurrence_id' => $recurrence->id])->toArray();
+    $post_data = Post::factory()->make([
+      'start_date' => null, 'end_date' => null, 'media_id' => $this->media->id, 'recurrence_id' => $recurrence->id
+    ])->toArray();
     $this->postJson(route('posts.store'), $post_data)
-      ->assertUnprocessable()->assertJsonValidationErrors(['start_date', 'end_date']);
+      ->assertUnprocessable()->assertJsonValidationErrors(['recurrence_id']);
 
     $this->assertDatabaseCount('posts', 0);
   }
 
+  /**
+   * @test
+   */
+  public function start_date_and_end_date_must_not_be_passed_if_recurrence_id_is_passed()
+  {
+    $recurrence = Recurrence::factory()->create();
+    $post_data = Post::factory()->make(['media_id' => $this->media->id, 'recurrence_id' => $recurrence->id])->toArray();
+    $this->postJson(route('posts.store'), $post_data)
+      ->assertUnprocessable()->assertJsonValidationErrors(['recurrence_id']);
+
+    $this->assertDatabaseCount('posts', 0);
+  }
+
+  /**
+   * @test
+   */
+  public function start_date_and_end_date_are_required_if_recurrence_id_is_not_passed()
+  {
+    $recurrence = Recurrence::factory()->create();
+    $post_data = Post::factory()->make([
+      'start_date' => null, 'end_date' => null, 'media_id' => $this->media->id
+    ])->toArray();
+    $response = $this->postJson(route('posts.store'), $post_data);
+    $response->json();
+
+    $this->assertDatabaseCount('posts', 0);
+  }
+  
   /**
    * @test
    * @dataProvider invalidPosts
