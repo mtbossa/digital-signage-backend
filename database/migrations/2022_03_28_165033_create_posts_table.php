@@ -23,10 +23,17 @@ return new class extends Migration {
       $table->time('start_time');
       $table->time('end_time');
       $table->mediumInteger('expose_time');
+
       $table->foreignId('media_id')
         ->constrained('medias', 'id')
         ->cascadeOnUpdate()
         ->cascadeOnDelete();
+      $table->foreignId('recurrence_id')
+        ->nullable()
+        ->constrained('recurrences', 'id')
+        ->cascadeOnUpdate()
+        ->cascadeOnDelete();
+
       $table->timestamps();
     });
   }

@@ -7,13 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Recurrence extends Model
 {
-    use HasFactory;
-    
-    protected $fillable = [
-      'description',
-      'isoweekday',
-      'day',
-      'month',
-      'year',
-    ];
+  use HasFactory;
+
+  protected $fillable = [
+    'description',
+    'isoweekday',
+    'day',
+    'month',
+    'year',
+  ];
+
+  public function posts()
+  {
+    return $this->hasMany(Post::class);
+  }
 }
