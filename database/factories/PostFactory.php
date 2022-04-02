@@ -36,4 +36,14 @@ class PostFactory extends Factory
       'expose_time' => $this->faker->numberBetween(1, 86400),
     ];
   }
+
+  public function recurrent()
+  {
+    return $this->state(function (array $attributes) {
+      return [
+        'start_date' => null,
+        'end_date' => null,
+      ];
+    });
+  }
 }

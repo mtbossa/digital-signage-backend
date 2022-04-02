@@ -53,13 +53,25 @@ class PostRelationshipsTest extends TestCase
     $media = Media::factory()->create();
     $recurrence = Recurrence::factory()->create();
     $post_without_recurrence = Post::factory()->create(['media_id' => $media->id]);
-    $post = Post::factory()->create(['media_id' => $media->id, 'recurrence_id' => $recurrence->id]);
+    $post = Post::factory()->recurrent()->create(['media_id' => $media->id, 'recurrence_id' => $recurrence->id]);
 
     $recurrence->delete();
 
     $this->assertModelMissing($recurrence);
     $this->assertModelMissing($post);
     $this->assertModelExists($post_without_recurrence);
+  }
+
+  /** @test */
+  public function should_create_post_with_recurrence()
+  {
+    $media = Media::factory()->create();
+    $recurrence = Recurrence::factory()->create();
+    $post = Post::factory()->recurrent()->create(['media_id' => $media->id, 'recurrence_id' => $recurrence->id]);
+
+    $this->assertModelExists($post);
+    $this->assertNull($post->start_date);
+    $this->assertNull($post->end_date);
   }
 
 
