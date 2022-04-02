@@ -23,4 +23,9 @@ class Post extends Model
   {
     return $this->belongsTo(Media::class);
   }
+
+  public function recurrence(): BelongsTo
+  {
+    return $this->belongsTo(Recurrence::class);
+  }
 }
