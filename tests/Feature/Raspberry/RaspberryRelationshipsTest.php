@@ -28,7 +28,19 @@ class RaspberryRelationshipsTest extends TestCase
 
     $this->assertInstanceOf(Display::class, $raspberry->display);
     $this->assertEquals(1, $raspberry->display->count());
-    $this->assertDatabaseHas('raspberries', ['display_id' => $display->id]);
+    $this->assertDatabaseHas('raspberries', ['id' => $raspberry->id, 'display_id' => $display->id]);
+  }
+
+  /** @test */
+  public function should_set_display_id_to_null_when_display_is_deleted()
+  {
+    $display = Display::factory()->create();
+    $raspberry = Raspberry::factory()->create(['display_id' => $display->id]);
+
+    $display->delete();
+    $this->assertModelMissing($display);
+    $this->assertModelExists($raspberry);
+    $this->assertDatabaseHas('raspberries', ['id' => $raspberry->id, ['display_id' => null]]);
   }
 
   /** @test */
@@ -39,7 +51,7 @@ class RaspberryRelationshipsTest extends TestCase
 
     $response = $this->postJson(route('raspberries.store', ['display_id' => $display->id]), $raspberry_data);
 
-    $this->assertDatabaseHas('raspberries', ['display_id' => $display->id]);
+    $this->assertDatabaseHas('raspberries', ['id' => $response['id'], 'display_id' => $display->id]);
 
     $raspberry = Raspberry::find($response->json()['id']);
     $response->assertCreated()->assertJson($raspberry->toArray())->assertJsonFragment(['display_id' => $display->id]);
@@ -56,7 +68,7 @@ class RaspberryRelationshipsTest extends TestCase
     $response = $this->putJson(route('raspberries.update', $this->raspberry->id),
       ['display_id' => $last_display->id]);
 
-    $this->assertDatabaseHas('raspberries', ['display_id' => $last_display->id]);
+    $this->assertDatabaseHas('raspberries', ['id' => $this->raspberry->id, 'display_id' => $last_display->id]);
 
     $response->assertJsonFragment(['display_id' => $last_display->id])->assertOk();
   }
@@ -69,7 +81,7 @@ class RaspberryRelationshipsTest extends TestCase
 
     $response = $this->putJson(route('raspberries.update', $this->raspberry->id), ['display_id' => null]);
 
-    $this->assertDatabaseHas('raspberries', ['display_id' => null]);
+    $this->assertDatabaseHas('raspberries', ['id' => $this->raspberry->id, 'display_id' => null]);
 
     $response->assertJsonFragment(['display_id' => null])->assertOk();
   }
