@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Post\StorePostAction;
-use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\Post\StorePostRequest;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;

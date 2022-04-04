@@ -2,7 +2,7 @@
 
 namespace App\Actions\Display;
 
-use App\Http\Requests\StoreDisplayRequest;
+use App\Http\Requests\Display\StoreDisplayRequest;
 use App\Models\Display;
 use App\Models\Raspberry;
 

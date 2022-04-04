@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UpdateRecurrenceRequest;
+use App\Http\Requests\Recurrence\UpdateRecurrenceRequest;
 use App\Models\Recurrence;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Display\StoreDisplayAction;
 use App\Actions\Display\UpdateDisplayAction;
-use App\Http\Requests\StoreDisplayRequest;
+use App\Http\Requests\Display\StoreDisplayRequest;
 use App\Models\Display;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
