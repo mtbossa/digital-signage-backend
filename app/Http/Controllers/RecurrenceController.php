@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateRecurrenceRequest;
 use App\Models\Recurrence;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -47,9 +48,9 @@ class RecurrenceController extends Controller
    * @param  int  $id
    * @return Response
    */
-  public function update(Request $request, Recurrence $recurrence)
+  public function update(UpdateRecurrenceRequest $request, Recurrence $recurrence)
   {
-    $recurrence->update($request->all());
+    $recurrence->update($request->validated());
     return $recurrence;
   }
 

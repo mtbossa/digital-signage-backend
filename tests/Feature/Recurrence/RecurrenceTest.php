@@ -43,6 +43,17 @@ class RecurrenceTest extends TestCase
   }
 
   /** @test */
+  public function ensure_only_description_is_updated_even_if_more_fields_are_sent()
+  {
+    $current_values = $this->recurrence->toArray();
+    unset($current_values['description']);
+    $update_values = $this->_makeRecurrence()->toArray();
+
+    $this->putJson(route('recurrences.update', $this->recurrence->id), $update_values)->assertJson(['description' => $update_values['description']])->assertOk();
+    $this->assertDatabaseHas('recurrences', [...$current_values, 'description' => $update_values['description']]);
+  }
+
+  /** @test */
   public function delete_recurrence()
   {
     $response = $this->deleteJson(route('recurrences.destroy', $this->recurrence->id));
