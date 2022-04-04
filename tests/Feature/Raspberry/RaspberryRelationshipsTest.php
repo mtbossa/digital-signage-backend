@@ -53,8 +53,7 @@ class RaspberryRelationshipsTest extends TestCase
 
     $this->assertDatabaseHas('raspberries', ['id' => $response['id'], 'display_id' => $display->id]);
 
-    $raspberry = Raspberry::find($response->json()['id']);
-    $response->assertCreated()->assertJson($raspberry->toArray())->assertJsonFragment(['display_id' => $display->id]);
+    $response->assertCreated()->assertJson($raspberry_data)->assertJsonFragment(['display_id' => $display->id]);
   }
 
   /** @test */

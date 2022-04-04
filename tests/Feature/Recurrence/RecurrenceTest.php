@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\recurrence;
+namespace Tests\Feature\Recurrence;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Recurrence\Traits\RecurrenceTestsTrait;
@@ -50,7 +50,7 @@ class RecurrenceTest extends TestCase
     $update_values = $this->_makeRecurrence()->toArray();
 
     $this->putJson(route('recurrences.update', $this->recurrence->id), $update_values)->assertJson(['description' => $update_values['description']])->assertOk();
-    $this->assertDatabaseHas('recurrences', [...$current_values, 'description' => $update_values['description']]);
+    $this->assertDatabaseHas('recurrences', ['id' => $this->recurrence->id, 'description' => $update_values['description']]);
   }
 
   /** @test */

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Raspberry\StoreRaspberryRequest;
 use App\Models\Display;
 use App\Models\Raspberry;
 use Illuminate\Database\Eloquent\Collection;
@@ -15,7 +16,7 @@ class RaspberryController extends Controller
     return Raspberry::all();
   }
 
-  public function store(Request $request): Raspberry
+  public function store(StoreRaspberryRequest $request): Raspberry
   {
     $raspberry = Raspberry::create($request->except(['display_id']));
     if ($request->display_id) {
