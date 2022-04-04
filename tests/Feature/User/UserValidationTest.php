@@ -33,7 +33,7 @@ class UserValidationTest extends TestCase
    */
   public function cant_store_invalid_user($invalidData, $invalidFields)
   {
-    $this->patchJson(route('invitations.update', $this->invitation->token), $invalidData)
+    $response = $this->patchJson(route('invitations.update', $this->invitation->token), $invalidData)
       ->assertJsonValidationErrors($invalidFields)
       ->assertUnprocessable();
 
@@ -42,14 +42,15 @@ class UserValidationTest extends TestCase
 
   public function invalidUsers(): array
   {
-    $user_data = ['name' => 'Mateus Bossa', 'password' => 'A1boitudo@me'];
+    $user_data = ['name' => 'Mateus Bossa', 'password' => 'A1boitudo@me', 'password_confirmation' => 'A1boitudo@me'];
     return [
-      'name as null' => [['name' => null], ['name']],
-      'name as number' => [['name' => 1], ['name']],
-      'name greater than 255' => [['name' => Str::random(256)], ['name']],
-      'password as null' => [['password' => null], ['password']],
-      'password as number' => [['password' => 1], ['password']],
-      'password lower then 8 char' => [['password' => 'A1boi'], ['password']],
+      'name as null' => [[...$user_data, 'name' => null], ['name']],
+      'name as number' => [[...$user_data, 'name' => 1], ['name']],
+      'name greater than 255' => [[...$user_data, 'name' => Str::random(256)], ['name']],
+      'password as null' => [[...$user_data, 'password' => null], ['password']],
+      'password as number' => [[...$user_data, 'password' => 12345678910], ['password']],
+      'password lower then 8 char' => [[...$user_data, 'password' => 'A1boi', 'password_confirmation' => 'A1boi'], ['password']],
+      'wrong password confirmation' => [[...$user_data, 'password_confirmation' => 'A1boitudaaa@me'], ['password']],
     ];
   }
 
