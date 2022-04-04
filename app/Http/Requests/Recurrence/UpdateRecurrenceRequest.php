@@ -14,7 +14,7 @@ class UpdateRecurrenceRequest extends FormRequest
   public function rules(): array
   {
     return [
-      'description' => ['required', 'string', 'max:100'],
+      'description' => ['required', 'string', 'max:50'],
     ];
   }
 }

@@ -2,65 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Recurrence\StoreRecurrenceRequest;
 use App\Http\Requests\Recurrence\UpdateRecurrenceRequest;
 use App\Models\Recurrence;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Database\Eloquent\Collection;
 
 class RecurrenceController extends Controller
 {
-  /**
-   * Display a listing of the resource.
-   *
-   * @return Response
-   */
-  public function index()
+  public function index(): Collection
   {
     return Recurrence::all();
   }
 
-  /**
-   * Store a newly created resource in storage.
-   *
-   * @param  Request  $request
-   * @return Response
-   */
-  public function store(Request $request)
+  public function store(StoreRecurrenceRequest $request): Recurrence
   {
-    return Recurrence::create($request->all());
+    return Recurrence::create($request->validated());
   }
 
-  /**
-   * Display the specified resource.
-   *
-   * @param  int  $id
-   * @return Response
-   */
-  public function show(Recurrence $recurrence)
+  public function show(Recurrence $recurrence): Recurrence
   {
     return $recurrence;
   }
 
-  /**
-   * Update the specified resource in storage.
-   *
-   * @param  Request  $request
-   * @param  int  $id
-   * @return Response
-   */
-  public function update(UpdateRecurrenceRequest $request, Recurrence $recurrence)
+  public function update(UpdateRecurrenceRequest $request, Recurrence $recurrence): Recurrence
   {
     $recurrence->update($request->validated());
     return $recurrence;
   }
 
-  /**
-   * Remove the specified resource from storage.
-   *
-   * @param  int  $id
-   * @return Response
-   */
-  public function destroy(Recurrence $recurrence)
+  public function destroy(Recurrence $recurrence): bool
   {
     return $recurrence->delete();
   }
