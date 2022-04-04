@@ -14,8 +14,9 @@ class StoreInvitationAction
   public function handle(Request $request): Invitation
   {
     $invited_email = $request->email;
+    $store_id = $request->store_id;
     $invitation = Invitation::create([
-      'email' => $invited_email, 'inviter' => Auth::user()->id,
+      'email' => $invited_email, 'store_id' => $store_id, 'inviter' => Auth::user()->id,
       'token' => Invitation::generateInvitationToken($invited_email)
     ]);
     Mail::to($invited_email)->send(new UserInvitation($invitation));

@@ -24,7 +24,7 @@ class InvitationController extends Controller
 
   public function store(Request $request, StoreInvitationAction $action): Invitation
   {
-    $request->validate(['email' => ['required', 'email', 'unique:invitations', 'max:255']]);
+    $request->validate(['email' => ['required', 'email', 'unique:invitations', 'max:255'], 'store_id' => ['nullable', 'numeric', 'exists:stores,id']]);
     return $action->handle($request);
   }
 
@@ -42,7 +42,7 @@ class InvitationController extends Controller
   public function update(Request $request, string $token, CreateNewUser $action): User
   {
     $invitation = Invitation::where('token', $token)->firstOrFail();
-    $user = $action->create([...$request->all(), 'email' => $invitation->email]);
+    $user = $action->create([...$request->all(), 'email' => $invitation->email, 'store_id' => $invitation->store_id]);
     $invitation->registered_at = Carbon::now()->format('Y-m-d H:i:s');
     $invitation->save();
 
