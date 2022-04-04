@@ -4,6 +4,7 @@ namespace App\Actions\Post;
 
 use App\Models\Media;
 use App\Models\Post;
+use App\Models\Recurrence;
 use Illuminate\Http\Request;
 
 class StorePostAction
@@ -11,6 +12,12 @@ class StorePostAction
   public function handle(Request $request): Post
   {
     $media = Media::findOrFail($request->media_id);
-    return $media->posts()->create($request->except(['media_id']));
+    $post = $media->posts()->create($request->except(['media_id']));
+    if ($request->has('recurrence_id')) {
+      $recurrence = Recurrence::findOrFail($request->recurrence_id);
+      $post->recurrence()->associate($recurrence);
+      $post->save();
+    }
+    return $post;
   }
 }

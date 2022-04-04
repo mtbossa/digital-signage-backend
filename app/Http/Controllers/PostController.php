@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Actions\Post\StorePostAction;
 use App\Http\Requests\Post\StorePostRequest;
+use App\Http\Requests\Post\UpdatePostRequest;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
@@ -25,9 +25,9 @@ class PostController extends Controller
     return $post;
   }
 
-  public function update(Request $request, Post $post): Post
+  public function update(UpdatePostRequest $request, Post $post): Post
   {
-    $post->update($request->all());
+    $post->update($request->validated());
 
     return $post;
   }

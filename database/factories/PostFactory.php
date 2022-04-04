@@ -17,8 +17,6 @@ class PostFactory extends Factory
    */
   public function definition()
   {
-    $start_date = Carbon::instance($this->faker->dateTimeBetween('-1 months', '+1 months'));
-    $end_date = (clone $start_date)->addDays($this->faker->numberBetween(0, 90));
     $base_time = Carbon::create(null, null, null, 3, 0, 0);
     $start_time = (clone $base_time)->addHours($this->faker->numberBetween(0,
       8))->addMinutes($this->faker->numberBetween(0,
@@ -29,20 +27,21 @@ class PostFactory extends Factory
 
     return [
       'description' => $this->faker->text(100),
-      'start_date' => $start_date->format('Y-m-d'),
-      'end_date' => $end_date->format('Y-m-d'),
       'start_time' => $start_time->format('H:i:s'),
       'end_time' => $end_time->format('H:i:s'),
       'expose_time' => $this->faker->numberBetween(1, 86400),
     ];
   }
 
-  public function recurrent()
+  public function nonRecurrent()
   {
-    return $this->state(function (array $attributes) {
+    $start_date = Carbon::instance($this->faker->dateTimeBetween('-1 months', '+1 months'));
+    $end_date = (clone $start_date)->addDays($this->faker->numberBetween(0, 90));
+
+    return $this->state(function (array $attributes) use ($start_date, $end_date) {
       return [
-        'start_date' => null,
-        'end_date' => null,
+        'start_date' => $start_date->format('Y-m-d'),
+        'end_date' => $end_date->format('Y-m-d'),
       ];
     });
   }

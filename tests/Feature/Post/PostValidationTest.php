@@ -57,7 +57,9 @@ class PostValidationTest extends TestCase
   public function start_date_and_end_date_must_not_be_passed_if_recurrence_id_is_passed()
   {
     $recurrence = Recurrence::factory()->create();
-    $post_data = Post::factory()->make(['media_id' => $this->media->id, 'recurrence_id' => $recurrence->id])->toArray();
+    $post_data = Post::factory()->nonRecurrent()->make([
+      'media_id' => $this->media->id, 'recurrence_id' => $recurrence->id
+    ])->toArray();
     $this->postJson(route('posts.store'), $post_data)
       ->assertUnprocessable()->assertJsonValidationErrors(['recurrence_id']);
 
@@ -78,7 +80,7 @@ class PostValidationTest extends TestCase
 
     $this->assertDatabaseCount('posts', 0);
   }
-  
+
   /**
    * @test
    * @dataProvider invalidPosts
