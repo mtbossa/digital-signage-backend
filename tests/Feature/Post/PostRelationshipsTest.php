@@ -27,10 +27,12 @@ class PostRelationshipsTest extends TestCase
   /** @test */
   public function post_should_be_deleted_when_media_is_deleted()
   {
+    $this->_authUser();
     $media = Media::factory()->create();
     $post = Post::factory()->create(['media_id' => $media->id]);
 
-    $media->delete();
+    $this->deleteJson(route('medias.destroy', $media->id));
+
     $this->assertModelMissing($media);
     $this->assertModelMissing($post);
   }
@@ -50,12 +52,13 @@ class PostRelationshipsTest extends TestCase
   /** @test */
   public function post_should_be_deleted_when_recurrence_is_deleted()
   {
+    $this->_authUser();
     $media = Media::factory()->create();
     $recurrence = Recurrence::factory()->create();
     $post_without_recurrence = Post::factory()->create(['media_id' => $media->id]);
     $post = Post::factory()->recurrent()->create(['media_id' => $media->id, 'recurrence_id' => $recurrence->id]);
 
-    $recurrence->delete();
+    $this->deleteJson(route('recurrences.destroy', $recurrence->id));
 
     $this->assertModelMissing($recurrence);
     $this->assertModelMissing($post);
@@ -63,7 +66,7 @@ class PostRelationshipsTest extends TestCase
   }
 
   /** @test */
-  public function should_create_post_with_recurrence()
+  public function recurrent_post_factory_should_create_post_with_recurrence()
   {
     $media = Media::factory()->create();
     $recurrence = Recurrence::factory()->create();
