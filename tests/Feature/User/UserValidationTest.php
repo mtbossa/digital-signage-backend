@@ -22,7 +22,7 @@ class UserValidationTest extends TestCase
     parent::setUp();
 
     $this->user = User::factory()->create();
-    $this->invitation = Invitation::factory()->unaccepted()->create(['inviter' => $this->user->id]);
+    $this->invitation = Invitation::factory()->withToken()->create(['inviter' => $this->user->id]);
   }
 
   /**

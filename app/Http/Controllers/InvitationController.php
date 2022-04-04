@@ -4,39 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\User\Invitation\StoreInvitationAction;
+use App\Http\Requests\Invitation\StoreInvitationRequest;
 use App\Models\Invitation;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class InvitationController extends Controller
 {
-  /**
-   * Display a listing of the resource.
-   *
-   * @return Response
-   */
-  public function index()
+
+  public function index(): Collection
   {
-    //
+    return Invitation::all();
   }
 
-  public function store(Request $request, StoreInvitationAction $action): Invitation
+  public function store(StoreInvitationRequest $request, StoreInvitationAction $action): Invitation
   {
-    $request->validate(['email' => ['required', 'email', 'unique:invitations', 'max:255'], 'store_id' => ['nullable', 'numeric', 'exists:stores,id']]);
     return $action->handle($request);
   }
 
-  /**
-   * Display the specified resource.
-   *
-   * @param  int  $id
-   * @return Response
-   */
-  public function show($id)
+  public function show(Invitation $invitation): Invitation
   {
-    //
+    return $invitation;
   }
 
   public function update(Request $request, string $token, CreateNewUser $action): User
@@ -49,14 +39,8 @@ class InvitationController extends Controller
     return $user;
   }
 
-  /**
-   * Remove the specified resource from storage.
-   *
-   * @param  int  $id
-   * @return Response
-   */
-  public function destroy($id)
+  public function destroy(Invitation $invitation): bool
   {
-    //
+    return $invitation->delete();
   }
 }

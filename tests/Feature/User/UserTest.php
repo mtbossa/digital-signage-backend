@@ -27,7 +27,7 @@ class UserTest extends TestCase
     $test_date = Carbon::now();
     Carbon::setTestNow($test_date);
 
-    $invitation = Invitation::factory()->unaccepted()->create(['inviter' => $this->user->id]);
+    $invitation = Invitation::factory()->withToken()->create(['inviter' => $this->user->id]);
 
     $user_data = [
       'name' => $this->faker()->name, 'password' => 'A@oitudob3m', 'password_confirmation' => 'A@oitudob3m'
@@ -47,7 +47,7 @@ class UserTest extends TestCase
     Carbon::setTestNow($test_date);
 
     $store = Store::factory()->create();
-    $invitation = Invitation::factory()->unaccepted()->create(['inviter' => $this->user->id, 'store_id' => $store->id]);
+    $invitation = Invitation::factory()->withToken()->create(['inviter' => $this->user->id, 'store_id' => $store->id]);
 
     $user_data = [
       'name' => $this->faker()->name, 'password' => 'A@oitudob3m', 'password_confirmation' => 'A@oitudob3m'

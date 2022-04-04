@@ -22,7 +22,7 @@ class InvitationFactory extends Factory
     ];
   }
 
-  public function unaccepted()
+  public function withToken()
   {
     return $this->state(function (array $attributes) {
       return [

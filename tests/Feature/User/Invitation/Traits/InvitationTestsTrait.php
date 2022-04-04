@@ -18,8 +18,8 @@ trait InvitationTestsTrait
     return Invitation::factory()->create($data);
   }
 
-  private function _createUnacceptedInvitation(array $data = null): Invitation
+  private function _createWithTokenInvitation(array $data = null): Invitation
   {
-    return Invitation::factory()->unaccepted()->create($data);
+    return Invitation::factory()->withToken()->create($data);
   }
 }

@@ -3,15 +3,15 @@
 
 namespace App\Actions\User\Invitation;
 
+use App\Http\Requests\Invitation\StoreInvitationRequest;
 use App\Mail\UserInvitation;
 use App\Models\Invitation;
 use Auth;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class StoreInvitationAction
 {
-  public function handle(Request $request): Invitation
+  public function handle(StoreInvitationRequest $request): Invitation
   {
     $invited_email = $request->email;
     $store_id = $request->store_id;
