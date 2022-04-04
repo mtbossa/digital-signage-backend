@@ -77,6 +77,17 @@ class MediaTest extends TestCase
   }
 
   /** @test */
+  public function ensure_only_description_is_updated_even_if_more_fields_are_sent()
+  {
+    $current_values = $this->media->toArray();
+    unset($current_values['description']);
+    $update_values = $this->_makeMedia()->toArray();
+
+    $this->putJson(route('medias.update', $this->media->id), $update_values)->assertJson(['description' => $update_values['description']])->assertOk();
+    $this->assertDatabaseHas('medias', [...$current_values, 'description' => $update_values['description']]);
+  }
+
+  /** @test */
   public function delete_media()
   {
     $response = $this->deleteJson(route('medias.destroy', $this->media->id));
