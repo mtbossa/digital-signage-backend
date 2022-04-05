@@ -28,7 +28,7 @@ class InvitationTest extends TestCase
   public function create_user_without_store_invitation()
   {
     Mail::fake();
-    $email_data = ['email' => $this->faker->email()];
+    $email_data = ['email' => $this->faker->email(), 'is_admin' => false];
     $response = $this->postJson(route('invitations.store'), $email_data)->assertCreated()->assertJson($email_data);
     $this->assertDatabaseHas('invitations', $response->json());
     Mail::assertQueued(UserInvitation::class);
@@ -39,7 +39,7 @@ class InvitationTest extends TestCase
   {
     Mail::fake();
     $store = Store::factory()->create();
-    $invitation_data = ['email' => $this->faker->email(), 'store_id' => $store->id];
+    $invitation_data = ['email' => $this->faker->email(), 'store_id' => $store->id, 'is_admin' => false];
     $response = $this->postJson(route('invitations.store'),
       $invitation_data)->assertCreated()->assertJson($invitation_data);
     $this->assertDatabaseHas('invitations', $response->json());
@@ -83,7 +83,7 @@ class InvitationTest extends TestCase
   /** @test */
   public function fetch_all_invitations()
   {
-    $this->_createWithTokenInvitation(['inviter' => $this->user->id]);
+    $this->_createWithTokenInvitation(['inviter' => $this->user->id, 'is_admin' => false]);
 
     $this->getJson(route('invitations.index'))->assertOk()->assertJsonCount(2)->assertJsonFragment($this->invitation->toArray());
   }

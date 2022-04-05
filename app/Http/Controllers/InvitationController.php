@@ -32,7 +32,7 @@ class InvitationController extends Controller
   public function update(Request $request, string $token, CreateNewUser $action): User
   {
     $invitation = Invitation::where('token', $token)->firstOrFail();
-    $user = $action->create([...$request->all(), 'email' => $invitation->email, 'store_id' => $invitation->store_id]);
+    $user = $action->create([...$request->all(), 'email' => $invitation->email, 'store_id' => $invitation->store_id, 'is_admin' => $invitation->is_admin]);
     $invitation->registered_at = Carbon::now()->format('Y-m-d H:i:s');
     $invitation->save();
 

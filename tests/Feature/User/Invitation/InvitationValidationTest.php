@@ -26,7 +26,7 @@ class InvitationValidationTest extends TestCase
   {
     $this->invitation = $this->_createwithTokenInvitation(['inviter' => $this->user->id]);
 
-    $this->postJson(route('invitations.store'), ['email' => $this->invitation->email])
+    $this->postJson(route('invitations.store'), ['email' => $this->invitation->email, 'is_admin' => $this->invitation->is_admin])
       ->assertJsonValidationErrorFor('email')
       ->assertUnprocessable();
 
@@ -57,6 +57,9 @@ class InvitationValidationTest extends TestCase
       'email greater than 255' => [['email' => Str::random(255) . '@gmail.com'], ['email']],
       'store that doesn\'t exists' => [[...$email_data, 'store_id' => 100000], ['store_id']],
       'store as string' => [[...$email_data, 'store_id' => 'a'], ['store_id']],
+      'is_admin as null' => [[...$email_data, 'is_admin' => null], ['is_admin']],
+      'is_admin as number different from 0 or 1' => [[...$email_data, 'is_admin' => 3], ['is_admin']],
+      'is_admin string different from true or false' => [[...$email_data, 'is_admin' => 'oi'], ['is_admin']],
     ];
   }
 

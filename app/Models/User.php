@@ -59,6 +59,7 @@ class User extends Authenticatable
     'password',
     'is_admin',
     'store_id',
+    'email_verified_at'
   ];
 
   /**

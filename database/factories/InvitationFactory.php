@@ -19,6 +19,7 @@ class InvitationFactory extends Factory
   {
     return [
       'email' => $this->faker->email,
+      'is_admin' => false,
     ];
   }
 

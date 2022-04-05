@@ -15,7 +15,8 @@ class StoreInvitationRequest extends FormRequest
   {
     return [
       'email' => ['required', 'email', 'unique:invitations', 'max:255'],
-      'store_id' => ['nullable', 'numeric', 'exists:stores,id']
+      'store_id' => ['nullable', 'numeric', 'exists:stores,id'],
+      'is_admin' => ['required', 'boolean'],
     ];
   }
 }

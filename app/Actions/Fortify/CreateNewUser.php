@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -36,7 +37,9 @@ class CreateNewUser implements CreatesNewUsers
       'name' => $input['name'],
       'email' => $input['email'],
       'password' => Hash::make($input['password']),
-      'store_id' => $input['store_id']
+      'email_verified_at' => Carbon::now()->format('Y-m-d H:i:s'),
+      'is_admin' => $input['is_admin'],
+      'store_id' => $input['store_id'],
     ]);
   }
 }
