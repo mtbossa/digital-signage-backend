@@ -19,7 +19,9 @@ class InvitationTest extends TestCase
   {
     parent::setUp();
     $this->_authUser();
-    $this->invitation = $this->_createWithTokenInvitation(['inviter' => $this->user->id]);
+    $this->invitation = $this->_createWithTokenInvitation([
+      'inviter' => $this->user->id, 'is_admin' => $this->user->is_admin
+    ]);
   }
 
   /** @test */
@@ -38,8 +40,36 @@ class InvitationTest extends TestCase
     Mail::fake();
     $store = Store::factory()->create();
     $invitation_data = ['email' => $this->faker->email(), 'store_id' => $store->id];
-    $response = $this->postJson(route('invitations.store'), $invitation_data)->assertCreated()->assertJson($invitation_data);
+    $response = $this->postJson(route('invitations.store'),
+      $invitation_data)->assertCreated()->assertJson($invitation_data);
     $this->assertDatabaseHas('invitations', $response->json());
+    Mail::assertQueued(UserInvitation::class);
+  }
+
+  /** @test */
+  public function create_invitation_to_admin_user_with_store()
+  {
+    Mail::fake();
+    $store = Store::factory()->create();
+    $invitation_data = ['email' => $this->faker->email(), 'is_admin' => true, 'store_id' => $store->id];
+    $response = $this->postJson(route('invitations.store'),
+      $invitation_data)->assertCreated()->assertJson($invitation_data);
+    $this->assertDatabaseHas('invitations', [
+      'id' => $response['id'], 'is_admin' => $invitation_data['is_admin'], 'store_id' => $invitation_data['store_id']
+    ]);
+    Mail::assertQueued(UserInvitation::class);
+  }
+
+  /** @test */
+  public function create_invitation_to_admin_user_without_store()
+  {
+    Mail::fake();
+    $store = Store::factory()->create();
+    $invitation_data = ['email' => $this->faker->email(), 'is_admin' => true];
+    $response = $this->postJson(route('invitations.store'),
+      $invitation_data)->assertCreated()->assertJson($invitation_data);
+    $this->assertDatabaseHas('invitations',
+      ['id' => $response['id'], 'is_admin' => $invitation_data['is_admin'], 'store_id' => null]);
     Mail::assertQueued(UserInvitation::class);
   }
 

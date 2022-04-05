@@ -27,7 +27,9 @@ class UserTest extends TestCase
     $test_date = Carbon::now();
     Carbon::setTestNow($test_date);
 
-    $invitation = Invitation::factory()->withToken()->create(['inviter' => $this->user->id]);
+    $invitation = Invitation::factory()->withToken()->create([
+      'inviter' => $this->user->id, 'is_admin' => $this->user->is_admin
+    ]);
 
     $user_data = [
       'name' => $this->faker()->name, 'password' => 'A@oitudob3m', 'password_confirmation' => 'A@oitudob3m'
@@ -36,7 +38,8 @@ class UserTest extends TestCase
     $this->patchJson(route('invitations.update', $invitation->token),
       $user_data)->assertCreated()->assertJson(['name' => $user_data['name'], 'email' => $invitation->email]);
 
-    $this->assertDatabaseHas('users', ['name' => $user_data['name'], 'email' => $invitation->email, 'store_id' => null]);
+    $this->assertDatabaseHas('users',
+      ['name' => $user_data['name'], 'email' => $invitation->email, 'store_id' => null]);
     $this->assertDatabaseHas('invitations', ['registered_at' => Carbon::now()->format('Y-m-d H:i:s')]);
   }
 
@@ -54,9 +57,12 @@ class UserTest extends TestCase
     ];
 
     $this->patchJson(route('invitations.update', $invitation->token),
-      $user_data)->assertCreated()->assertJson(['name' => $user_data['name'], 'email' => $invitation->email, 'store_id' => $store->id]);
+      $user_data)->assertCreated()->assertJson([
+      'name' => $user_data['name'], 'email' => $invitation->email, 'store_id' => $store->id
+    ]);
 
-    $this->assertDatabaseHas('users', ['name' => $user_data['name'], 'email' => $invitation->email, 'store_id' => $store->id]);
+    $this->assertDatabaseHas('users',
+      ['name' => $user_data['name'], 'email' => $invitation->email, 'store_id' => $store->id]);
     $this->assertDatabaseHas('invitations', ['registered_at' => Carbon::now()->format('Y-m-d H:i:s')]);
   }
 }

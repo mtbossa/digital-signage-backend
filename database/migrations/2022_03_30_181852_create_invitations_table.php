@@ -14,6 +14,7 @@ class CreateInvitationsTable extends Migration
       $table->string('email', 255)->unique();
       $table->string('token', 32);
       $table->dateTime('registered_at')->nullable();
+      $table->boolean('is_admin');
 
       $table->foreignIdFor(User::class, 'inviter'); // User how send the invitation email      
       $table->foreignId('store_id')
