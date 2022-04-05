@@ -29,6 +29,11 @@ class PostController extends Controller
   {
     $post->update($request->validated());
 
+    if ($request->has('displays_ids')) {
+      $post->displays()->sync($request->displays_ids);
+      $post['displays'] = $post->displays->toArray();
+    }
+
     return $post;
   }
 

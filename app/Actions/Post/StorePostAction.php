@@ -17,7 +17,13 @@ class StorePostAction
       $recurrence = Recurrence::findOrFail($request->recurrence_id);
       $post->recurrence()->associate($recurrence);
       $post->save();
+
     }
+    if ($request->has('displays_ids')) {
+      $post->displays()->attach($request->displays_ids);
+      $post['displays'] = $post->displays->toArray();
+    }
+
     return $post;
   }
 }

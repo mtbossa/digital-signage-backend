@@ -41,6 +41,59 @@ class PostRelationshipsTest extends TestCase
   }
 
   /** @test */
+  public function ensure_can_attach_displays_when_creating_post()
+  {
+    $media = Media::factory()->create();
+    $displays_ids = Display::factory(2)->create()->pluck('id');
+    $post_data = Post::factory()->nonRecurrent()->make(['media_id' => $media->id])->toArray();
+
+    $response = $this->postJson(route('posts.store'), [...$post_data, 'displays_ids' => $displays_ids->toArray()])
+      ->assertCreated();
+
+
+    foreach ($displays_ids as $key => $id) {
+      $response->assertJson(['displays' => [$key => ['id' => $id]]]);
+      $this->assertDatabaseHas('display_post', ['post_id' => $response['id'], 'display_id' => $id]);
+    }
+  }
+
+  /** @test */
+  public function ensure_can_attach_displays_when_updating_post()
+  {
+    $media = Media::factory()->create();
+    $displays_ids = Display::factory(2)->create()->pluck('id');
+    $post = Post::factory()->nonRecurrent()->create(['media_id' => $media->id]);
+
+    $response = $this->putJson(route('posts.update', $post->id), [...$post->toArray(), 'displays_ids' => $displays_ids->toArray()])
+      ->assertOk();
+
+    foreach ($displays_ids as $key => $id) {
+      $response->assertJson(['displays' => [$key => ['id' => $id]]]);
+      $this->assertDatabaseHas('display_post', ['post_id' => $response['id'], 'display_id' => $id]);
+    }
+  }
+
+  /** @test */
+  public function ensure_not_passed_displays_are_detached_when_updating_post()
+  {
+    $media = Media::factory()->create();
+    $displays_ids = Display::factory(3)->create()->pluck('id')->toArray();
+    $post = Post::factory()->nonRecurrent()->create(['media_id' => $media->id]);
+    $post->displays()->attach($displays_ids);
+
+    $removed_display_id = array_pop($displays_ids);
+
+    $response = $this->putJson(route('posts.update', $post->id), [...$post->toArray(), 'displays_ids' => $displays_ids])
+      ->assertOk();
+
+    foreach ($displays_ids as $key => $id) {
+      $response->assertJson(['displays' => [$key => ['id' => $id]]]);
+      $this->assertDatabaseHas('display_post', ['post_id' => $response['id'], 'display_id' => $id]);
+    }
+    $this->assertDatabaseMissing('display_post', ['post_id' => $post->id, 'display_id' => $removed_display_id]);
+  }
+
+  /** @test */
   public function check_if_post_belongs_to_a_media_relationship_is_working()
   {
     $media = Media::factory()->create();
