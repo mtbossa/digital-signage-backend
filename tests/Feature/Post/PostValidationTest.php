@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Post;
 
+use App\Models\Display;
 use App\Models\Post;
 use App\Models\Recurrence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -30,7 +31,7 @@ class PostValidationTest extends TestCase
     $post_data = Post::factory()->make([
       'start_date' => '2022-01-01', 'end_date' => '2022-01-01', 'media_id' => $this->media->id
     ])->toArray();
-    $this->postJson(route('posts.store'), $post_data)
+    $this->postJson(route('posts.store'), [...$post_data, 'displays_ids' => null])
       ->assertCreated()->assertJson($post_data);
 
     $this->assertDatabaseCount('posts', 1);
@@ -75,10 +76,60 @@ class PostValidationTest extends TestCase
     $post_data = Post::factory()->make([
       'start_date' => null, 'end_date' => null, 'media_id' => $this->media->id
     ])->toArray();
-    $response = $this->postJson(route('posts.store'), $post_data);
-    $response->json();
+    $response = $this->postJson(route('posts.store'), $post_data)->assertUnprocessable()->assertJsonValidationErrors(['start_date', 'end_date']);
 
     $this->assertDatabaseCount('posts', 0);
+  }
+
+  /**
+   * @test
+   */
+  public function displays_ids_must_be_array_when_creating_post()
+  {
+    Display::factory()->create();
+    $post_data = Post::factory()->nonRecurrent()->make(['media_id' => $this->media->id])->toArray();
+    $response = $this->postJson(route('posts.store'), [...$post_data, 'displays_ids' => 1])->assertUnprocessable()->assertJsonValidationErrorFor('displays_ids');
+
+    $this->assertDatabaseCount('posts', 0);
+  }
+
+  /**
+   * @test
+   */
+  public function all_displays_ids_must_exist_in_displays_table_when_creating_post()
+  {
+    $displays_ids = Display::factory(2)->create()->pluck('id')->toArray();
+    $nonExistentId = ++Display::all()->last()->id;
+    $post_data = Post::factory()->nonRecurrent()->make(['media_id' => $this->media->id])->toArray();
+    $response = $this->postJson(route('posts.store'), [...$post_data, 'displays_ids' => [...$displays_ids, $nonExistentId]])->assertUnprocessable()->assertJsonValidationErrorFor('displays_ids');
+
+    $this->assertDatabaseCount('posts', 0);
+  }
+
+  /**
+   * @test
+   */
+  public function displays_ids_must_be_present_even_as_null_when_creating_post()
+  {
+    $displays_ids = Display::factory(2)->create()->pluck('id')->toArray();
+    $nonExistentId = ++Display::all()->last()->id;
+    $post_data = Post::factory()->nonRecurrent()->make(['media_id' => $this->media->id])->toArray();
+    $response = $this->postJson(route('posts.store'), $post_data)->assertUnprocessable()->assertJsonValidationErrorFor('displays_ids');
+
+    $this->assertDatabaseCount('posts', 0);
+  }
+
+  /**
+   * @test
+   */
+  public function displays_ids_can_be_null_when_creating_post()
+  {
+    $displays_ids = Display::factory(2)->create()->pluck('id')->toArray();
+    $nonExistentId = ++Display::all()->last()->id;
+    $post_data = Post::factory()->nonRecurrent()->make(['media_id' => $this->media->id])->toArray();
+    $response = $this->postJson(route('posts.store'), [...$post_data, 'displays_ids' => null])->assertCreated();
+
+    $this->assertDatabaseCount('posts', 1);
   }
 
   /**

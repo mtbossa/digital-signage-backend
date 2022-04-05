@@ -28,7 +28,7 @@ class PostTest extends TestCase
     $this->withoutExceptionHandling();
     $post_data = $this->_makePost(['media_id' => $this->media->id], false)->toArray();
 
-    $response = $this->postJson(route('posts.store'), $post_data);
+    $response = $this->postJson(route('posts.store'), [...$post_data, 'displays_ids' => null]);
 
     $this->assertDatabaseHas('posts', $post_data);
 
