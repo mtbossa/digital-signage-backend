@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Post;
 
+use App\Models\Display;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\Recurrence;
@@ -18,6 +19,25 @@ class PostRelationshipsTest extends TestCase
     parent::setUp();
 
     $this->_authUser();
+  }
+
+  /** @test */
+  public function check_if_post_belongs_to_many_displays_relationship_is_working()
+  {
+    $media = Media::factory()->create();
+    $displays = Display::factory(2)->create();
+    $post = Post::factory()->create(['media_id' => $media->id]);
+
+    foreach ($displays as $display) {
+      $post->displays()->attach($display->id);
+    }
+
+    $this->assertEquals(2, $post->displays()->count());
+    $this->assertInstanceOf(Display::class, $post->displays[0]);
+
+    foreach ($displays as $display) {
+      $this->assertDatabaseHas('display_post', ['post_id' => $post->id, 'display_id' => $display->id]);
+    }
   }
 
   /** @test */
