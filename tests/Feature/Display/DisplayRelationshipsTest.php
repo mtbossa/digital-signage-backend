@@ -3,6 +3,8 @@
 namespace Tests\Feature\Display;
 
 use App\Models\Display;
+use App\Models\Media;
+use App\Models\Post;
 use App\Models\Raspberry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Display\Traits\DisplayTestsTrait;
@@ -18,6 +20,23 @@ class DisplayRelationshipsTest extends TestCase
     parent::setUp();
 
     $this->_authUser();
+  }
+
+  /** @test */
+  public function check_if_display_belongs_to_many_posts_relationship_is_working()
+  {
+    $media = Media::factory()->create();
+    $display = Display::factory()->create();
+    $posts_ids = Post::factory(2)->create(['media_id' => $media->id])->pluck('id')->toArray();
+
+    $display->posts()->attach($posts_ids);
+
+    $this->assertEquals(2, $display->posts()->count());
+    $this->assertInstanceOf(Post::class, $display->posts[0]);
+
+    foreach ($posts_ids as $post_id) {
+      $this->assertDatabaseHas('display_post', ['post_id' => $post_id, 'display_id' => $display->id]);
+    }
   }
 
   /** @test */

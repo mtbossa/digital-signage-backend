@@ -28,6 +28,8 @@ Route::middleware('auth:sanctum')->group(function () {
     return $request->user();
   });
 
+  Route::apiResource('displays.posts', \App\Http\Controllers\DisplayPostController::class)->only('index');
+
   Route::apiResources([
     'displays' => DisplayController::class, 'raspberries' => RaspberryController::class,
     'posts' => PostController::class,
