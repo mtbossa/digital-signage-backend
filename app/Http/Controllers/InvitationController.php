@@ -24,15 +24,19 @@ class InvitationController extends Controller
     return $action->handle($request);
   }
 
-  public function show(Invitation $invitation): Invitation
+  public function show(Request $request, string $token): Invitation
   {
+    $invitation = Invitation::where('token', $token)->firstOrFail();
     return $invitation;
   }
 
   public function update(Request $request, string $token, CreateNewUser $action): User
   {
     $invitation = Invitation::where('token', $token)->firstOrFail();
-    $user = $action->create([...$request->all(), 'email' => $invitation->email, 'store_id' => $invitation->store_id, 'is_admin' => $invitation->is_admin]);
+    $user = $action->create([
+      ...$request->all(), 'email' => $invitation->email, 'store_id' => $invitation->store_id,
+      'is_admin' => $invitation->is_admin
+    ]);
     $invitation->registered_at = Carbon::now()->format('Y-m-d H:i:s');
     $invitation->save();
 

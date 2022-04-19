@@ -40,8 +40,9 @@ Route::middleware('auth:sanctum')->group(function () {
     'stores' => StoreController::class,
   ]);
 
-  Route::apiResource('invitations', InvitationController::class, ['except' => ['update']]);
+  Route::apiResource('invitations', InvitationController::class, ['except' => ['update', 'show']]);
 });
 
+Route::get('invitations/{token}', [InvitationController::class, 'show'])->name('invitations.show');
 Route::patch('invitations/{token}', [InvitationController::class, 'update'])->name('invitations.update');
 

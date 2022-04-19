@@ -74,10 +74,10 @@ class InvitationTest extends TestCase
   }
 
   /** @test */
-  public function fetch_single_invitation()
+  public function fetch_single_invitation_by_token()
   {
     $this->getJson(route('invitations.show',
-      $this->invitation->id))->assertOk()->assertJson($this->invitation->toArray());
+      $this->invitation->token))->assertOk()->assertJson($this->invitation->toArray());
   }
 
   /** @test */
