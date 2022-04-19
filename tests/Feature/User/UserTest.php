@@ -7,12 +7,13 @@ use App\Models\Store;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Feature\Traits\AuthUserTrait;
 use Tests\Feature\User\Traits\UserTestsTrait;
 use Tests\TestCase;
 
 class UserTest extends TestCase
 {
-  use RefreshDatabase, UserTestsTrait, WithFaker;
+  use RefreshDatabase, UserTestsTrait, WithFaker, AuthUserTrait;
 
   public function setUp(): void
   {
@@ -39,7 +40,10 @@ class UserTest extends TestCase
       $user_data)->assertCreated()->assertJson(['name' => $user_data['name'], 'email' => $invitation->email]);
 
     $this->assertDatabaseHas('users',
-      ['name' => $user_data['name'], 'email' => $invitation->email, 'store_id' => null, 'email_verified_at' => Carbon::now()->format('Y-m-d H:i:s')]);
+      [
+        'name' => $user_data['name'], 'email' => $invitation->email, 'store_id' => null,
+        'email_verified_at' => Carbon::now()->format('Y-m-d H:i:s')
+      ]);
     $this->assertDatabaseHas('invitations', ['registered_at' => Carbon::now()->format('Y-m-d H:i:s')]);
   }
 
@@ -50,7 +54,9 @@ class UserTest extends TestCase
     Carbon::setTestNow($test_date);
 
     $store = Store::factory()->create();
-    $invitation = Invitation::factory()->withToken()->create(['inviter' => $this->user->id, 'store_id' => $store->id, 'is_admin' => $this->user->is_admin]);
+    $invitation = Invitation::factory()->withToken()->create([
+      'inviter' => $this->user->id, 'store_id' => $store->id, 'is_admin' => $this->user->is_admin
+    ]);
 
     $user_data = [
       'name' => $this->faker()->name, 'password' => 'A@oitudob3m', 'password_confirmation' => 'A@oitudob3m'
@@ -73,7 +79,9 @@ class UserTest extends TestCase
     Carbon::setTestNow($test_date);
 
     $store = Store::factory()->create();
-    $invitation = Invitation::factory()->withToken()->create(['inviter' => $this->user->id, 'store_id' => $store->id, 'is_admin' => true]);
+    $invitation = Invitation::factory()->withToken()->create([
+      'inviter' => $this->user->id, 'store_id' => $store->id, 'is_admin' => true
+    ]);
 
     $user_data = [
       'name' => $this->faker()->name, 'password' => 'A@oitudob3m', 'password_confirmation' => 'A@oitudob3m'
@@ -109,5 +117,13 @@ class UserTest extends TestCase
     $this->assertDatabaseHas('users',
       ['name' => $user_data['name'], 'email' => $invitation->email, 'is_admin' => true]);
     $this->assertDatabaseHas('invitations', ['registered_at' => Carbon::now()->format('Y-m-d H:i:s')]);
+  }
+
+  /** @test */
+  public function fetch_all_users()
+  {
+    $this->_authUser();
+
+    $this->getJson(route('users.index'))->assertOk()->assertJsonCount(2)->assertJsonFragment($this->user->toArray());
   }
 }

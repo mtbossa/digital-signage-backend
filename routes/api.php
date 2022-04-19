@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\DisplayController;
+use App\Http\Controllers\DisplayPostController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RaspberryController;
 use App\Http\Controllers\RecurrenceController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,9 +30,10 @@ Route::middleware('auth:sanctum')->group(function () {
     return $request->user();
   });
 
-  Route::apiResource('displays.posts', \App\Http\Controllers\DisplayPostController::class)->only('index');
+  Route::apiResource('displays.posts', DisplayPostController::class)->only('index');
 
   Route::apiResources([
+    'users' => UserController::class,
     'displays' => DisplayController::class, 'raspberries' => RaspberryController::class,
     'posts' => PostController::class,
     'medias' => MediaController::class, 'recurrences' => RecurrenceController::class,
