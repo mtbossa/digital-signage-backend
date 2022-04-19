@@ -28,8 +28,7 @@ class InvitationEmailTest extends TestCase
     $front_url = url(env('APP_FRONT_URL'));
     $correct_invitation_path = "{$front_url}/invitations/{$this->invitation->token}";
 
-    $mailable->assertSeeInHtml('Você foi convidado para participar da instância da Intus.');
-    $mailable->assertSeeInHtml('Para aceitar, clique no botão abaixo ou no link caso o botão não esteja funcionando: ');
+    $mailable->assertSeeInHtml('Para aceitar, clique no botão abaixo ou no link caso o botão não esteja funcionando');
     $mailable->assertSeeInHtml($correct_invitation_path);
   }
 }
