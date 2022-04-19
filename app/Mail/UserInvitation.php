@@ -17,14 +17,9 @@ class UserInvitation extends Mailable implements ShouldQueue
   public function __construct(public Invitation $invitation)
   {
     $this->afterCommit();
-    $this->url = $this->_generateFrontendInvitationUrl();
+    $this->url = $this->invitation->generateFrontendInvitationUrl();
   }
 
-  private function _generateFrontendInvitationUrl()
-  {
-    $front_url = env('APP_FRONT_URL');
-    return url("{$front_url}/invitations/{$this->invitation->token}");
-  }
 
   public function build()
   {

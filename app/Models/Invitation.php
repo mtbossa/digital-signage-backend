@@ -15,4 +15,10 @@ class Invitation extends Model
   {
     return substr(md5(rand(0, 9).$email.time()), 0, 32);
   }
+
+  public function generateFrontendInvitationUrl()
+  {
+    $front_url = env('APP_FRONT_URL');
+    return url("{$front_url}/invitations/{$this->token}/accept");
+  }
 }
