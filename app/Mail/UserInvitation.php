@@ -10,15 +10,24 @@ use Illuminate\Queue\SerializesModels;
 
 class UserInvitation extends Mailable implements ShouldQueue
 {
-    use Queueable, SerializesModels;
-    
-    public function __construct(public Invitation $invitation)
-    {
-        $this->afterCommit();
-    }
-    
-    public function build()
-    {
-        return $this->markdown('emails.users.invitation');
-    }
+  use Queueable, SerializesModels;
+
+  public string $url;
+
+  public function __construct(public Invitation $invitation)
+  {
+    $this->afterCommit();
+    $this->url = $this->_generateFrontendInvitationUrl();
+  }
+
+  private function _generateFrontendInvitationUrl()
+  {
+    $front_url = env('APP_FRONT_URL');
+    return url("{$front_url}/invitations/{$this->invitation->token}");
+  }
+
+  public function build()
+  {
+    return $this->markdown('emails.users.invitation');
+  }
 }

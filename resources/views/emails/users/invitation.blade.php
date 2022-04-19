@@ -1,12 +1,13 @@
 @component('mail::message')
-  # Introduction
+  # Convite para instância Intus
 
-  The body of your message.
+  Você foi convidado para participar da instância da Intus.
+  Para aceitar, clique no botão abaixo ou no link caso o botão não esteja funcionando:<br><{{ $url }}>
 
-  @component('mail::button', ['url' => ''])
-    Button Text
+  @component('mail::button', ['url' => $url])
+    Aceitar convite
   @endcomponent
 
-  Thanks,<br>
+  Obrigado,<br>
   {{ config('app.name') }}
 @endcomponent
