@@ -10,6 +10,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class InvitationController extends Controller
 {
@@ -26,13 +27,22 @@ class InvitationController extends Controller
 
   public function show(Request $request, string $token): Invitation
   {
-    $invitation = Invitation::where('token', $token)->firstOrFail();
+    $is_guest = Auth::guest();
+    $invitation = Invitation::query()
+      ->where('token', $token)
+      ->when($is_guest, function ($query, $is_guest) {
+        $query->where('registered_at', null);
+      })
+      ->firstOrFail();
     return $invitation;
   }
 
   public function update(Request $request, string $token, CreateNewUser $action): User
   {
-    $invitation = Invitation::where('token', $token)->firstOrFail();
+    $invitation = Invitation::query()
+      ->where('token', $token)
+      ->where('registered_at', null)
+      ->firstOrFail();
     $user = $action->create([
       ...$request->all(), 'email' => $invitation->email, 'store_id' => $invitation->store_id,
       'is_admin' => $invitation->is_admin

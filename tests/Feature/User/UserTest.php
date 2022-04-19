@@ -120,6 +120,21 @@ class UserTest extends TestCase
   }
 
   /** @test */
+  public function ensure_only_not_accepted_invitations_can_be_accepted()
+  {
+    $invitation = Invitation::factory()->withToken()->create([
+      'inviter' => $this->user->id, 'registered_at' => Carbon::now()->format('Y-m-d H:i:s')
+    ]);
+
+    $user_data = [
+      'name' => $this->faker()->name, 'password' => 'A@oitudob3m', 'password_confirmation' => 'A@oitudob3m'
+    ];
+
+    $this->patchJson(route('invitations.update', $invitation->token),
+      $user_data)->assertNotFound();
+  }
+
+  /** @test */
   public function fetch_all_users()
   {
     $this->_authUser();

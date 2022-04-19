@@ -4,6 +4,7 @@ namespace Tests\Feature\User\Invitation;
 
 use App\Mail\UserInvitation;
 use App\Models\Store;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Mail;
@@ -78,6 +79,16 @@ class InvitationTest extends TestCase
   {
     $this->getJson(route('invitations.show',
       $this->invitation->token))->assertOk()->assertJson($this->invitation->toArray());
+  }
+
+  /** @test */
+  public function ensure_auth_user_can_fetch_single_accepted_invitation()
+  {
+    $invitation = $this->_createWithTokenInvitation([
+      'inviter' => $this->user->id, 'registered_at' => Carbon::now()->format('Y-m-d H:i:s')
+    ]);
+    $this->getJson(route('invitations.show',
+      $invitation->token))->assertOk()->assertJson($invitation->toArray());
   }
 
   /** @test */
