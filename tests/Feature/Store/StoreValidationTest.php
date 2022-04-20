@@ -20,6 +20,15 @@ class StoreValidationTest extends TestCase
     $this->_authUser();
   }
 
+  /** @test */
+  public function store_name_must_be_unique()
+  {
+    $this->store = $this->_createStore();
+    $store = $this->_makeStore(['name' => $this->store->name]);
+    $this->postJson(route('stores.store'),
+      $store->toArray())->assertUnprocessable()->assertJsonValidationErrorFor('name');
+  }
+
   /**
    * @test
    * @dataProvider invalidStores

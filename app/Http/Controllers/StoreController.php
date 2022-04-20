@@ -15,7 +15,7 @@ class StoreController extends Controller
 
   public function store(Request $request)
   {
-    $request->validate(['name' => ['required', 'string', 'max:255']]);
+    $request->validate(['name' => ['required', 'string', 'max:255', 'unique:stores']]);
     return Store::create($request->all());
   }
 
