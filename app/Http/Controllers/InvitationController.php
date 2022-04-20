@@ -41,7 +41,7 @@ class InvitationController extends Controller
   {
     $invitation = Invitation::query()
       ->where('token', $token)
-      ->where('registered_at', null)
+      ->whereNull('registered_at')
       ->firstOrFail();
     $user = $action->create([
       ...$request->all(), 'email' => $invitation->email, 'store_id' => $invitation->store_id,
