@@ -76,7 +76,8 @@ class PostValidationTest extends TestCase
     $post_data = Post::factory()->make([
       'start_date' => null, 'end_date' => null, 'media_id' => $this->media->id
     ])->toArray();
-    $response = $this->postJson(route('posts.store'), $post_data)->assertUnprocessable()->assertJsonValidationErrors(['start_date', 'end_date']);
+    $response = $this->postJson(route('posts.store'),
+      $post_data)->assertUnprocessable()->assertJsonValidationErrors(['start_date', 'end_date']);
 
     $this->assertDatabaseCount('posts', 0);
   }
@@ -88,7 +89,8 @@ class PostValidationTest extends TestCase
   {
     Display::factory()->create();
     $post_data = Post::factory()->nonRecurrent()->make(['media_id' => $this->media->id])->toArray();
-    $response = $this->postJson(route('posts.store'), [...$post_data, 'displays_ids' => 1])->assertUnprocessable()->assertJsonValidationErrorFor('displays_ids');
+    $response = $this->postJson(route('posts.store'),
+      [...$post_data, 'displays_ids' => 1])->assertUnprocessable()->assertJsonValidationErrorFor('displays_ids');
 
     $this->assertDatabaseCount('posts', 0);
   }
@@ -101,7 +103,9 @@ class PostValidationTest extends TestCase
     $displays_ids = Display::factory(2)->create()->pluck('id')->toArray();
     $nonExistentId = ++Display::all()->last()->id;
     $post_data = Post::factory()->nonRecurrent()->make(['media_id' => $this->media->id])->toArray();
-    $response = $this->postJson(route('posts.store'), [...$post_data, 'displays_ids' => [...$displays_ids, $nonExistentId]])->assertUnprocessable()->assertJsonValidationErrorFor('displays_ids');
+    $response = $this->postJson(route('posts.store'), [
+      ...$post_data, 'displays_ids' => [...$displays_ids, $nonExistentId]
+    ])->assertUnprocessable()->assertJsonValidationErrorFor('displays_ids');
 
     $this->assertDatabaseCount('posts', 0);
   }
@@ -114,7 +118,8 @@ class PostValidationTest extends TestCase
     $displays_ids = Display::factory(2)->create()->pluck('id')->toArray();
     $nonExistentId = ++Display::all()->last()->id;
     $post_data = Post::factory()->nonRecurrent()->make(['media_id' => $this->media->id])->toArray();
-    $response = $this->postJson(route('posts.store'), $post_data)->assertUnprocessable()->assertJsonValidationErrorFor('displays_ids');
+    $response = $this->postJson(route('posts.store'),
+      $post_data)->assertUnprocessable()->assertJsonValidationErrorFor('displays_ids');
 
     $this->assertDatabaseCount('posts', 0);
   }
@@ -179,6 +184,15 @@ class PostValidationTest extends TestCase
       ],
       'media_id as string' => [
         [...$post_data, 'media_id' => ''], ['media_id'],
+      ],
+      'expose_time as null' => [
+        [...$post_data, 'expose_time' => null], ['expose_time'],
+      ],
+      'expose_time as string' => [
+        [...$post_data, 'expose_time' => ''], ['expose_time'],
+      ],
+      'expose_time less than 1000' => [
+        [...$post_data, 'expose_time' => 999], ['expose_time'],
       ],
     ];
   }
