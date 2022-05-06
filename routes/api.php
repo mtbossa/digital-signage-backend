@@ -30,7 +30,6 @@ Route::middleware('auth:sanctum')->group(function () {
     return $request->user();
   });
 
-  Route::apiResource('displays.posts', DisplayPostController::class)->only('index');
 
   Route::apiResources([
     'users' => UserController::class,
@@ -43,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::apiResource('invitations', InvitationController::class, ['except' => ['update', 'show']]);
 });
 
+Route::apiResource('displays.posts', DisplayPostController::class)->only('index');
 Route::get('invitations/{token}', [InvitationController::class, 'show'])->name('invitations.show');
 Route::patch('invitations/{token}', [InvitationController::class, 'update'])->name('invitations.update');
 

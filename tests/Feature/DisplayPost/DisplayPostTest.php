@@ -41,6 +41,33 @@ class DisplayPostTest extends TestCase
   }
 
   /** @test */
+  public function ensure_json_structure_is_clean_and_correct()
+  {
+    $media = Media::factory()->create();
+    $posts = Post::factory(2)->create(['media_id' => $media->id]);
+
+    $json_structure = [];
+    foreach ($posts as $post) {
+      $post->displays()->attach($this->display->id);
+
+      $json_structure[] = [
+        'id' => $post->id,
+        'start_date' => $post->start_date,
+        'end_date' => $post->end_date,
+        'start_time' => $post->start_time,
+        'end_time' => $post->end_time,
+        'expose_time' => $post->expose_time,
+        'media' => ['path' => $post->media->path, 'type' => $post->media->type]
+      ];
+    }
+    $complete_json = ['data' => $json_structure];
+
+    $response = $this->getJson(route('displays.posts.index',
+      ['display' => $this->display->id]))->assertOk();
+    $response->assertExactJson($complete_json);
+  }
+
+  /** @test */
   public function ensure_only_posts_from_sent_display_id_are_returned()
   {
     $media = Media::factory()->create();

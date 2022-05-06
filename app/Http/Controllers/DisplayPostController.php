@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\DisplayPostsResource;
 use App\Models\Display;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -14,7 +15,7 @@ class DisplayPostController extends Controller
   {
     $not_ended = $request->not_ended;
 
-    $posts_with_media = Display::query()
+    $display_with_posts = Display::query()
       ->with([
         'posts' => function (BelongsToMany $query) use ($not_ended) {
           $query->when($not_ended, function (Builder $query) {
@@ -25,6 +26,6 @@ class DisplayPostController extends Controller
       ])
       ->find($display_id);
 
-    return $posts_with_media;
+    return DisplayPostsResource::collection($display_with_posts->posts);
   }
 }
