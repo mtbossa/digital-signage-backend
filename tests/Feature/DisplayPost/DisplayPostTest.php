@@ -4,6 +4,7 @@ namespace Tests\Feature\DisplayPost;
 
 use App\Models\Media;
 use App\Models\Post;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Display\Traits\DisplayTestsTrait;
 use Tests\Feature\Post\Traits\PostTestsTrait;
@@ -32,11 +33,34 @@ class DisplayPostTest extends TestCase
       $post->displays()->attach($this->display->id);
     }
 
-    $response = $this->getJson(route('displays.posts.index', $this->display->id))->assertOk();
+    $response = $this->getJson(route('displays.posts.index', ['display' => $this->display->id]))->assertOk();
     foreach ($posts as $key => $post) {
-      $response->assertJsonPath("posts.{$key}.id", $post->id);
+      $response->assertJsonFragment(['id' => $post->id]);
     }
   }
 
+  /** @test */
+  public function fetch_only_display_posts_which_end_date_is_greater_or_equal_today()
+  {
+    Carbon::setTestNow(Carbon::createFromDate(2022, 1, 2));
+    $today = Carbon::now()->format('Y-m-d');
+
+    $media = Media::factory()->create();
+
+    $ended_post = Post::factory()->create(['end_date' => '2022-01-01', 'media_id' => $media->id]);
+    $today_end_post = Post::factory()->create(['end_date' => '2022-01-02', 'media_id' => $media->id]);
+    $tomorrow_end_post = Post::factory()->create(['end_date' => '2022-01-03', 'media_id' => $media->id]);
+
+    $posts = [$ended_post, $today_end_post, $tomorrow_end_post];
+
+    foreach ($posts as $post) {
+      $post->displays()->attach($this->display->id);
+    }
+
+    $response = $this->getJson(route('displays.posts.index',
+      ['display' => $this->display->id, 'not_ended' => true]))->assertOk();
+
+    $response->assertJsonMissing(['end_date' => $ended_post->end_date]);
+  }
 
 }
