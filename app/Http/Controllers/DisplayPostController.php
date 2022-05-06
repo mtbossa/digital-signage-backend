@@ -15,7 +15,6 @@ class DisplayPostController extends Controller
     $not_ended = $request->not_ended;
 
     $posts_with_media = Display::query()
-      ->find($display_id)
       ->with([
         'posts' => function (BelongsToMany $query) use ($not_ended) {
           $query->when($not_ended, function (Builder $query) {
@@ -24,7 +23,7 @@ class DisplayPostController extends Controller
           $query->with('media');
         }
       ])
-      ->get();
+      ->find($display_id);
 
     return $posts_with_media;
   }

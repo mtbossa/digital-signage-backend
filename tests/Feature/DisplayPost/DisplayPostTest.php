@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\DisplayPost;
 
+use App\Models\Display;
 use App\Models\Media;
 use App\Models\Post;
 use Carbon\Carbon;
@@ -37,6 +38,28 @@ class DisplayPostTest extends TestCase
     foreach ($posts as $key => $post) {
       $response->assertJsonFragment(['id' => $post->id]);
     }
+  }
+
+  /** @test */
+  public function ensure_only_posts_from_sent_display_id_are_returned()
+  {
+    $media = Media::factory()->create();
+    $posts = Post::factory(2)->create(['media_id' => $media->id]);
+    foreach ($posts as $post) {
+      $post->displays()->attach($this->display->id);
+    }
+
+    $display_two = Display::factory()->create();
+    $post_for_display_two = Post::factory()->create(['media_id' => $media->id]);
+    $post_for_display_two->displays()->attach($display_two);
+
+    $response = $this->getJson(route('displays.posts.index', ['display' => $this->display->id]))->assertOk();
+
+    foreach ($posts as $key => $post) {
+      $response->assertJsonFragment(['id' => $post->id]);
+    }
+
+    $response->assertJsonMissing(['id' => $post_for_display_two->id]);
   }
 
   /** @test */
