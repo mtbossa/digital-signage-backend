@@ -25,7 +25,8 @@ class DisplayPostsResource extends JsonResource
       $this->mergeWhen($this->whenLoaded('medias'), [
         'media' => [
           'path' => $this->media->path,
-          'type' => $this->media->type
+          'type' => $this->media->type,
+          'filename' => $this->media->filename
         ],
       ]),
     ];
