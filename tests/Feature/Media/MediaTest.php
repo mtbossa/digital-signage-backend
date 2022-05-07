@@ -45,7 +45,7 @@ class MediaTest extends TestCase
 
     $response->assertCreated()->assertJson($response_data);
 
-    $this->getJson(route('media-download', $response_data['filename']))->assertDownload($response_data['filename']);
+    $this->getJson(route('media.download', $response_data['filename']))->assertDownload($response_data['filename']);
   }
 
   /** @test */
@@ -66,7 +66,7 @@ class MediaTest extends TestCase
 
     $response->assertCreated()->assertJson($response_data);
 
-    $this->getJson(route('media-download', $response_data['filename']))->assertDownload($response_data['filename']);
+    $this->getJson(route('media.download', $response_data['filename']))->assertDownload($response_data['filename']);
   }
 
   /** @test */

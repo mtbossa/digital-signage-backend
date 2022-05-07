@@ -32,7 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
   });
 
   Route::apiResource('displays.posts', DisplayPostController::class)->only('index');
-  Route::get('media-download/{filename}', MediaDownloadController::class)->name('media-download');
+  Route::get('media/download/{filename}', MediaDownloadController::class)->name('media.download');
 
   Route::apiResources([
     'users' => UserController::class,
