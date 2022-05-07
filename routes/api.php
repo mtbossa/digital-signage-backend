@@ -4,6 +4,7 @@ use App\Http\Controllers\DisplayController;
 use App\Http\Controllers\DisplayPostController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\MediaDownloadController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RaspberryController;
 use App\Http\Controllers\RecurrenceController;
@@ -30,6 +31,8 @@ Route::middleware('auth:sanctum')->group(function () {
     return $request->user();
   });
 
+  Route::apiResource('displays.posts', DisplayPostController::class)->only('index');
+  Route::get('media-download/{filename}', MediaDownloadController::class)->name('media-download');
 
   Route::apiResources([
     'users' => UserController::class,
@@ -42,7 +45,6 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::apiResource('invitations', InvitationController::class, ['except' => ['update', 'show']]);
 });
 
-Route::apiResource('displays.posts', DisplayPostController::class)->only('index');
 Route::get('invitations/{token}', [InvitationController::class, 'show'])->name('invitations.show');
 Route::patch('invitations/{token}', [InvitationController::class, 'update'])->name('invitations.update');
 

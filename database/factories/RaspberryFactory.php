@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Raspberry;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -10,6 +11,19 @@ use Illuminate\Support\Str;
  */
 class RaspberryFactory extends Factory
 {
+
+  /**
+   * Configure the model factory.
+   *
+   * @return $this
+   */
+  public function configure()
+  {
+    return $this->afterCreating(function (Raspberry $raspberry) {
+      return $raspberry->plainTextToken = $raspberry->createToken('raspberry_api_token')->plainTextToken;
+    });
+  }
+
   /**
    * Define the model's default state.
    *
@@ -33,7 +47,8 @@ class RaspberryFactory extends Factory
   public function booted()
   {
     return $this->state(function (array $attributes) {
-      return ['last_boot' => $this->faker->dateTime()->format('Y-m-d H:m:s'),
+      return [
+        'last_boot' => $this->faker->dateTime()->format('Y-m-d H:m:s'),
       ];
     });
   }

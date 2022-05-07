@@ -54,14 +54,16 @@ class RaspberryTest extends TestCase
   public function fetch_single_raspberry()
   {
     $this->getJson(route('raspberries.show',
-      $this->raspberry->id))->assertOk()->assertJson($this->raspberry->toArray());
+      $this->raspberry->id))->assertOk()->assertJson(['id' => $this->raspberry->id]);
   }
 
   /** @test */
-  public function fetch_all_displays()
+  public function fetch_all_raspberries()
   {
-    $this->_createRaspberry();
+    $second_raspberry = $this->_createRaspberry();
 
-    $this->getJson(route('raspberries.index'))->assertOk()->assertJsonCount(2)->assertJsonFragment($this->raspberry->toArray());
+    $this->getJson(route('raspberries.index'))->assertOk()->assertJsonCount(2)->assertJson([
+      ['id' => $this->raspberry->id], ['id' => $second_raspberry->id]
+    ]);
   }
 }

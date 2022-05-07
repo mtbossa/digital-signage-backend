@@ -23,6 +23,10 @@ class RaspberryController extends Controller
       $display = Display::findOrFail($request->display_id);
       $raspberry->display()->associate($display)->save();
     }
+
+    $new_token = $raspberry->createToken('raspberry_access_token');
+    $raspberry->token = $new_token;
+
     return $raspberry;
   }
 
