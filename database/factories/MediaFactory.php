@@ -38,7 +38,7 @@ class MediaFactory extends Factory
   {
     $type = $this->faker->randomElement($this->available_types);
     $extension = $this->faker->randomElement($this->available_extensions[$type]);
-    $filename = Str::of($this->faker->text(50))->replace('.', '')->snake()->toString().$extension;
+    $filename = Str::of($this->faker->text(50))->replace('.', '')->snake()->toString().'.'.$extension;
     $hashed_filename = hash('md5', $filename);
     $type_folder = Str::plural($type);
     list($min, $max) = $type === 'image' ? [100, 30000] : [2000, 150000];
