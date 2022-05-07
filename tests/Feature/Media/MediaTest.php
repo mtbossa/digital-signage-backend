@@ -28,7 +28,7 @@ class MediaTest extends TestCase
   }
 
   /** @test */
-  public function create_image_media_and_store_file_under_images_folder()
+  public function create_image_media_and_store_file_under_images_folder_and_ensure_it_can_be_downloaded()
   {
     Storage::fake('local');
 
@@ -44,10 +44,12 @@ class MediaTest extends TestCase
     $this->assertDatabaseHas('medias', $response_data);
 
     $response->assertCreated()->assertJson($response_data);
+
+    $this->getJson(route('media-download', $response_data['filename']))->assertDownload($response_data['filename']);
   }
 
   /** @test */
-  public function create_video_media_and_store_file_under_videos_folder()
+  public function create_video_media_and_store_file_under_videos_folder_and_ensure_it_can_be_downloaded()
   {
     Storage::fake('local');
 
@@ -63,6 +65,8 @@ class MediaTest extends TestCase
     $this->assertDatabaseHas('medias', $response_data);
 
     $response->assertCreated()->assertJson($response_data);
+
+    $this->getJson(route('media-download', $response_data['filename']))->assertDownload($response_data['filename']);
   }
 
   /** @test */
@@ -83,7 +87,8 @@ class MediaTest extends TestCase
     unset($current_values['description']);
     $update_values = $this->_makeMedia()->toArray();
 
-    $this->putJson(route('medias.update', $this->media->id), $update_values)->assertJson(['description' => $update_values['description']])->assertOk();
+    $this->putJson(route('medias.update', $this->media->id),
+      $update_values)->assertJson(['description' => $update_values['description']])->assertOk();
     $this->assertDatabaseHas('medias', [...$current_values, 'description' => $update_values['description']]);
   }
 
