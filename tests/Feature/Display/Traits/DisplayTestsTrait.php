@@ -15,7 +15,6 @@ trait DisplayTestsTrait
 
   private function _createDisplay(array $data = null): Display
   {
-    Display::factory()->create($data);
-    return Display::first();
+    return Display::factory()->create($data);
   }
 }
