@@ -16,7 +16,7 @@ return new class extends Migration {
       $table->id();
       $table->string('description', 50);
       $table->string('type', 10);
-      $table->string('filename', 255);
+      $table->string('filename', 255)->unique();
       $table->string('extension', 5);
       $table->string('path', 255);
       $table->integer('size_kb');
