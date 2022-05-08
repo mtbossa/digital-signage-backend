@@ -57,7 +57,10 @@ class DisplayPostTest extends TestCase
         'start_time' => $post->start_time,
         'end_time' => $post->end_time,
         'expose_time' => $post->expose_time,
-        'media' => ['path' => $post->media->path, 'type' => $post->media->type, 'filename' => $post->media->filename]
+        'media' => [
+          'id' => $post->media->id, 'path' => $post->media->path, 'type' => $post->media->type,
+          'filename' => $post->media->filename
+        ]
       ];
     }
     $complete_json = ['data' => $json_structure];

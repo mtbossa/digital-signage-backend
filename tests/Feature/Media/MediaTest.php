@@ -28,6 +28,21 @@ class MediaTest extends TestCase
   }
 
   /** @test */
+  public function ensure_filename_is_store_as_hash()
+  {
+    Storage::fake('local');
+
+    $description = 'Imagem de teste';
+
+    $file = UploadedFile::fake()->image('image_test.jpg');
+    $hash_name = $file->hashName();
+    $response = $this->postJson(route('medias.store'), ['description' => $description, 'file' => $file]);
+
+    Storage::disk('local')->assertExists($this->defaultLocation['image'].'/'.$response['filename']);
+    $this->assertDatabaseHas('medias', ['id' => $response['id'], 'filename' => $hash_name]);
+  }
+
+  /** @test */
   public function create_image_media_and_store_file_under_images_folder_and_ensure_it_can_be_downloaded()
   {
     Storage::fake('local');
