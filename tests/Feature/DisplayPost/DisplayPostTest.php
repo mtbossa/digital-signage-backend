@@ -5,6 +5,7 @@ namespace Tests\Feature\DisplayPost;
 use App\Models\Display;
 use App\Models\Media;
 use App\Models\Post;
+use App\Models\Recurrence;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Display\Traits\DisplayTestsTrait;
@@ -68,6 +69,44 @@ class DisplayPostTest extends TestCase
     $response = $this->getJson(route('displays.posts.index',
       ['display' => $this->display->id]))->assertOk();
     $response->assertExactJson($complete_json);
+  }
+
+  /** @test */
+  public function ensure_recurrent_posts_are_always_returned()
+  {
+    $now = Carbon::createFromDate(2022, 1, 2);
+    Carbon::setTestNow($now);
+
+    $recurrence = Recurrence::factory()->create();
+    $media = Media::factory()->create();
+    $recurrent_post = Post::factory()->create(['media_id' => $media->id, 'recurrence_id' => $recurrence->id]);
+    $posts = Post::factory(2)->nonRecurrent()->create([
+      'start_date' => '2021-01-01', 'end_date' => '2022-02-02', 'media_id' => $media->id
+    ]);
+    $posts[] = $recurrent_post;
+
+    $recurrence_structure = [];
+    foreach ($posts as $post) {
+      $post->displays()->attach($this->display->id);
+
+      if ($post->recurrence) {
+        $recurrence_structure[] = [
+          'id' => $post->id,
+          'recurrence' => [
+            'day' => $post->recurrence->day, 'isoweekday' => $post->recurrence->isoweekday,
+            'month' => $post->recurrence->month, 'year' => $post->recurrence->year
+          ]
+        ];
+      }
+    }
+
+    $complete_json = ['data' => $recurrence_structure];
+
+    $res = $this->getJson(route('displays.posts.index',
+      ['display' => $this->display->id]))->assertOk()->assertJson($complete_json);
+
+    $this->getJson(route('displays.posts.index',
+      ['display' => $this->display->id]), ['not_ended' => true])->assertOk()->assertJson($complete_json);
   }
 
   /** @test */

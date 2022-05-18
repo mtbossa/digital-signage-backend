@@ -22,7 +22,8 @@ class DisplayPostController extends Controller
             $query->where('end_date', '>=', Carbon::now()->format('Y-m-d'));
           });
           $query->with('media');
-        }
+          $query->with('recurrence');
+        },
       ])
       ->find($display_id);
 
