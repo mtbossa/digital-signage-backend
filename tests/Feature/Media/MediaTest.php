@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Media;
 
+use App\Models\Media;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
@@ -104,7 +105,11 @@ class MediaTest extends TestCase
 
     $this->putJson(route('medias.update', $this->media->id),
       $update_values)->assertJson(['description' => $update_values['description']])->assertOk();
-    $this->assertDatabaseHas('medias', [...$current_values, 'description' => $update_values['description']]);
+    $test = Media::all();
+    $this->assertDatabaseHas('medias', [
+      'id' => $current_values['id'], 'filename' => $current_values['filename'], 'path' => $current_values['path'],
+      'description' => $update_values['description']
+    ]);
   }
 
   /** @test */

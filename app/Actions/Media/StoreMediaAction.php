@@ -43,7 +43,7 @@ class StoreMediaAction
    */
   private function _getType(string $mime_type): string
   {
-    return Str::of(explode('/', $mime_type)[0])->plural()->toString();
+    return Str::of(explode('/', $mime_type)[0])->toString();
   }
 
   private function _storeFile(array $file_info): string
