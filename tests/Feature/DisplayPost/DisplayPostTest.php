@@ -90,8 +90,7 @@ class DisplayPostTest extends TestCase
       $post->displays()->attach($this->display->id);
 
       if ($post->recurrence) {
-        $recurrence_structure[] = [
-          'id' => $post->id,
+        $recurrence_structure = [
           'recurrence' => [
             'day' => $post->recurrence->day, 'isoweekday' => $post->recurrence->isoweekday,
             'month' => $post->recurrence->month, 'year' => $post->recurrence->year
@@ -100,13 +99,11 @@ class DisplayPostTest extends TestCase
       }
     }
 
-    $complete_json = ['data' => $recurrence_structure];
-
-    $res = $this->getJson(route('displays.posts.index',
-      ['display' => $this->display->id]))->assertOk()->assertJson($complete_json);
+    $this->getJson(route('displays.posts.index',
+      ['display' => $this->display->id]))->assertOk()->assertJsonFragment($recurrence_structure);
 
     $this->getJson(route('displays.posts.index',
-      ['display' => $this->display->id]), ['not_ended' => true])->assertOk()->assertJson($complete_json);
+      ['display' => $this->display->id, 'not_ended' => true]))->assertOk()->assertJsonFragment($recurrence_structure);
   }
 
   /** @test */

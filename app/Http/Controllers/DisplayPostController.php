@@ -20,7 +20,21 @@ class DisplayPostController extends Controller
         'posts' => function (BelongsToMany $query) use ($not_ended) {
           $query->when($not_ended, function (Builder $query) {
             $query->where('end_date', '>=', Carbon::now()->format('Y-m-d'));
+            $query->orWhereNotNull('recurrence_id');
           });
+          $query->with('media');
+          $query->with('recurrence');
+        },
+      ])
+      ->find($display_id);
+
+    $test = Display::query()
+      ->with([
+        'posts' => function (BelongsToMany $query) use ($not_ended) {
+          $query->when($not_ended, function (Builder $query) {
+            $query->where('end_date', '>=', Carbon::now()->format('Y-m-d'));
+            $query->orWhereNotNull('recurrence_id');
+          })->toSql();
           $query->with('media');
           $query->with('recurrence');
         },
