@@ -185,9 +185,6 @@ class PostValidationTest extends TestCase
       'media_id as string' => [
         [...$post_data, 'media_id' => ''], ['media_id'],
       ],
-      'expose_time as null' => [
-        [...$post_data, 'expose_time' => null], ['expose_time'],
-      ],
       'expose_time as string' => [
         [...$post_data, 'expose_time' => ''], ['expose_time'],
       ],

@@ -29,7 +29,7 @@ class StorePostRequest extends FormRequest
       'media_id' => ['required', 'integer'],
       'recurrence_id' => ['sometimes', 'prohibits:start_date,end_date'],
       'displays_ids' => ['present', 'nullable', 'array', Rule::in(Display::all()->pluck('id')->toArray())],
-      'expose_time' => ['required', 'numeric', 'min:1000']
+      'expose_time' => ['numeric', 'min:1000']
     ];
   }
 }

@@ -22,7 +22,7 @@ return new class extends Migration {
 
       $table->time('start_time');
       $table->time('end_time');
-      $table->mediumInteger('expose_time');
+      $table->mediumInteger('expose_time')->nullable();
 
       $table->foreignId('media_id')
         ->constrained('medias', 'id')
