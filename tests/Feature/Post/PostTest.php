@@ -25,7 +25,6 @@ class PostTest extends TestCase
   /** @test */
   public function create_post()
   {
-    $this->withoutExceptionHandling();
     $post_data = $this->_makePost(['media_id' => $this->media->id], false)->toArray();
 
     $response = $this->postJson(route('posts.store'), [...$post_data, 'displays_ids' => null]);
@@ -34,7 +33,7 @@ class PostTest extends TestCase
 
     $response->assertCreated()->assertJson($post_data);
   }
-  
+
   /** @test */
   public function delete_post()
   {
