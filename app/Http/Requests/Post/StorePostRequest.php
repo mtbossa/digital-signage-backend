@@ -25,7 +25,7 @@ class StorePostRequest extends FormRequest
         'after_or_equal:start_date',
       ],
       'start_time' => ['required', 'date_format:H:i:s'],
-      'end_time' => ['required', 'date_format:H:i:s', 'after:start_time'],
+      'end_time' => ['required', 'date_format:H:i:s'],
       'media_id' => ['required', 'integer'],
       'recurrence_id' => ['sometimes', 'prohibits:start_date,end_date'],
       'displays_ids' => ['present', 'nullable', 'array', Rule::in(Display::all()->pluck('id')->toArray())],
