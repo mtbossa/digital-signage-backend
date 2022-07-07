@@ -26,7 +26,9 @@ class StorePostAction
       $post->load('displays');
     }
 
-    $service->setPost($post)->run();
+    if (!$post->recurrence_id) {
+      $service->setPost($post)->run();
+    }
 
     return $post;
   }
