@@ -15,6 +15,10 @@ class PostStartWhenCreatingTest extends TestCase
   private int $displaysAmount = 3;
   private string $nowDate = '2022-01-01 15:15:00';
 
+  /**
+   * All values here are based on chosen $nowDate;
+   */
+
   // Between these times, must always dispatch event
   private array $eventTimes = [
     ['start' => '15:14:00', 'end' => '15:16:00'],
