@@ -65,7 +65,7 @@ class PostStartTest extends TestCase
    * @test
    * @dataProvider dateAndTimeThatShouldDispatchEvent
    */
-  public function should_dispatch_event($startDate, $endDate, $startTime, $endTime)
+  public function when_creating_post_should_dispatch_event($startDate, $endDate, $startTime, $endTime)
   {
     $this->showPostAssetion(
       $startDate,
@@ -78,7 +78,8 @@ class PostStartTest extends TestCase
     );
   }
 
-  public function dateAndTimeThatShouldDispatchEvent()
+  // Dispatching event always depend on time
+  public function dateAndTimeThatShouldDispatchEvent(): array
   {
     $test = [];
     foreach ($this->eventTimes as $eventTime) {
@@ -102,4 +103,132 @@ class PostStartTest extends TestCase
     }
     return $test;
   }
+
+  /**
+   * @test
+   * @dataProvider shouldQueueByTimeOnly
+   */
+  public function when_creating_post_should_queue_time_only($startDate, $endDate, $startTime, $endTime)
+  {
+    $this->showPostAssetion(
+      $startDate,
+      $endDate,
+      $startTime,
+      $endTime,
+      $this->nowDate,
+      $this->displaysAmount,
+      PostShouldDo::Queue
+    );
+  }
+
+  public function shouldQueueByTimeOnly(): array
+  {
+    $test = [];
+    foreach ($this->queueTimes as $queueTime) {
+      foreach ($this->showDates as $showDate) {
+        $startDate = $showDate['start'];
+        $startTime = $queueTime['start'];
+        $endDate = $showDate['end'];
+        $endTime = $queueTime['end'];
+        $startDateAndTime = "$startDate $startTime";
+        $endDateAndTime = "$endDate $endTime";
+
+        $string = "Start: $startDateAndTime | End: $endDateAndTime";
+
+        $test[$string] = [
+          'startDate' => $showDate['start'],
+          'endDate' => $showDate['end'],
+          'startTime' => $queueTime['start'],
+          'endTime' => $queueTime['end']
+        ];
+      }
+    }
+    return $test;
+  }
+
+  /**
+   * @test
+   * @dataProvider shouldQueueByDateOnly
+   */
+  public function when_creating_post_should_queue_date_only($startDate, $endDate, $startTime, $endTime)
+  {
+    $this->showPostAssetion(
+      $startDate,
+      $endDate,
+      $startTime,
+      $endTime,
+      $this->nowDate,
+      $this->displaysAmount,
+      PostShouldDo::Queue
+    );
+  }
+
+  public function shouldQueueByDateOnly(): array
+  {
+    $test = [];
+    foreach ($this->eventTimes as $eventTime) {
+      foreach ($this->queueDates as $queueDate) {
+        $startDate = $queueDate['start'];
+        $startTime = $eventTime['start'];
+        $endDate = $queueDate['end'];
+        $endTime = $eventTime['end'];
+        $startDateAndTime = "$startDate $startTime";
+        $endDateAndTime = "$endDate $endTime";
+
+        $string = "Start: $startDateAndTime | End: $endDateAndTime";
+
+        $test[$string] = [
+          'startDate' => $queueDate['start'],
+          'endDate' => $queueDate['end'],
+          'startTime' => $eventTime['start'],
+          'endTime' => $eventTime['end']
+        ];
+      }
+    }
+    return $test;
+  }
+
+  /**
+   * @test
+   * @dataProvider shouldQueueByDateAndTime
+   */
+  public function when_creating_post_should_queue_date_and_time($startDate, $endDate, $startTime, $endTime)
+  {
+    $this->showPostAssetion(
+      $startDate,
+      $endDate,
+      $startTime,
+      $endTime,
+      $this->nowDate,
+      $this->displaysAmount,
+      PostShouldDo::Queue
+    );
+  }
+
+  public function shouldQueueByDateAndTime(): array
+  {
+    $test = [];
+    foreach ($this->queueTimes as $eventTime) {
+      foreach ($this->queueDates as $queueDate) {
+        $startDate = $queueDate['start'];
+        $startTime = $eventTime['start'];
+        $endDate = $queueDate['end'];
+        $endTime = $eventTime['end'];
+        $startDateAndTime = "$startDate $startTime";
+        $endDateAndTime = "$endDate $endTime";
+
+        $string = "Start: $startDateAndTime | End: $endDateAndTime";
+
+        $test[$string] = [
+          'startDate' => $queueDate['start'],
+          'endDate' => $queueDate['end'],
+          'startTime' => $eventTime['start'],
+          'endTime' => $eventTime['end']
+        ];
+      }
+    }
+    return $test;
+  }
+
+
 }

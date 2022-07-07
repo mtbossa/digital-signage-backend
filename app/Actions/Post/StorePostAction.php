@@ -27,36 +27,44 @@ class StorePostAction
       $post->load('displays');
     }
     $now = Carbon::now();
-    $start = Carbon::createFromTimeString($post->start_time);
-    $end = Carbon::createFromTimeString($post->end_time);
+    $startDate = Carbon::createFromFormat('Y-m-d H:i:s', $post->start_date.$post->start_time);
+    $endDate = Carbon::createFromFormat('Y-m-d H:i:s', $post->end_date.$post->end_time);
+    $startTime = Carbon::createFromTimeString($post->start_time);
+    $endTime = Carbon::createFromTimeString($post->end_time);
 
-    if ($start->isAfter($end) || ($start->isSameHour($end)) && $start->isAfter($end)) {
-      $startOfToday = $now->copy()->startOf('day');
-      $endOfToday = $now->copy()->endOf('day');
-
-      $endYesterdayMinutesShowToday = $startOfToday->diffInMinutes($end);
-      $todayShowEndYesterday = $startOfToday->copy()->addMinute($endYesterdayMinutesShowToday);
-
-      $startTodayMinutesShowToday = $endOfToday->diffInMinutes($start);
-      $todayShowStartToday = $endOfToday->copy()->subMinute($startTodayMinutesShowToday);
-
-      if ($now->isBetween($todayShowEndYesterday, $todayShowStartToday)) {
-        foreach ($post->displays as $display) {
-          StartPost::dispatch($post);
-        }
-      } else {
-        foreach ($post->displays as $display) {
-          event(new PostStarted($post, $display));
-        }
+    if ($startDate->isAfter($now)) {
+      foreach ($post->displays as $display) {
+        StartPost::dispatch($post);
       }
     } else {
-      if ($post->start_date <= now()->format('Y-m-d') && $now->isAfter($post->start_time)) {
-        foreach ($post->displays as $display) {
-          event(new PostStarted($post, $display));
+      if ($startTime->isAfter($endTime) || ($startTime->isSameHour($endTime)) && $startTime->isAfter($endTime)) {
+        $startOfToday = $now->copy()->startOf('day');
+        $endOfToday = $now->copy()->endOf('day');
+
+        $endYesterdayMinutesShowToday = $startOfToday->diffInMinutes($endTime);
+        $todayShowEndYesterday = $startOfToday->copy()->addMinute($endYesterdayMinutesShowToday);
+
+        $startTodayMinutesShowToday = $endOfToday->diffInMinutes($startTime);
+        $todayShowStartToday = $endOfToday->copy()->subMinute($startTodayMinutesShowToday);
+
+        if ($now->isBetween($todayShowEndYesterday, $todayShowStartToday)) {
+          foreach ($post->displays as $display) {
+            StartPost::dispatch($post);
+          }
+        } else {
+          foreach ($post->displays as $display) {
+            event(new PostStarted($post, $display));
+          }
         }
       } else {
-        foreach ($post->displays as $display) {
-          StartPost::dispatch($post);
+        if ($post->start_date <= now()->format('Y-m-d') && ($now->isAfter($startTime) && $now->isBefore($endTime))) {
+          foreach ($post->displays as $display) {
+            event(new PostStarted($post, $display));
+          }
+        } else {
+          foreach ($post->displays as $display) {
+            StartPost::dispatch($post);
+          }
         }
       }
     }
