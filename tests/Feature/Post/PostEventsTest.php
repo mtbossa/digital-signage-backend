@@ -61,10 +61,9 @@ class PostEventsTest extends TestCase
    * @test
    * @dataProvider dateAndTimeThatShouldDispatchEvent
    */
-  public function when_creating_post_should_dispatch_event($startDate, $endDate, $startTime, $endTime)
+  public function when_post_started_event_is_fired_should_queue_end_post_job($startDate, $endDate, $startTime, $endTime)
   {
-    $this->withoutExceptionHandling();
-    $this->showPostAssetion(
+    $this->showPostAssertion(
       $startDate,
       $endDate,
       $startTime,
@@ -107,7 +106,7 @@ class PostEventsTest extends TestCase
    */
   public function when_creating_post_should_queue_time_only($startDate, $endDate, $startTime, $endTime)
   {
-    $this->showPostAssetion(
+    $this->showPostAssertion(
       $startDate,
       $endDate,
       $startTime,
@@ -149,7 +148,7 @@ class PostEventsTest extends TestCase
    */
   public function when_creating_post_should_queue_date_only($startDate, $endDate, $startTime, $endTime)
   {
-    $this->showPostAssetion(
+    $this->showPostAssertion(
       $startDate,
       $endDate,
       $startTime,
@@ -191,7 +190,7 @@ class PostEventsTest extends TestCase
    */
   public function when_creating_post_should_queue_date_and_time($startDate, $endDate, $startTime, $endTime)
   {
-    $this->showPostAssetion(
+    $this->showPostAssertion(
       $startDate,
       $endDate,
       $startTime,

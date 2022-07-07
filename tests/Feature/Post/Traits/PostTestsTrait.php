@@ -45,7 +45,7 @@ trait PostTestsTrait
     return Display::factory($amount)->create()->pluck(['id'])->toArray();
   }
 
-  private function showPostAssetion(
+  private function showPostAssertion(
     string $startDate,
     string $endDate,
     string $startTime,
@@ -53,7 +53,7 @@ trait PostTestsTrait
     string $nowDateTime,
     int $amountOfDisplays,
     PostShouldDo $shouldShowOrQueue,
-  ) {
+  ): void {
     Bus::fake();
     Event::fake();
 
