@@ -7,12 +7,11 @@ use App\Jobs\StartPost;
 use App\Models\Post;
 use Carbon\Carbon;
 
-class PostStartAndEndDispatcher
+class PostStartAndEndDispatcherService
 {
   private Post $post;
   private Carbon $now;
   private Carbon $startDate;
-  private Carbon $endDate;
   private Carbon $startTime;
   private Carbon $endTime;
 
@@ -21,7 +20,7 @@ class PostStartAndEndDispatcher
     $this->now = Carbon::now();
   }
 
-  public function setPost(Post $post): PostStartAndEndDispatcher
+  public function setPost(Post $post): PostStartAndEndDispatcherService
   {
     $this->post = $post;
     $this->setDatesAndTimes();
@@ -31,7 +30,6 @@ class PostStartAndEndDispatcher
   private function setDatesAndTimes()
   {
     $this->startDate = Carbon::createFromFormat('Y-m-d', $this->post->start_date);
-    $this->endDate = Carbon::createFromFormat('Y-m-d', $this->post->end_date);
     $this->startTime = Carbon::createFromTimeString($this->post->start_time);
     $this->endTime = Carbon::createFromTimeString($this->post->end_time);
   }

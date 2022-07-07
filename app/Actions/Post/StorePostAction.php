@@ -5,12 +5,12 @@ namespace App\Actions\Post;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\Recurrence;
-use App\Services\PostStartAndEndDispatcher;
+use App\Services\PostStartAndEndDispatcherService;
 use Illuminate\Http\Request;
 
 class StorePostAction
 {
-  public function handle(Request $request, PostStartAndEndDispatcher $service): Post
+  public function handle(Request $request, PostStartAndEndDispatcherService $service): Post
   {
     $media = Media::findOrFail($request->media_id);
     $post = $media->posts()->create($request->except(['media_id']));

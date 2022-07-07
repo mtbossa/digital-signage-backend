@@ -64,7 +64,7 @@ class PostStartWhenCreatingTest extends TestCase
   public function when_creating_post_should_dispatch_event($startDate, $endDate, $startTime, $endTime)
   {
     $this->withoutExceptionHandling();
-    $this->showPostAssetion(
+    $this->showPostAssertion(
       $startDate,
       $endDate,
       $startTime,
@@ -107,7 +107,7 @@ class PostStartWhenCreatingTest extends TestCase
    */
   public function when_creating_post_should_queue_time_only($startDate, $endDate, $startTime, $endTime)
   {
-    $this->showPostAssetion(
+    $this->showPostAssertion(
       $startDate,
       $endDate,
       $startTime,
@@ -149,7 +149,7 @@ class PostStartWhenCreatingTest extends TestCase
    */
   public function when_creating_post_should_queue_date_only($startDate, $endDate, $startTime, $endTime)
   {
-    $this->showPostAssetion(
+    $this->showPostAssertion(
       $startDate,
       $endDate,
       $startTime,
@@ -191,7 +191,7 @@ class PostStartWhenCreatingTest extends TestCase
    */
   public function when_creating_post_should_queue_date_and_time($startDate, $endDate, $startTime, $endTime)
   {
-    $this->showPostAssetion(
+    $this->showPostAssertion(
       $startDate,
       $endDate,
       $startTime,
