@@ -27,12 +27,12 @@ class StorePostAction
       $post->load('displays');
     }
     $now = Carbon::now();
-    $startDate = Carbon::createFromFormat('Y-m-d H:i:s', $post->start_date.$post->start_time);
-    $endDate = Carbon::createFromFormat('Y-m-d H:i:s', $post->end_date.$post->end_time);
+    $startDate = Carbon::createFromFormat('Y-m-d', $post->start_date);
+    $endDate = Carbon::createFromFormat('Y-m-d', $post->end_date);
     $startTime = Carbon::createFromTimeString($post->start_time);
     $endTime = Carbon::createFromTimeString($post->end_time);
 
-    if ($startDate->isAfter($now)) {
+    if ($startDate->startOfDay()->isAfter($now)) {
       foreach ($post->displays as $display) {
         StartPost::dispatch($post);
       }

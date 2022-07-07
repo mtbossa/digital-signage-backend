@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Events\PostStarted;
 use App\Models\Post;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -10,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class StartPost implements ShouldQueue
+class EndPost implements ShouldQueue
 {
   use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -31,8 +30,6 @@ class StartPost implements ShouldQueue
    */
   public function handle()
   {
-    foreach ($this->post->displays as $display) {
-      event(new PostStarted($this->post, $display));
-    }
+    //
   }
 }

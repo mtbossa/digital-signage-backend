@@ -8,7 +8,7 @@ use Tests\Feature\Post\Traits\PostTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
 
-class PostStartTest extends TestCase
+class PostEventsTest extends TestCase
 {
   use RefreshDatabase, PostTestsTrait, AuthUserTrait;
 
@@ -46,10 +46,6 @@ class PostStartTest extends TestCase
     ['start' => '2022-01-02', 'end' => '2022-01-03'],
     ['start' => '2022-05-20', 'end' => '2022-11-20'],
   ];
-  // Must delete or inactive post when end date is before today (as passed/expired)
-  private array $deleteDates = [
-    ['start' => '2021-12-30', 'end' => '2022-12-31'],
-  ];
 
   public function setUp(): void
   {
@@ -67,6 +63,7 @@ class PostStartTest extends TestCase
    */
   public function when_creating_post_should_dispatch_event($startDate, $endDate, $startTime, $endTime)
   {
+    $this->withoutExceptionHandling();
     $this->showPostAssetion(
       $startDate,
       $endDate,
