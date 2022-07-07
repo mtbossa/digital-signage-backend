@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Events\PostStarted;
+use App\Helpers\DateAndTimeHelper;
 use App\Jobs\StartPost;
 use App\Models\Post;
 use Carbon\Carbon;
@@ -43,7 +44,7 @@ class PostStartAndEndDispatcherService
     }
 
     // If startTime is after endTime, means it's a post that must stay visible from current day to next
-    if ($this->isPostFromCurrentDayToNext()) {
+    if (DateAndTimeHelper::isPostFromCurrentDayToNext($this->startTime, $this->endTime)) {
       [$todayShowEndYesterday, $todayShowStartToday] = $this->handlePostFromOneDayToNext();
 
       if ($this->isNowBetweenStartAndEndHourAndMinute($todayShowEndYesterday, $todayShowStartToday)) {
