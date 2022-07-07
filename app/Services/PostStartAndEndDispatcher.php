@@ -38,41 +38,72 @@ class PostStartAndEndDispatcher
 
   public function run(): void
   {
-    if ($this->startDate->startOfDay()->isAfter($this->now)) {
-      foreach ($this->post->displays as $display) {
-        StartPost::dispatch($this->post);
-      }
-    } else {
-      if ($this->startTime->isAfter($this->endTime) || ($this->startTime->isSameHour($this->endTime)) && $this->startTime->isAfter($this->endTime)) {
-        $startOfToday = $this->now->copy()->startOf('day');
-        $endOfToday = $this->now->copy()->endOf('day');
+    // When start date is not today or before, must go to queue
+    if ($this->isTodayBeforeStartDate()) {
+      $this->dispatchStartPostJob();
+      return;
+    }
 
-        $endYesterdayMinutesShowToday = $startOfToday->diffInMinutes($this->endTime);
-        $todayShowEndYesterday = $startOfToday->copy()->addMinute($endYesterdayMinutesShowToday);
+    // If startTime is after endTime, means it's a post that must stay visible from current day to next
+    if ($this->isPostFromCurrentDayToNext()) {
+      [$todayShowEndYesterday, $todayShowStartToday] = $this->handlePostFromOneDayToNext();
 
-        $startTodayMinutesShowToday = $endOfToday->diffInMinutes($this->startTime);
-        $todayShowStartToday = $endOfToday->copy()->subMinute($startTodayMinutesShowToday);
-
-        if ($this->now->isBetween($todayShowEndYesterday, $todayShowStartToday)) {
-          foreach ($this->post->displays as $display) {
-            StartPost::dispatch($this->post);
-          }
-        } else {
-          foreach ($this->post->displays as $display) {
-            event(new PostStarted($this->post, $display));
-          }
-        }
+      if ($this->isNowBetweenStartAndEndHourAndMinute($todayShowEndYesterday, $todayShowStartToday)) {
+        $this->dispatchStartPostJob();
       } else {
-        if ($this->post->start_date <= now()->format('Y-m-d') && ($this->now->isAfter($this->startTime) && $this->now->isBefore($this->endTime))) {
-          foreach ($this->post->displays as $display) {
-            event(new PostStarted($this->post, $display));
-          }
-        } else {
-          foreach ($this->post->displays as $display) {
-            StartPost::dispatch($this->post);
-          }
-        }
+        $this->dispatchPostStartedEvent();
       }
+      return;
+    }
+
+    if ($this->isNowBetweenStartAndEndHourAndMinute($this->startTime, $this->endTime)) {
+      $this->dispatchPostStartedEvent();
+      return;
+    }
+
+    $this->dispatchStartPostJob();
+  }
+
+  private function handlePostFromOneDayToNext(): array
+  {
+    $startOfToday = $this->now->copy()->startOfDay();
+    $endOfToday = $this->now->copy()->endOfDay();
+
+    $endYesterdayMinutesShowToday = $startOfToday->diffInMinutes($this->endTime);
+    $todayShowEndYesterday = $startOfToday->copy()->addMinute($endYesterdayMinutesShowToday);
+
+    $startTodayMinutesShowToday = $endOfToday->diffInMinutes($this->startTime);
+    $todayShowStartToday = $endOfToday->copy()->subMinute($startTodayMinutesShowToday);
+
+    return [$todayShowEndYesterday, $todayShowStartToday];
+  }
+
+  private function isNowBetweenStartAndEndHourAndMinute(Carbon $startTime, Carbon $endTime): bool
+  {
+    return $this->now->isBetween($this->startTime, $this->endTime);
+  }
+
+  private function isPostFromCurrentDayToNext(): bool
+  {
+    return $this->startTime->isAfter($this->endTime);
+  }
+
+  private function isTodayBeforeStartDate(): bool
+  {
+    return $this->startDate->startOfDay()->isAfter($this->now);
+  }
+
+  private function dispatchStartPostJob(): void
+  {
+    foreach ($this->post->displays as $display) {
+      StartPost::dispatch($this->post);
+    }
+  }
+
+  private function dispatchPostStartedEvent(): void
+  {
+    foreach ($this->post->displays as $display) {
+      event(new PostStarted($this->post, $display));
     }
   }
 }
