@@ -6,6 +6,7 @@ use App\Actions\Post\StorePostAction;
 use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Models\Post;
+use App\Services\PostStartAndEndDispatcherService;
 use Illuminate\Database\Eloquent\Collection;
 
 class PostController extends Controller
@@ -15,9 +16,12 @@ class PostController extends Controller
     return Post::all();
   }
 
-  public function store(StorePostRequest $request, StorePostAction $action): Post
-  {
-    return $action->handle($request);
+  public function store(
+    StorePostRequest $request,
+    StorePostAction $action,
+    PostStartAndEndDispatcherService $service
+  ): Post {
+    return $action->handle($request, $service);
   }
 
   public function show(Post $post): Post
