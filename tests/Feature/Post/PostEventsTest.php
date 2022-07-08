@@ -3,6 +3,7 @@
 namespace Tests\Feature\Post;
 
 use App\Jobs\EndPost;
+use App\Jobs\StartPost;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
@@ -51,13 +52,18 @@ class PostEventsTest extends TestCase
     ['start' => '2021-12-31', 'end' => '2022-01-01'],
     ['start' => '2021-10-05', 'end' => '2022-05-06'],
     ['start' => '2022-01-01', 'end' => '2022-01-02'],
-    ['start' => '2022-01-01', 'end' => '2022-01-01'],
   ];
 
   // Always will queue when start date is after today
   private array $queueDates = [
     ['start' => '2022-01-02', 'end' => '2022-01-03'],
     ['start' => '2022-05-20', 'end' => '2022-11-20'],
+  ];
+
+  // Always will queue when start date is after today
+  private array $expireDates = [
+    ['start' => '2022-01-01', 'end' => '2022-01-01'],
+    ['start' => '2021-12-29', 'end' => '2021-12-31'],
   ];
 
   public function setUp(): void
@@ -195,6 +201,97 @@ class PostEventsTest extends TestCase
       }
     }
     return $test;
+  }
+
+  /**
+   * @test
+   * @dataProvider oneDayPostsThatShouldDispatchEvent
+   */
+  public function when_one_day_post_end_post_job_completes_must_dispatch_start_post_job_for_next_day_start_time(
+    $startDate,
+    $endDate,
+    $startTime,
+    $endTime
+  ) {
+    Bus::fake([StartPost::class]);
+
+    $now = Carbon::createFromFormat('Y-m-d H:i:s', $this->nowDate);
+    $this->travelTo($now);
+
+    $media = $this->_createMedia();
+    $displays_ids = $this->createDisplaysAndReturnIds($this->displaysAmount);
+    $post_data = $this->_makePost([
+      'start_date' => $startDate, 'start_time' => $startTime, 'end_date' => $endDate, 'end_time' => $endTime,
+      'displays_ids' => $displays_ids,
+      'media_id' => $media->id
+    ], false)->toArray();
+
+    $response = $this->postJson(route('posts.store'), $post_data);
+
+    $correctScheduleEndDate = Carbon::createFromTimeString($endTime);
+    // Travels to end time so job is completed
+    $this->travelTo($correctScheduleEndDate);
+
+    Bus::assertDispatched(function (StartPost $job) use ($endTime, $startTime) {
+      $correctScheduleNextStartDate = Carbon::createFromTimeString($startTime)->addDay();
+      $endTimeObject = Carbon::createFromTimeString($endTime);
+
+      $scheduledJobDate = $endTimeObject->copy()->addSecond($job->delay);
+
+      $this->assertTrue($scheduledJobDate->isSameDay($correctScheduleNextStartDate));
+      $this->assertTrue($scheduledJobDate->isSameHour($correctScheduleNextStartDate));
+      $this->assertTrue($scheduledJobDate->isSameMinute($correctScheduleNextStartDate));
+
+      return !is_null($job->delay);
+    });
+  }
+
+  /**
+   * Example:
+   *  Start 05:10:00 current morning
+   *  End 04:10:00 next morning
+   *  So need schedule the post to start on next morning 05:10:00
+   *
+   * @test
+   * @dataProvider twoDayPostsThatShouldDispatchEvent
+   */
+  public function when_two_day_post_end_post_job_completes_must_dispatch_start_post_job_for_current_day_start_time(
+    $startDate,
+    $endDate,
+    $startTime,
+    $endTime
+  ) {
+    Bus::fake([StartPost::class]);
+
+    $now = Carbon::createFromFormat('Y-m-d H:i:s', $this->nowDate);
+    $this->travelTo($now);
+
+    $media = $this->_createMedia();
+    $displays_ids = $this->createDisplaysAndReturnIds($this->displaysAmount);
+    $post_data = $this->_makePost([
+      'start_date' => $startDate, 'start_time' => $startTime, 'end_date' => $endDate, 'end_time' => $endTime,
+      'displays_ids' => $displays_ids,
+      'media_id' => $media->id
+    ], false)->toArray();
+
+    $response = $this->postJson(route('posts.store'), $post_data);
+
+    $correctScheduleEndDate = Carbon::createFromTimeString($endTime)->addDay();
+    // Travels to end time so job is completed
+    $this->travelTo($correctScheduleEndDate);
+
+    Bus::assertDispatched(function (StartPost $job) use ($endTime, $startTime) {
+      $correctScheduleNextStartDate = Carbon::createFromTimeString($startTime);
+      $endTimeObject = Carbon::createFromTimeString($endTime);
+
+      $scheduledJobDate = $endTimeObject->copy()->addSecond($job->delay);
+
+      $this->assertTrue($scheduledJobDate->isSameDay($correctScheduleNextStartDate));
+      $this->assertTrue($scheduledJobDate->isSameHour($correctScheduleNextStartDate));
+      $this->assertTrue($scheduledJobDate->isSameMinute($correctScheduleNextStartDate));
+
+      return !is_null($job->delay);
+    });
   }
 
 }
