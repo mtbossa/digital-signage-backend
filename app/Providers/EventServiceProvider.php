@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Events\PostStarted;
+use App\Events\StartPostJobCompleted;
 use App\Listeners\SchedulePostEnd;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -10,37 +10,38 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 
 class EventServiceProvider extends ServiceProvider
 {
-  /**
-   * The event listener mappings for the application.
-   *
-   * @var array<class-string, array<int, class-string>>
-   */
-  protected $listen = [
-    Registered::class => [
-      SendEmailVerificationNotification::class,
-    ],
-    PostStarted::class => [
-      SchedulePostEnd::class,
-    ],
-  ];
+    /**
+     * The event listener mappings for the application.
+     *
+     * @var array<class-string, array<int, class-string>>
+     */
+    protected $listen
+        = [
+            Registered::class            => [
+                SendEmailVerificationNotification::class,
+            ],
+            StartPostJobCompleted::class => [
+                SchedulePostEnd::class,
+            ],
+        ];
 
-  /**
-   * Register any events for your application.
-   *
-   * @return void
-   */
-  public function boot()
-  {
-    //
-  }
+    /**
+     * Register any events for your application.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        //
+    }
 
-  /**
-   * Determine if events and listeners should be automatically discovered.
-   *
-   * @return bool
-   */
-  public function shouldDiscoverEvents()
-  {
-    return false;
-  }
+    /**
+     * Determine if events and listeners should be automatically discovered.
+     *
+     * @return bool
+     */
+    public function shouldDiscoverEvents()
+    {
+        return false;
+    }
 }
