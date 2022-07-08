@@ -2,11 +2,16 @@
 
 namespace Tests\Feature\Post;
 
+use App\Events\PostStarted;
+use App\Jobs\EndPost;
+use App\Jobs\StartPost;
 use App\Models\Display;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\Recurrence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Event;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
 
@@ -17,6 +22,9 @@ class PostRelationshipsTest extends TestCase
   public function setUp(): void
   {
     parent::setUp();
+
+    Event::fake([PostStarted::class]);
+    Bus::fake([EndPost::class, StartPost::class]);
 
     $this->_authUser();
   }
@@ -64,7 +72,8 @@ class PostRelationshipsTest extends TestCase
     $displays_ids = Display::factory(2)->create()->pluck('id');
     $post = Post::factory()->nonRecurrent()->create(['media_id' => $media->id]);
 
-    $response = $this->putJson(route('posts.update', $post->id), [...$post->toArray(), 'displays_ids' => $displays_ids->toArray()])
+    $response = $this->putJson(route('posts.update', $post->id),
+      [...$post->toArray(), 'displays_ids' => $displays_ids->toArray()])
       ->assertOk();
 
     foreach ($displays_ids as $key => $id) {
@@ -127,7 +136,9 @@ class PostRelationshipsTest extends TestCase
     $post_data = Post::factory()->nonRecurrent()->make()->toArray();
 
     $this->postJson(route('posts.store'),
-      [...$post_data, 'media_id' => $media->id, 'displays_ids' => null])->assertCreated()->assertJson(['media_id' => $media->id]);
+      [
+        ...$post_data, 'media_id' => $media->id, 'displays_ids' => null
+      ])->assertCreated()->assertJson(['media_id' => $media->id]);
 
     $this->assertDatabaseHas('posts', ['media_id' => $media->id]);
   }
