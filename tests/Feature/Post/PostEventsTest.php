@@ -103,23 +103,10 @@ class PostEventsTest extends TestCase
     ) {
         Bus::fake();
 
-        $this->travelTo(Carbon::createFromFormat('Y-m-d H:i:s',
-            $this->nowDate));
-
-        $media = $this->_createMedia();
-        $displays_ids
-            = $this->createDisplaysAndReturnIds($this->displaysAmount);
-        $post_data = $this->_makePost([
-            'start_date'   => $startDate, 'start_time' => $startTime,
-            'end_date'     => $endDate, 'end_time' => $endTime,
-            'displays_ids' => $displays_ids,
-            'media_id'     => $media->id
-        ], false)->toArray();
-
-        $response = $this->postJson(route('posts.store'), $post_data);
+        $this->configureEventsTests($startDate, $endDate, $startTime, $endTime,
+            $this->nowDate, $this->displaysAmount);
 
         Bus::assertDispatched(EndPost::class, 1);
-
         Bus::assertDispatched(function (EndPost $job) use (
             $endTime,
             $startTime
@@ -130,9 +117,8 @@ class PostEventsTest extends TestCase
             $scheduledJobDate = $startTimeObject->copy()
                 ->addSecond($job->delay);
 
-            $this->assertTrue($scheduledJobDate->isSameDay($correctScheduleEndDate));
-            $this->assertTrue($scheduledJobDate->isSameHour($correctScheduleEndDate));
-            $this->assertTrue($scheduledJobDate->isSameMinute($correctScheduleEndDate));
+            $this->assertCorrectJobScheduleDate($correctScheduleEndDate,
+                $scheduledJobDate);
 
             return !is_null($job->delay);
         });
@@ -175,22 +161,10 @@ class PostEventsTest extends TestCase
     ) {
         Bus::fake();
 
-        $this->travelTo(Carbon::createFromFormat('Y-m-d H:i:s',
-            $this->nowDate));
+        $this->configureEventsTests($startDate, $endDate, $startTime, $endTime,
+            $this->nowDate, $this->displaysAmount);
 
-        $media = $this->_createMedia();
-        $displays_ids
-            = $this->createDisplaysAndReturnIds($this->displaysAmount);
-        $post_data = $this->_makePost([
-            'start_date'   => $startDate, 'start_time' => $startTime,
-            'end_date'     => $endDate, 'end_time' => $endTime,
-            'displays_ids' => $displays_ids,
-            'media_id'     => $media->id
-        ], false)->toArray();
-
-        $response = $this->postJson(route('posts.store'), $post_data);
         Bus::assertDispatched(EndPost::class, 1);
-
         Bus::assertDispatched(function (EndPost $job) use (
             $endTime,
             $startTime
@@ -202,9 +176,8 @@ class PostEventsTest extends TestCase
             $scheduledJobDate = $startTimeObject->copy()
                 ->addSecond($job->delay);
 
-            $this->assertTrue($scheduledJobDate->isSameDay($correctScheduleEndDate));
-            $this->assertTrue($scheduledJobDate->isSameHour($correctScheduleEndDate));
-            $this->assertTrue($scheduledJobDate->isSameMinute($correctScheduleEndDate));
+            $this->assertCorrectJobScheduleDate($correctScheduleEndDate,
+                $scheduledJobDate);
 
             return !is_null($job->delay);
         });
@@ -247,24 +220,11 @@ class PostEventsTest extends TestCase
     ) {
         Bus::fake([StartPost::class]);
 
-        $now = Carbon::createFromFormat('Y-m-d H:i:s', $this->nowDate);
-        $this->travelTo($now);
+        $this->configureEventsTests($startDate, $endDate, $startTime, $endTime,
+            $this->nowDate, $this->displaysAmount);
 
-        $media = $this->_createMedia();
-        $displays_ids
-            = $this->createDisplaysAndReturnIds($this->displaysAmount);
-        $post_data = $this->_makePost([
-            'start_date'   => $startDate, 'start_time' => $startTime,
-            'end_date'     => $endDate, 'end_time' => $endTime,
-            'displays_ids' => $displays_ids,
-            'media_id'     => $media->id
-        ], false)->toArray();
-
-        $response = $this->postJson(route('posts.store'), $post_data);
-
-        $correctScheduleEndDate = Carbon::createFromTimeString($endTime);
         // Travels to end time so job is completed
-        $this->travelTo($correctScheduleEndDate);
+        $this->travelTo(Carbon::createFromTimeString($endTime));
 
         Bus::assertDispatched(StartPost::class, 1);
         Bus::assertDispatched(function (StartPost $job) use (
@@ -277,9 +237,8 @@ class PostEventsTest extends TestCase
 
             $scheduledJobDate = $endTimeObject->copy()->addSecond($job->delay);
 
-            $this->assertTrue($scheduledJobDate->isSameDay($correctScheduleNextStartDate));
-            $this->assertTrue($scheduledJobDate->isSameHour($correctScheduleNextStartDate));
-            $this->assertTrue($scheduledJobDate->isSameMinute($correctScheduleNextStartDate));
+            $this->assertCorrectJobScheduleDate($correctScheduleNextStartDate,
+                $scheduledJobDate);
 
             return !is_null($job->delay);
         });
@@ -302,25 +261,12 @@ class PostEventsTest extends TestCase
     ) {
         Bus::fake([StartPost::class]);
 
-        $now = Carbon::createFromFormat('Y-m-d H:i:s', $this->nowDate);
-        $this->travelTo($now);
+        $this->configureEventsTests($startDate, $endDate, $startTime, $endTime,
+            $this->nowDate, $this->displaysAmount);
 
-        $media = $this->_createMedia();
-        $displays_ids
-            = $this->createDisplaysAndReturnIds($this->displaysAmount);
-        $post_data = $this->_makePost([
-            'start_date'   => $startDate, 'start_time' => $startTime,
-            'end_date'     => $endDate, 'end_time' => $endTime,
-            'displays_ids' => $displays_ids,
-            'media_id'     => $media->id
-        ], false)->toArray();
-
-        $response = $this->postJson(route('posts.store'), $post_data);
-
-        $correctScheduleEndDate = Carbon::createFromTimeString($endTime)
-            ->addDay();
-        // Travels to end time so job is completed
-        $this->travelTo($correctScheduleEndDate);
+        // Travels to end time so job is completed (end date is tomorrow)
+        $this->travelTo(Carbon::createFromTimeString($endTime)
+            ->addDay());
 
         Bus::assertDispatched(StartPost::class, 1);
         Bus::assertDispatched(function (StartPost $job) use (
@@ -333,9 +279,8 @@ class PostEventsTest extends TestCase
 
             $scheduledJobDate = $endTimeObject->copy()->addSecond($job->delay);
 
-            $this->assertTrue($scheduledJobDate->isSameDay($correctScheduleNextStartDate));
-            $this->assertTrue($scheduledJobDate->isSameHour($correctScheduleNextStartDate));
-            $this->assertTrue($scheduledJobDate->isSameMinute($correctScheduleNextStartDate));
+            $this->assertCorrectJobScheduleDate($correctScheduleNextStartDate,
+                $scheduledJobDate);
 
             return !is_null($job->delay);
         });
@@ -349,9 +294,9 @@ class PostEventsTest extends TestCase
      *  Need to PostExpire when PostEnd job finishes
      *
      * @test
-     * @dataProvider oneDayExpiredPostsThatShouldDispatchEvent
+     * @dataProvider expireDatesWithBothTypesOfTimes
      */
-    public function when_one_day_post_end_post_job_completes_must_dispatch_post_expired_when_and_date_is_today(
+    public function when_end_post_job_completes_must_dispatch_post_expired_when_end_date_is_today(
         $startDate,
         $endDate,
         $startTime,
@@ -359,34 +304,26 @@ class PostEventsTest extends TestCase
     ) {
         Event::fake([PostExpired::class]);
 
-        $now = Carbon::createFromFormat('Y-m-d H:i:s', $this->nowDate);
-        $this->travelTo($now);
+        $this->configureEventsTests($startDate, $endDate, $startTime, $endTime,
+            $this->nowDate, $this->displaysAmount);
 
-        $media = $this->_createMedia();
-        $displays_ids
-            = $this->createDisplaysAndReturnIds($this->displaysAmount);
-        $post_data = $this->_makePost([
-            'start_date'   => $startDate, 'start_time' => $startTime,
-            'end_date'     => $endDate, 'end_time' => $endTime,
-            'displays_ids' => $displays_ids,
-            'media_id'     => $media->id
-        ], false)->toArray();
-
-        $response = $this->postJson(route('posts.store'), $post_data);
-
-        $correctScheduleEndDate = Carbon::createFromTimeString($endTime)
-            ->addDay();
-
-        // Travels to end time so job is completed
-        $this->travelTo($correctScheduleEndDate);
+        // Travels to end time so job is completed (end time is tomorrow)
+        $this->travelTo(Carbon::createFromTimeString($endTime)
+            ->addDay());
 
         Event::assertDispatched(PostExpired::class, $this->displaysAmount);
     }
 
-    public function oneDayExpiredPostsThatShouldDispatchEvent(): array
+    public function expireDatesWithBothTypesOfTimes(): array
     {
         $test = [];
-        foreach ($this->eventTimesOneDay as $eventTime) {
+
+        $timesData = [
+            ...$this->eventTimesOneDay,
+            ...$this->eventTimesTwoDay,
+        ];
+
+        foreach ($timesData as $eventTime) {
             foreach ($this->expireDates as $date) {
                 $startDate = $date['start'];
                 $startTime = $eventTime['start'];

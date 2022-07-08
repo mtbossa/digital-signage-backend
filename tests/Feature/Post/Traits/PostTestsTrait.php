@@ -42,18 +42,8 @@ trait PostTestsTrait
         Bus::fake();
         Event::fake();
 
-        $this->travelTo(Carbon::createFromFormat('Y-m-d H:i:s', $nowDateTime));
-
-        $media = $this->_createMedia();
-        $displays_ids = $this->createDisplaysAndReturnIds($amountOfDisplays);
-        $post_data = $this->_makePost([
-            'start_date'   => $startDate, 'start_time' => $startTime,
-            'end_date'     => $endDate, 'end_time' => $endTime,
-            'displays_ids' => $displays_ids,
-            'media_id'     => $media->id
-        ], false)->toArray();
-
-        $response = $this->postJson(route('posts.store'), $post_data);
+        $this->configureEventsTests($startDate, $endDate, $startTime, $endTime,
+            $nowDateTime, $amountOfDisplays);
 
         switch ($shouldShowOrQueue) {
             case PostShouldDo::Event:
@@ -65,6 +55,30 @@ trait PostTestsTrait
                 Event::assertNotDispatched(PostStarted::class);
                 return;
         }
+    }
+
+    private function configureEventsTests(
+        string $startDate,
+        string $endDate,
+        string $startTime,
+        string $endTime,
+        string $nowDateTime,
+        int $amountOfDisplays,
+    ): void {
+        $this->travelTo(Carbon::createFromFormat('Y-m-d H:i:s',
+            $nowDateTime));
+
+        $media = $this->_createMedia();
+        $displays_ids
+            = $this->createDisplaysAndReturnIds($amountOfDisplays);
+        $post_data = $this->_makePost([
+            'start_date'   => $startDate, 'start_time' => $startTime,
+            'end_date'     => $endDate, 'end_time' => $endTime,
+            'displays_ids' => $displays_ids,
+            'media_id'     => $media->id
+        ], false)->toArray();
+
+        $response = $this->postJson(route('posts.store'), $post_data);
     }
 
     private function _createMedia(array $data = null): Media
@@ -81,6 +95,15 @@ trait PostTestsTrait
     {
         return $recurrent ? Post::factory()->make($data)
             : Post::factory()->nonRecurrent()->make($data);
+    }
+
+    private function assertCorrectJobScheduleDate(
+        Carbon $correct,
+        Carbon $scheduled
+    ): void {
+        $this->assertTrue($scheduled->isSameDay($correct));
+        $this->assertTrue($scheduled->isSameHour($correct));
+        $this->assertTrue($scheduled->isSameMinute($correct));
     }
 
 }
