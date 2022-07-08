@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\Events\PostStarted;
 use App\Events\StartPostJobCompleted;
-use App\Services\PostStartAndEndDispatcherService;
+use App\Services\PostDispatcherService;
 
 class SchedulePostEnd
 {
@@ -13,7 +13,7 @@ class SchedulePostEnd
      *
      * @return void
      */
-    public function __construct(public PostStartAndEndDispatcherService $service
+    public function __construct(public PostDispatcherService $service
     ) {
         //
     }

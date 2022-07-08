@@ -9,7 +9,7 @@ use App\Jobs\StartPost;
 use App\Models\Post;
 use Carbon\Carbon;
 
-class PostStartAndEndDispatcherService
+class PostDispatcherService
 {
     private Post $post;
     private Carbon $now;
@@ -22,7 +22,7 @@ class PostStartAndEndDispatcherService
         $this->now = Carbon::now();
     }
 
-    public function setPost(Post $post): PostStartAndEndDispatcherService
+    public function setPost(Post $post): PostDispatcherService
     {
         $this->post = $post;
         $this->setDatesAndTimes();
