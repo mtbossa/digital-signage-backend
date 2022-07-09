@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\RaspberryPostsResource;
 use App\Models\Raspberry;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
@@ -19,15 +18,13 @@ class RaspberryPostController extends Controller
         Request $request,
         Raspberry $raspberry
     ): AnonymousResourceCollection {
-        $not_ended = $request->not_ended;
+        $showing = $request->showing;
 
         $display_with_posts = $raspberry->display->query()
             ->with([
-                'posts' => function (BelongsToMany $query) use ($not_ended) {
-                    $query->when($not_ended, function (Builder $query) {
-                        $query->where('end_date', '>=',
-                            Carbon::now()->format('Y-m-d'));
-                        $query->orWhereNotNull('recurrence_id');
+                'posts' => function (BelongsToMany $query) use ($showing) {
+                    $query->when($showing, function (Builder $query) {
+                        $query->where('showing', true);
                     });
                     $query->with('media');
                     $query->with('recurrence');
