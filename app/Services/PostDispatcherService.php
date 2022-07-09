@@ -50,11 +50,8 @@ class PostDispatcherService
         if (DateAndTimeHelper::isPostFromCurrentDayToNext($this->startTime,
             $this->endTime)
         ) {
-            [$todayShowEndYesterday, $todayShowStartToday]
-                = $this->handlePostFromOneDayToNext();
-
-            if ($this->isNowBetweenStartAndEndHourAndMinute($todayShowEndYesterday,
-                $todayShowStartToday)
+            if ($this->isNowBetweenStartAndEndHourAndMinute($this->startTime,
+                $this->endTime)
             ) {
                 $this->dispatchStartPostJob();
             } else {
@@ -83,29 +80,6 @@ class PostDispatcherService
         StartPost::dispatch($this->post);
     }
 
-    private function isPostFromCurrentDayToNext(): bool
-    {
-        return $this->startTime->isAfter($this->endTime);
-    }
-
-    private function handlePostFromOneDayToNext(): array
-    {
-        $startOfToday = $this->now->copy()->startOfDay();
-        $endOfToday = $this->now->copy()->endOfDay();
-
-        $endYesterdayMinutesShowToday
-            = $startOfToday->diffInMinutes($this->endTime);
-        $todayShowEndYesterday = $startOfToday->copy()
-            ->addMinute($endYesterdayMinutesShowToday);
-
-        $startTodayMinutesShowToday
-            = $endOfToday->diffInMinutes($this->startTime);
-        $todayShowStartToday = $endOfToday->copy()
-            ->subMinute($startTodayMinutesShowToday);
-
-        return [$todayShowEndYesterday, $todayShowStartToday];
-    }
-
     private function isNowBetweenStartAndEndHourAndMinute(
         Carbon $startTime,
         Carbon $endTime
@@ -122,7 +96,7 @@ class PostDispatcherService
         $this->schedulePostEnd();
     }
 
-    public function schedulePostEnd()
+    public function schedulePostEnd(): void
     {
         if (DateAndTimeHelper::isPostFromCurrentDayToNext($this->startTime,
             $this->endTime)
