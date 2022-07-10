@@ -31,7 +31,6 @@ class RaspberryPostsResource extends JsonResource
                     'filename' => $this->media->filename
                 ],
             ]),
-            'recurrence'  => new DisplayPostsRecurrenceResource($this->whenNotNull($this->recurrence))
         ];
     }
 }
