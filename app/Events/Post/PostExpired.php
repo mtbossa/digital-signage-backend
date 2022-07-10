@@ -14,26 +14,13 @@ class PostExpired
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * Create a new event instance.
-     *
-     * @return void
-     */
     public function __construct(public Post $post, public Display $display)
     {
         //
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return Channel|array
-     */
-    public function broadcastOn()
+    public function broadcastOn(): Channel|PrivateChannel|array
     {
-        if (!$this->display->raspberry) {
-            return null;
-        }
         $raspberryId = $this->display->raspberry->id;
         return new PrivateChannel("raspberry.$raspberryId");
     }
