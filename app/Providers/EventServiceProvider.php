@@ -6,6 +6,7 @@ use App\Events\ShouldEndPost;
 use App\Events\ShouldStartPost;
 use App\Listeners\BroadcastToRaspberries;
 use App\Listeners\SchedulePostEnd;
+use App\Listeners\SchedulePostStart;
 use App\Listeners\SetShowingFalse;
 use App\Listeners\SetShowingTrue;
 use Illuminate\Auth\Events\Registered;
@@ -32,6 +33,7 @@ class EventServiceProvider extends ServiceProvider
             ShouldEndPost::class   => [
                 SetShowingFalse::class,
                 BroadcastToRaspberries::class,
+                SchedulePostStart::class,
             ]
         ];
 

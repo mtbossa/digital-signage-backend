@@ -1,10 +1,14 @@
 <?php
 
-namespace Tests\Feature\Post;
+
+namespace Post\Listeners;
 
 use App\Events\PostExpired;
-use App\Jobs\EndPost;
+use App\Events\ShouldEndPost;
 use App\Jobs\StartPost;
+use App\Models\Display;
+use App\Models\Post;
+use App\Models\Raspberry;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
@@ -13,7 +17,7 @@ use Tests\Feature\Post\Traits\PostTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
 
-class PostEventsTest extends TestCase
+class SchedulePostStartTest extends TestCase
 {
     use RefreshDatabase, PostTestsTrait, AuthUserTrait;
 
@@ -91,38 +95,6 @@ class PostEventsTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     * @dataProvider oneDayPostsThatShouldDispatchEvent
-     */
-    public function when_one_day_post_end_post_job_must_be_scheduled_to_end_date_on_same_day(
-        $startDate,
-        $endDate,
-        $startTime,
-        $endTime
-    ) {
-        Bus::fake();
-
-        $this->configureEventsTests($startDate, $endDate, $startTime, $endTime,
-            $this->nowDate, $this->displaysAmount);
-
-        Bus::assertDispatched(EndPost::class, 1);
-        Bus::assertDispatched(function (EndPost $job) use (
-            $endTime,
-            $startTime
-        ) {
-            $correctScheduleEndDate = Carbon::createFromTimeString($endTime);
-            $startTimeObject = Carbon::createFromTimeString($startTime);
-
-            $scheduledJobDate = $startTimeObject->copy()
-                ->addSecond($job->delay);
-
-            $this->assertCorrectJobScheduleDate($correctScheduleEndDate,
-                $scheduledJobDate);
-
-            return !is_null($job->delay);
-        });
-    }
 
     public function oneDayPostsThatShouldDispatchEvent(): array
     {
@@ -147,40 +119,6 @@ class PostEventsTest extends TestCase
             }
         }
         return $test;
-    }
-
-    /**
-     * @test
-     * @dataProvider twoDayPostsThatShouldDispatchEvent
-     */
-    public function when_two_day_post_end_post_job_must_be_scheduled_to_end_date_on_next_day(
-        $startDate,
-        $endDate,
-        $startTime,
-        $endTime
-    ) {
-        Bus::fake();
-
-        $this->configureEventsTests($startDate, $endDate, $startTime, $endTime,
-            $this->nowDate, $this->displaysAmount);
-
-        Bus::assertDispatched(EndPost::class, 1);
-        Bus::assertDispatched(function (EndPost $job) use (
-            $endTime,
-            $startTime
-        ) {
-            $correctScheduleEndDate = Carbon::createFromTimeString($endTime)
-                ->addDay();
-            $startTimeObject = Carbon::createFromTimeString($startTime);
-
-            $scheduledJobDate = $startTimeObject->copy()
-                ->addSecond($job->delay);
-
-            $this->assertCorrectJobScheduleDate($correctScheduleEndDate,
-                $scheduledJobDate);
-
-            return !is_null($job->delay);
-        });
     }
 
     public function twoDayPostsThatShouldDispatchEvent(): array
@@ -212,7 +150,7 @@ class PostEventsTest extends TestCase
      * @test
      * @dataProvider oneDayPostsThatShouldDispatchEvent
      */
-    public function when_one_day_post_end_post_job_completes_must_dispatch_start_post_job_for_next_day_start_time(
+    public function one_day_post_must_dispatch_start_post_job_for_next_day_start_time(
         $startDate,
         $endDate,
         $startTime,
@@ -220,11 +158,17 @@ class PostEventsTest extends TestCase
     ) {
         Bus::fake([StartPost::class]);
 
-        $this->configureEventsTests($startDate, $endDate, $startTime, $endTime,
-            $this->nowDate, $this->displaysAmount);
+        $post = Post::factory()->create([
+            'start_date' => $startDate, 'start_time' => $startTime,
+            'end_date'   => $endDate, 'end_time' => $endTime,
+            'media_id'   => $this->media->id
+        ]);
 
-        // Travels to end time so job is completed
-        $this->travelTo(Carbon::createFromTimeString($endTime));
+        // subDay() so post won't expire
+        $this->travelTo(Carbon::createFromFormat('Y-m-d H:i:s',
+            $endDate.$endTime)->subDay());
+
+        event(new ShouldEndPost($post));
 
         Bus::assertDispatched(StartPost::class, 1);
         Bus::assertDispatched(function (StartPost $job) use (
@@ -253,7 +197,7 @@ class PostEventsTest extends TestCase
      * @test
      * @dataProvider twoDayPostsThatShouldDispatchEvent
      */
-    public function when_two_day_post_end_post_job_completes_must_dispatch_start_post_job_for_current_day_start_time(
+    public function two_day_post_must_dispatch_start_post_job_for_current_day_start_time(
         $startDate,
         $endDate,
         $startTime,
@@ -261,12 +205,17 @@ class PostEventsTest extends TestCase
     ) {
         Bus::fake([StartPost::class]);
 
-        $this->configureEventsTests($startDate, $endDate, $startTime, $endTime,
-            $this->nowDate, $this->displaysAmount);
+        $post = Post::factory()->create([
+            'start_date' => $startDate, 'start_time' => $startTime,
+            'end_date'   => $endDate, 'end_time' => $endTime,
+            'media_id'   => $this->media->id
+        ]);
 
-        // Travels to end time so job is completed (end date is tomorrow)
-        $this->travelTo(Carbon::createFromTimeString($endTime)
-            ->addDay());
+        // subDay() so post won't expire
+        $this->travelTo(Carbon::createFromFormat('Y-m-d H:i:s',
+            $endDate.$endTime)->subDay());
+
+        event(new ShouldEndPost($post));
 
         Bus::assertDispatched(StartPost::class, 1);
         Bus::assertDispatched(function (StartPost $job) use (
@@ -296,22 +245,46 @@ class PostEventsTest extends TestCase
      * @test
      * @dataProvider expireDatesWithBothTypesOfTimes
      */
-    public function when_end_post_job_completes_must_dispatch_post_expired_when_end_date_is_today(
+    public function when_expire_date_is_today_must_dispatch_post_expired_event_only_to_displays_with_raspberry(
         $startDate,
         $endDate,
         $startTime,
         $endTime
     ) {
+
         Event::fake([PostExpired::class]);
 
-        $this->configureEventsTests($startDate, $endDate, $startTime, $endTime,
-            $this->nowDate, $this->displaysAmount);
+        $post = Post::factory()->create([
+            'start_date' => $startDate, 'start_time' => $startTime,
+            'end_date'   => $endDate, 'end_time' => $endTime,
+            'media_id'   => $this->media->id
+        ]);
 
-        // Travels to end time so job is completed (end time is tomorrow)
-        $this->travelTo(Carbon::createFromTimeString($endTime)
-            ->addDay());
+        $displaysWithRaspberry = Display::factory(3)->create();
+        $displayWithoutRaspberry = Display::factory(2)->create();
 
-        Event::assertDispatched(PostExpired::class, $this->displaysAmount);
+        foreach (
+            [...$displaysWithRaspberry, ...$displayWithoutRaspberry] as $display
+        ) {
+            $post->displays()->attach($display->id);
+        }
+
+        foreach ($displaysWithRaspberry as $display) {
+            $raspberry = Raspberry::factory()->make()->toArray();
+            $display->raspberry()->create($raspberry);
+        }
+
+        foreach ($displayWithoutRaspberry as $display) {
+            Raspberry::factory()->create();
+        }
+
+        $this->travelTo(Carbon::createFromFormat('Y-m-d H:i:s',
+            $endDate.$endTime));
+
+        event(new ShouldEndPost($post));
+
+        Event::assertDispatched(PostExpired::class,
+            count($displaysWithRaspberry));
     }
 
     public function expireDatesWithBothTypesOfTimes(): array

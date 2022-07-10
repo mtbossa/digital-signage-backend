@@ -6,6 +6,7 @@ namespace Post\Listeners;
 use App\Events\ShouldEndPost;
 use App\Events\ShouldStartPost;
 use App\Models\Display;
+use App\Models\Post;
 use App\Models\Raspberry;
 use App\Notifications\PostEnded;
 use App\Notifications\PostStarted;
@@ -27,9 +28,8 @@ class BroadcastToRaspberriesTest extends TestCase
 
         $this->_authUser();
         $this->media = $this->_createMedia();
-        $this->post = $this->_createPost([
-            'media_id' => $this->media->id,
-        ]);
+        $this->post = Post::factory()->nonRecurrent()
+            ->create(['media_id' => $this->media->id]);
     }
 
     /**
