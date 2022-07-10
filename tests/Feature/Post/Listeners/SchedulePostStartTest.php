@@ -3,16 +3,16 @@
 
 namespace Post\Listeners;
 
-use App\Events\Post\PostExpired;
 use App\Events\Post\ShouldEndPost;
 use App\Jobs\Post\StartPost;
 use App\Models\Display;
 use App\Models\Post;
 use App\Models\Raspberry;
+use App\Notifications\Post\PostExpired;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Tests\Feature\Post\Traits\PostTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
@@ -252,7 +252,7 @@ class SchedulePostStartTest extends TestCase
         $endTime
     ) {
 
-        Event::fake([PostExpired::class]);
+        Notification::fake([PostExpired::class]);
 
         $post = Post::factory()->create([
             'start_date' => $startDate, 'start_time' => $startTime,
@@ -283,8 +283,16 @@ class SchedulePostStartTest extends TestCase
 
         event(new ShouldEndPost($post));
 
-        Event::assertDispatched(PostExpired::class,
-            count($displaysWithRaspberry));
+        Notification::assertTimesSent(count($displaysWithRaspberry),
+            PostExpired::class);
+        Notification::assertSentTo(
+            Raspberry::query()->whereNotNull('display_id')->get(),
+            PostExpired::class
+        );
+        Notification::assertNotSentTo(
+            Raspberry::query()->whereNull('display_id')->get(),
+            PostExpired::class
+        );
     }
 
     public function expireDatesWithBothTypesOfTimes(): array

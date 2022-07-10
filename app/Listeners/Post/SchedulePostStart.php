@@ -2,10 +2,10 @@
 
 namespace App\Listeners\Post;
 
-use App\Events\Post\PostExpired;
 use App\Events\Post\ShouldEndPost;
 use App\Helpers\DateAndTimeHelper;
 use App\Jobs\Post\StartPost;
+use App\Notifications\Post\PostExpired;
 use Carbon\Carbon;
 
 class SchedulePostStart
@@ -39,7 +39,8 @@ class SchedulePostStart
         if ($now->isSameUnit('day', $endDate)) {
             foreach ($post->displays as $display) {
                 if ($display->raspberry) {
-                    event(new PostExpired($post, $display));
+                    $display->raspberry->notify(new PostExpired($post,
+                        $display));
                 }
             }
 
