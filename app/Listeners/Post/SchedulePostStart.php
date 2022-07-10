@@ -5,6 +5,7 @@ namespace App\Listeners\Post;
 use App\Events\Post\ShouldEndPost;
 use App\Helpers\DateAndTimeHelper;
 use App\Jobs\Post\StartPost;
+use App\Models\Post;
 use App\Notifications\Post\PostExpired;
 use Carbon\Carbon;
 
@@ -15,31 +16,28 @@ class SchedulePostStart
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(private Carbon $now, private Post $post)
     {
-        //
+        $this->now = Carbon::now();
     }
 
-    /**
-     * Handle the event.
-     *
-     * @param  object  $event
-     *
-     * @return void
-     */
-    public function handle(ShouldEndPost $event)
+    public function handle(ShouldEndPost $event): void
     {
-        $post = $event->post;
-        $now = Carbon::now();
+        $this->post = $event->post;
 
-        $endDate = Carbon::createFromFormat('Y-m-d', $post->end_date);
-        $endTime = Carbon::createFromTimeString($post->end_time);
-        $startTime = Carbon::createFromTimeString($post->start_time);
+        $this->scheduleNonRecurrent();
+    }
 
-        if ($now->isSameUnit('day', $endDate)) {
-            foreach ($post->displays as $display) {
+    private function scheduleNonRecurrent()
+    {
+        $endDate = Carbon::createFromFormat('Y-m-d', $this->post->end_date);
+        $endTime = Carbon::createFromTimeString($this->post->end_time);
+        $startTime = Carbon::createFromTimeString($this->post->start_time);
+
+        if ($this->now->isSameUnit('day', $endDate)) {
+            foreach ($this->post->displays as $display) {
                 if ($display->raspberry) {
-                    $display->raspberry->notify(new PostExpired($post,
+                    $display->raspberry->notify(new PostExpired($this->post,
                         $display));
                 }
             }
@@ -53,7 +51,7 @@ class SchedulePostStart
             $startTime->addDay();
         }
 
-        StartPost::dispatch($post)
+        StartPost::dispatch($this->post)
             ->delay($endTime->diffInSeconds($startTime));
     }
 }
