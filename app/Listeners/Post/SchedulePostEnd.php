@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Post;
 
-use App\Events\PostStarted;
-use App\Events\ShouldStartPost;
+use App\Events\Post\ShouldStartPost;
 use App\Helpers\DateAndTimeHelper;
-use App\Jobs\EndPost;
+use App\Jobs\Post\EndPost;
 use Carbon\Carbon;
 
 class SchedulePostEnd
@@ -20,16 +19,9 @@ class SchedulePostEnd
         //
     }
 
-    /**
-     * Handle the event.
-     *
-     * @param  PostStarted  $event
-     *
-     * @return void
-     */
     public function handle(
         ShouldStartPost $event,
-    ) {
+    ): void {
         $post = $event->post;
 
         $startTime = Carbon::createFromTimeString($post->start_time);

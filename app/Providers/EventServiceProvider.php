@@ -2,13 +2,13 @@
 
 namespace App\Providers;
 
-use App\Events\ShouldEndPost;
-use App\Events\ShouldStartPost;
-use App\Listeners\BroadcastToRaspberries;
-use App\Listeners\SchedulePostEnd;
-use App\Listeners\SchedulePostStart;
-use App\Listeners\SetShowingFalse;
-use App\Listeners\SetShowingTrue;
+use App\Events\Post\ShouldEndPost;
+use App\Events\Post\ShouldStartPost;
+use App\Listeners\Post\BroadcastToRaspberries;
+use App\Listeners\Post\SchedulePostEnd;
+use App\Listeners\Post\SchedulePostStart;
+use App\Listeners\Post\SetShowingFalse;
+use App\Listeners\Post\SetShowingTrue;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;

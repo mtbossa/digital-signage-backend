@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Events\ShouldStartPost;
+use App\Events\Post\ShouldStartPost;
 use App\Helpers\DateAndTimeHelper;
-use App\Jobs\StartPost;
+use App\Jobs\Post\StartPost;
 use App\Models\Post;
 use Carbon\Carbon;
 

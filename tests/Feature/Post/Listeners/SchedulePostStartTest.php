@@ -3,9 +3,9 @@
 
 namespace Post\Listeners;
 
-use App\Events\PostExpired;
-use App\Events\ShouldEndPost;
-use App\Jobs\StartPost;
+use App\Events\Post\PostExpired;
+use App\Events\Post\ShouldEndPost;
+use App\Jobs\Post\StartPost;
 use App\Models\Display;
 use App\Models\Post;
 use App\Models\Raspberry;

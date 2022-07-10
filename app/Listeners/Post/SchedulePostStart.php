@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Post;
 
-use App\Events\PostExpired;
-use App\Events\ShouldEndPost;
+use App\Events\Post\PostExpired;
+use App\Events\Post\ShouldEndPost;
 use App\Helpers\DateAndTimeHelper;
-use App\Jobs\StartPost;
+use App\Jobs\Post\StartPost;
 use Carbon\Carbon;
 
 class SchedulePostStart

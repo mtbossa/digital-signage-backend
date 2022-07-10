@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Post;
 
 use App\Models\Post;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ShouldEndPost
+class ShouldStartPost
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

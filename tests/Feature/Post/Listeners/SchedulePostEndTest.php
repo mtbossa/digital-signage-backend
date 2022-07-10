@@ -3,7 +3,7 @@
 
 namespace Post\Listeners;
 
-use App\Jobs\EndPost;
+use App\Jobs\Post\EndPost;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;

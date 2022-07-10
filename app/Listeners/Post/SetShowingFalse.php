@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Post;
 
-use App\Events\ShouldEndPost;
+use App\Events\Post\ShouldEndPost;
 
 class SetShowingFalse
 {

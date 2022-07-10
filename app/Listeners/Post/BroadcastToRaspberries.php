@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Post;
 
-use App\Events\ShouldEndPost;
-use App\Events\ShouldStartPost;
-use App\Notifications\PostEnded;
-use App\Notifications\PostStarted;
+use App\Events\Post\ShouldEndPost;
+use App\Events\Post\ShouldStartPost;
+use App\Notifications\Post\PostEnded;
+use App\Notifications\Post\PostStarted;
 
 class BroadcastToRaspberries
 {

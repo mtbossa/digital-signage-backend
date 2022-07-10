@@ -3,8 +3,8 @@
 
 namespace Post\Listeners;
 
-use App\Events\ShouldEndPost;
-use App\Events\ShouldStartPost;
+use App\Events\Post\ShouldEndPost;
+use App\Events\Post\ShouldStartPost;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;

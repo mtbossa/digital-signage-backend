@@ -3,13 +3,13 @@
 
 namespace Post\Listeners;
 
-use App\Events\ShouldEndPost;
-use App\Events\ShouldStartPost;
+use App\Events\Post\ShouldEndPost;
+use App\Events\Post\ShouldStartPost;
 use App\Models\Display;
 use App\Models\Post;
 use App\Models\Raspberry;
-use App\Notifications\PostEnded;
-use App\Notifications\PostStarted;
+use App\Notifications\Post\PostEnded;
+use App\Notifications\Post\PostStarted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;

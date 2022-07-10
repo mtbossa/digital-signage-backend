@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\Post;
 
 use App\Models\Display;
 use App\Models\Post;
@@ -8,7 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class PostStarted extends Notification
+class PostEnded extends Notification
 {
     use Queueable;
 

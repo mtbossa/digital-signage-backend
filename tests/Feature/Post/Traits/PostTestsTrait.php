@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Post\Traits;
 
-use App\Events\ShouldStartPost;
-use App\Jobs\StartPost;
+use App\Events\Post\ShouldStartPost;
+use App\Jobs\Post\StartPost;
 use App\Models\Display;
 use App\Models\Media;
 use App\Models\Post;

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Listeners\Post;
 
-use App\Events\ShouldStartPost;
+use App\Events\Post\ShouldStartPost;
 
 class SetShowingTrue
 {
