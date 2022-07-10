@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Post;
+namespace Post\ScheduleWhenCreating;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Post\Enums\PostShouldDo;
@@ -8,7 +8,7 @@ use Tests\Feature\Post\Traits\PostTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
 
-class PostScheduleWhenCreatingTest extends TestCase
+class NonRecurrentTest extends TestCase
 {
     use RefreshDatabase, PostTestsTrait, AuthUserTrait;
 
