@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Events\ShouldStartPost;
 use App\Helpers\DateAndTimeHelper;
-use App\Jobs\EndPost;
 use App\Jobs\StartPost;
 use App\Models\Post;
 use Carbon\Carbon;
@@ -90,17 +89,5 @@ class PostDispatcherService
     private function dispatchShouldStartPostEvent(): void
     {
         event(new ShouldStartPost($this->post));
-    }
-
-    public function schedulePostEnd(): void
-    {
-        if (DateAndTimeHelper::isPostFromCurrentDayToNext($this->startTime,
-            $this->endTime)
-        ) {
-            $this->endTime->addDay();
-        }
-
-        EndPost::dispatch($this->post)
-            ->delay($this->startTime->diffInSeconds($this->endTime));
     }
 }
