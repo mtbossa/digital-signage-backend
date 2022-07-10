@@ -81,7 +81,6 @@ class PostScheduleWhenCreatingTest extends TestCase
         $startTime,
         $endTime
     ) {
-        $this->withoutExceptionHandling();
         $this->showPostAssertion(
             $startDate,
             $endDate,
