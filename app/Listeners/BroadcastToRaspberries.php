@@ -2,8 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Events\PostStarted;
 use App\Events\ShouldStartPost;
+use App\Notifications\PostStarted;
 
 class BroadcastToRaspberries
 {
@@ -27,7 +27,10 @@ class BroadcastToRaspberries
     public function handle(ShouldStartPost $event): void
     {
         foreach ($event->post->displays as $display) {
-            event(new PostStarted($event->post, $display));
+            if ($display->raspberry) {
+                $display->raspberry->notify(new PostStarted($event->post,
+                    $display));
+            }
         }
     }
 }
