@@ -31,6 +31,7 @@ class EventServiceProvider extends ServiceProvider
             ],
             ShouldEndPost::class   => [
                 SetShowingFalse::class,
+                BroadcastToRaspberries::class,
             ]
         ];
 

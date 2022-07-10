@@ -2,7 +2,9 @@
 
 namespace App\Listeners;
 
+use App\Events\ShouldEndPost;
 use App\Events\ShouldStartPost;
+use App\Notifications\PostEnded;
 use App\Notifications\PostStarted;
 
 class BroadcastToRaspberries
@@ -24,12 +26,19 @@ class BroadcastToRaspberries
      *
      * @return void
      */
-    public function handle(ShouldStartPost $event): void
+    public function handle(ShouldStartPost|ShouldEndPost $event): void
     {
         foreach ($event->post->displays as $display) {
             if ($display->raspberry) {
-                $display->raspberry->notify(new PostStarted($event->post,
-                    $display));
+                if ($event instanceof ShouldStartPost) {
+                    $notification = new PostStarted($event->post,
+                        $display);
+                } else {
+                    $notification = new PostEnded($event->post,
+                        $display);
+                }
+
+                $display->raspberry->notify($notification);
             }
         }
     }
