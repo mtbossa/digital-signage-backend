@@ -39,6 +39,22 @@ class PostDispatcherService
 
     public function run(): void
     {
+
+//        if ($this->post->recurrence) {
+//            $recurrence = $this->post->recurrence;
+//            ['id' => $id, 'firstName' => $name] = get_object_vars($recurrence);
+//            $this->now->isSameUnit()
+//
+//
+//
+//        }
+//
+//
+//
+//
+//
+
+
         // When start date is not today or before, must go to queue
         if ($this->isTodayBeforeStartDate()) {
             $this->dispatchStartPostJob();

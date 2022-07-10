@@ -25,10 +25,14 @@ class SchedulePostStart
     {
         $this->post = $event->post;
 
+//        if ($this->post->recurrence) {
+//            $this->scheduleRecurrent();
+//        } else {
         $this->scheduleNonRecurrent();
+//        }
     }
 
-    private function scheduleNonRecurrent()
+    private function scheduleNonRecurrent(): void
     {
         $endDate = Carbon::createFromFormat('Y-m-d', $this->post->end_date);
         $endTime = Carbon::createFromTimeString($this->post->end_time);
@@ -53,5 +57,12 @@ class SchedulePostStart
 
         StartPost::dispatch($this->post)
             ->delay($endTime->diffInSeconds($startTime));
+    }
+
+    private function scheduleRecurrent()
+    {
+        $recurrence = $this->post->recurrence;
+
+
     }
 }
