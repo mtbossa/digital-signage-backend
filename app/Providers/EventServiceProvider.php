@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Events\ShouldEndPost;
 use App\Events\ShouldStartPost;
 use App\Listeners\BroadcastToRaspberries;
 use App\Listeners\SchedulePostEnd;
+use App\Listeners\SetShowingFalse;
 use App\Listeners\SetShowingTrue;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -26,6 +28,9 @@ class EventServiceProvider extends ServiceProvider
                 SetShowingTrue::class,
                 BroadcastToRaspberries::class,
                 SchedulePostEnd::class,
+            ],
+            ShouldEndPost::class   => [
+                SetShowingFalse::class,
             ]
         ];
 
