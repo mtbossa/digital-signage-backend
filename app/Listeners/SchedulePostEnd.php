@@ -3,8 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\PostStarted;
-use App\Events\StartPostJobCompleted;
-use App\Services\PostDispatcherService;
+use App\Events\ShouldStartPost;
+use App\Helpers\DateAndTimeHelper;
+use App\Jobs\EndPost;
+use Carbon\Carbon;
 
 class SchedulePostEnd
 {
@@ -13,8 +15,8 @@ class SchedulePostEnd
      *
      * @return void
      */
-    public function __construct(public PostDispatcherService $service
-    ) {
+    public function __construct()
+    {
         //
     }
 
@@ -26,8 +28,20 @@ class SchedulePostEnd
      * @return void
      */
     public function handle(
-        StartPostJobCompleted $event,
+        ShouldStartPost $event,
     ) {
-        $this->service->setPost($event->post)->schedulePostEnd();
+        $post = $event->post;
+
+        $startTime = Carbon::createFromTimeString($post->start_time);
+        $endTime = Carbon::createFromTimeString($post->end_time);
+
+        if (DateAndTimeHelper::isPostFromCurrentDayToNext($startTime,
+            $endTime)
+        ) {
+            $endTime->addDay();
+        }
+
+        EndPost::dispatch($post)
+            ->delay($startTime->diffInSeconds($endTime));
     }
 }

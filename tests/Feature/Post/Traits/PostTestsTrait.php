@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Post\Traits;
 
-use App\Events\PostStarted;
+use App\Events\ShouldStartPost;
 use App\Jobs\StartPost;
 use App\Models\Display;
 use App\Models\Media;
@@ -47,12 +47,12 @@ trait PostTestsTrait
 
         switch ($shouldShowOrQueue) {
             case PostShouldDo::Event:
-                Event::assertDispatched(PostStarted::class, $amountOfDisplays);
+                Event::assertDispatched(ShouldStartPost::class, 1);
                 Bus::assertNotDispatched(StartPost::class);
                 return;
             case PostShouldDo::Queue:
                 Bus::assertDispatched(StartPost::class, 1);
-                Event::assertNotDispatched(PostStarted::class);
+                Event::assertNotDispatched(ShouldStartPost::class);
                 return;
         }
     }

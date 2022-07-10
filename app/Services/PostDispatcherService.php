@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Events\PostStarted;
+use App\Events\ShouldStartPost;
 use App\Helpers\DateAndTimeHelper;
 use App\Jobs\EndPost;
 use App\Jobs\StartPost;
@@ -55,7 +55,7 @@ class PostDispatcherService
             ) {
                 $this->dispatchStartPostJob();
             } else {
-                $this->dispatchPostStartedEvent();
+                $this->dispatchShouldStartPostEvent();
             }
             return;
         }
@@ -63,7 +63,7 @@ class PostDispatcherService
         if ($this->isNowBetweenStartAndEndHourAndMinute($this->startTime,
             $this->endTime)
         ) {
-            $this->dispatchPostStartedEvent();
+            $this->dispatchShouldStartPostEvent();
             return;
         }
 
@@ -87,13 +87,9 @@ class PostDispatcherService
         return $this->now->isBetween($this->startTime, $this->endTime);
     }
 
-    private function dispatchPostStartedEvent(): void
+    private function dispatchShouldStartPostEvent(): void
     {
-        foreach ($this->post->displays as $display) {
-            event(new PostStarted($this->post, $display));
-        }
-
-        $this->schedulePostEnd();
+        event(new ShouldStartPost($this->post));
     }
 
     public function schedulePostEnd(): void

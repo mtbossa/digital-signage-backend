@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
-use App\Events\StartPostJobCompleted;
+use App\Events\ShouldStartPost;
+use App\Listeners\BroadcastToRaspberries;
 use App\Listeners\SchedulePostEnd;
+use App\Listeners\SetShowingTrue;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -17,12 +19,14 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen
         = [
-            Registered::class            => [
+            Registered::class      => [
                 SendEmailVerificationNotification::class,
             ],
-            StartPostJobCompleted::class => [
+            ShouldStartPost::class => [
+                SetShowingTrue::class,
+                BroadcastToRaspberries::class,
                 SchedulePostEnd::class,
-            ],
+            ]
         ];
 
     /**

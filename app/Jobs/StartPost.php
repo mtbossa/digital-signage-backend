@@ -2,8 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Events\PostStarted;
-use App\Events\StartPostJobCompleted;
+use App\Events\ShouldStartPost;
 use App\Models\Post;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -32,9 +31,6 @@ class StartPost implements ShouldQueue
      */
     public function handle()
     {
-        foreach ($this->post->displays as $display) {
-            event(new PostStarted($this->post, $display));
-        }
-        event(new StartPostJobCompleted($this->post));
+        event(new ShouldStartPost($this->post));
     }
 }
