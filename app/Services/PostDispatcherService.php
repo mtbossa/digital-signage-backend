@@ -64,47 +64,34 @@ class PostDispatcherService
         ) {
             // https://www.php.net/manual/en/datetime.format.php
             switch ($unit) {
-                case 'isoweekday':
-                    return $this->now->isDayOfWeek($value);
+                // Default is isoweekday
+                default:
+                    $test = $this->now->isDayOfWeek($value);
+                    break;
                 case 'day':
                     // j => Day of the month without leading zeros
-                    return $this->now->isSameDay(Carbon::createFromFormat('j',
+                    $test = $this->now->isSameDay(Carbon::createFromFormat('j',
                         $value));
+                    break;
                 case 'month':
                     // 'n' => Numeric representation of a month, without leading zeros
-                    return $this->now->isSameMonth(Carbon::createFromFormat('n',
+                    $test
+                        = $this->now->isSameMonth(Carbon::createFromFormat('n',
                         $value));
+                    break;
                 case 'year':
                     // 'Y' 	A full numeric representation of a year, at least 4 digits, with - for years BCE.
-                    return $this->now->isSameYear(Carbon::createFromFormat('Y',
+                    $test = $this->now->isSameYear(Carbon::createFromFormat('Y',
                         $value));
+                    break;
             }
+            return $test;
         })
             ->every(fn($value) => $value === true);
 
 
         if ($allPassed) {
-            if (DateAndTimeHelper::isPostFromCurrentDayToNext($this->startTime,
-                $this->endTime)
-            ) {
-                if ($this->isNowBetweenStartAndEndHourAndMinute($this->startTime,
-                    $this->endTime)
-                ) {
-                    $this->dispatchStartPostJob();
-                } else {
-                    $this->dispatchShouldStartPostEvent();
-                }
-            } else {
-                if ($this->isNowBetweenStartAndEndHourAndMinute($this->startTime,
-                    $this->endTime)
-                ) {
-                    $this->dispatchShouldStartPostEvent();
-                } else {
-                    $this->dispatchStartPostJob();
-                }
-            }
-
-            return;
+            $this->checkTimesAndDispatch();
         } else {
             $this->dispatchStartPostJob();
         }
@@ -119,6 +106,29 @@ class PostDispatcherService
                     || $key === 'month'
                     || $key === 'year')
             );
+    }
+
+    private function checkTimesAndDispatch(): void
+    {
+        if (DateAndTimeHelper::isPostFromCurrentDayToNext($this->startTime,
+            $this->endTime)
+        ) {
+            if ($this->isNowBetweenStartAndEndHourAndMinute($this->startTime,
+                $this->endTime)
+            ) {
+                $this->dispatchStartPostJob();
+            } else {
+                $this->dispatchShouldStartPostEvent();
+            }
+        } else {
+            if ($this->isNowBetweenStartAndEndHourAndMinute($this->startTime,
+                $this->endTime)
+            ) {
+                $this->dispatchShouldStartPostEvent();
+            } else {
+                $this->dispatchStartPostJob();
+            }
+        }
     }
 
     private function isNowBetweenStartAndEndHourAndMinute(
@@ -143,31 +153,9 @@ class PostDispatcherService
         // When start date is not today or before, must go to queue
         if ($this->isTodayBeforeStartDate()) {
             $this->dispatchStartPostJob();
-            return;
+        } else {
+            $this->checkTimesAndDispatch();
         }
-
-        // If startTime is after endTime, means it's a post that must stay visible from current day to next
-        if (DateAndTimeHelper::isPostFromCurrentDayToNext($this->startTime,
-            $this->endTime)
-        ) {
-            if ($this->isNowBetweenStartAndEndHourAndMinute($this->startTime,
-                $this->endTime)
-            ) {
-                $this->dispatchStartPostJob();
-            } else {
-                $this->dispatchShouldStartPostEvent();
-            }
-            return;
-        }
-
-        if ($this->isNowBetweenStartAndEndHourAndMinute($this->startTime,
-            $this->endTime)
-        ) {
-            $this->dispatchShouldStartPostEvent();
-            return;
-        }
-
-        $this->dispatchStartPostJob();
     }
 
     private function isTodayBeforeStartDate(): bool
