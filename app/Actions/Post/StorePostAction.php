@@ -12,7 +12,7 @@ class StorePostAction
 {
     public function handle(
         Request $request,
-        PostDispatcherService $service
+        PostDispatcherService $postDispatcherService
     ): Post {
         $media = Media::findOrFail($request->media_id);
         $post = $media->posts()->create($request->except(['media_id']));
@@ -28,9 +28,7 @@ class StorePostAction
             $post->load('displays');
         }
 
-        if (!$post->recurrence_id) {
-            $service->setPost($post)->run();
-        }
+        $postDispatcherService->setPost($post)->run();
 
         return $post;
     }

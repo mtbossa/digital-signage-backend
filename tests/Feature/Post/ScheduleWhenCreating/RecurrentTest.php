@@ -2,10 +2,14 @@
 
 namespace Post\ScheduleWhenCreating;
 
+use App\Events\Post\ShouldStartPost;
+use App\Jobs\Post\StartPost;
 use App\Models\Post;
 use App\Models\Recurrence;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Event;
 use Tests\Feature\Post\Traits\PostTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
@@ -44,7 +48,7 @@ class RecurrentTest extends TestCase
     private array $recurrences
         = [
             [
-                'isoWeekdayOnly' => [
+                'IsoWeekday' => [
                     'recurrence' => ['isoweekday' => 1],
                     'nowDates'   => [
                         'shouldShow'    => ['2022-01-03', '2022-04-04'],
@@ -53,7 +57,7 @@ class RecurrentTest extends TestCase
                 ]
             ],
             [
-                'isoWeekdayWithDay' => [
+                'IsoWeekday + Day' => [
                     'recurrence' => ['isoweekday' => 1, 'day' => 1],
                     'nowDates'   => [
                         'shouldShow'    => ['2022-08-01'],
@@ -63,7 +67,7 @@ class RecurrentTest extends TestCase
 
             ],
             [
-                'isoWeekdayWithMonth' => [
+                'IsoWeekday + Month' => [
                     'recurrence' => ['isoweekday' => 1, 'month' => 1],
                     'nowDates'   => [
                         'shouldShow'    => [
@@ -78,7 +82,7 @@ class RecurrentTest extends TestCase
                 ]
             ],
             [
-                'isoWeekdayWithYear' => [
+                'IsoWeekday + Year' => [
                     'recurrence' => ['isoweekday' => 1, 'year' => 2022],
                     'nowDates'   => [
                         'shouldShow'    => [
@@ -93,7 +97,32 @@ class RecurrentTest extends TestCase
                 ]
             ],
             [
-                'dayOnly' => [
+                'IsoWeekday + Day + Month' => [
+                    'recurrence' => [
+                        'isoweekday' => 1, 'day' => 1, 'month' => 1
+                    ],
+                    'nowDates'   => [
+                        'shouldShow'    => ['2024-01-01'],
+                        'shouldNotShow' => ['2022-01-01', '2023-01-01'],
+                    ]
+                ]
+
+            ],
+            [
+                'IsoWeekday + Day + Month + Year' => [
+                    'recurrence' => [
+                        'isoweekday' => 1, 'day' => 1, 'month' => 1,
+                        'year'       => 2024
+                    ],
+                    'nowDates'   => [
+                        'shouldShow'    => ['2024-01-01'],
+                        'shouldNotShow' => ['2022-01-01', '2023-01-01'],
+                    ]
+                ]
+
+            ],
+            [
+                'Day' => [
                     'recurrence' => ['day' => 1],
                     'nowDates'   => [
                         'shouldShow'    => [
@@ -108,7 +137,7 @@ class RecurrentTest extends TestCase
                 ]
             ],
             [
-                'dayWithMonth' => [
+                'Day + Month' => [
                     'recurrence' => ['day' => 1, 'month' => 1],
                     'nowDates'   => [
                         'shouldShow'    => [
@@ -122,7 +151,7 @@ class RecurrentTest extends TestCase
                 ]
             ],
             [
-                'dayWithYear' => [
+                'Day + Year' => [
                     'recurrence' => ['day' => 1, 'year' => 2022],
                     'nowDates'   => [
                         'shouldShow'    => [
@@ -137,7 +166,21 @@ class RecurrentTest extends TestCase
                 ]
             ],
             [
-                'monthOnly' => [
+                'Day + Month + Year' => [
+                    'recurrence' => ['day' => 1, 'month' => 2, 'year' => 2022],
+                    'nowDates'   => [
+                        'shouldShow'    => [
+                            '2022-02-01'
+                        ],
+                        'shouldNotShow' => [
+                            '2022-01-02', '2022-01-03', '2022-02-02',
+                            '2022-02-03', '2023-01-01', '2023-01-02'
+                        ],
+                    ]
+                ]
+            ],
+            [
+                'Month' => [
                     'recurrence' => ['month' => 1],
                     'nowDates'   => [
                         'shouldShow'    => [
@@ -152,7 +195,7 @@ class RecurrentTest extends TestCase
                 ]
             ],
             [
-                'monthYearYear' => [
+                'Month + Year' => [
                     'recurrence' => ['month' => 1, 'year' => 2022],
                     'nowDates'   => [
                         'shouldShow'    => [
@@ -169,7 +212,7 @@ class RecurrentTest extends TestCase
                 ]
             ],
             [
-                'yearOnly' => [
+                'Year' => [
                     'recurrence' => ['year' => 2022],
                     'nowDates'   => [
                         'shouldShow'    => [
@@ -193,11 +236,6 @@ class RecurrentTest extends TestCase
 
         $this->_authUser();
         $this->media = $this->_createMedia();
-        $this->recurrence = $this->_createRecurrence();
-        $this->post = $this->_createPost([
-            'media_id'      => $this->media->id,
-            'recurrence_id' => $this->recurrence->id
-        ]);
     }
 
     /**
@@ -205,22 +243,46 @@ class RecurrentTest extends TestCase
      * @dataProvider showDates
      */
     public function when_creating_recurrent_post_should_dispatch_ShouldStartPost(
-        $recurrence,
+        $recurrenceData,
         $nowDate,
         $startTime,
         $endTime,
     ) {
-        $now = Carbon::createFromFormat('Y-m-d', $nowDate);
-        $startTimeObject = Carbon::createFromTimeString($startTime);
+        Event::fake();
+        Bus::fake();
 
+        $emptyRecurrence = [
+            'isoweekday' => null,
+            'day'        => null,
+            'month'      => null,
+            'year'       => null,
+        ];
+
+        $recurrenceMakeData = [
+            ...$emptyRecurrence,
+            ...$recurrenceData,
+        ];
+
+        $now = Carbon::createFromFormat('Y-m-d', $nowDate);
         $now->setTimeFromTimeString($startTime)->addSecond();
 
-        $recurrence = Recurrence::factory()->create($recurrence);
-        $post = Post::factory()->create([
-            'recurrence_id' => $recurrence->id, 'start_time' => $startTime,
-            'end_time'      => $endTime
-        ]);
+        $this->travelTo($now);
 
+        $recurrence = Recurrence::factory()->create($recurrenceMakeData);
+        $displays_ids
+            = $this->createDisplaysAndReturnIds($this->displaysAmount);
+        $post_data = Post::factory()->make([
+            'start_time'    => $startTime,
+            'end_time'      => $endTime,
+            'media_id'      => $this->media->id,
+            'displays_ids'  => $displays_ids,
+            'recurrence_id' => $recurrence->id
+        ])->toArray();
+
+        $response = $this->postJson(route('posts.store'), $post_data);
+
+        Event::assertDispatched(ShouldStartPost::class, 1);
+        Bus::assertNotDispatched(StartPost::class);
     }
 
     public function showDates(): array
@@ -231,13 +293,13 @@ class RecurrentTest extends TestCase
                 foreach (
                     $recurrenceData as $name => $data
                 ) {
-                    foreach ($data['nowDates']['shouldShow'] as $notShowDate) {
+                    foreach ($data['nowDates']['shouldShow'] as $showDate) {
                         $string
-                            = "Not show $name - now date: $notShowDate";
+                            = "Show $name - now date: $showDate";
 
                         $test[$string] = [
                             'recurrence' => $data['recurrence'],
-                            'date'       => $notShowDate,
+                            'date'       => $showDate,
                             'startTime'  => $eventTime['start'],
                             'endTime'    => $eventTime['end'],
                         ];
@@ -253,20 +315,46 @@ class RecurrentTest extends TestCase
      * @dataProvider notShowDates
      */
     public function when_creating_recurrent_post_should_schedule(
-        $recurrence,
+        $recurrenceData,
         $nowDate,
         $startTime,
-        $endTime
+        $endTime,
     ) {
-//        $this->showPostAssertion(
-//            $startDate,
-//            $endDate,
-//            $startTime,
-//            $endTime,
-//            $this->nowDate,
-//            $this->displaysAmount,
-//            PostShouldDo::Event
-//        );
+        Event::fake();
+        Bus::fake();
+
+        $emptyRecurrence = [
+            'isoweekday' => null,
+            'day'        => null,
+            'month'      => null,
+            'year'       => null,
+        ];
+
+        $recurrenceMakeData = [
+            ...$emptyRecurrence,
+            ...$recurrenceData,
+        ];
+
+        $now = Carbon::createFromFormat('Y-m-d', $nowDate);
+        $now->setTimeFromTimeString($startTime)->addSecond();
+
+        $this->travelTo($now);
+
+        $recurrence = Recurrence::factory()->create($recurrenceMakeData);
+        $displays_ids
+            = $this->createDisplaysAndReturnIds($this->displaysAmount);
+        $post_data = Post::factory()->make([
+            'start_time'    => $startTime,
+            'end_time'      => $endTime,
+            'media_id'      => $this->media->id,
+            'displays_ids'  => $displays_ids,
+            'recurrence_id' => $recurrence->id
+        ])->toArray();
+
+        $response = $this->postJson(route('posts.store'), $post_data);
+
+        Event::assertNotDispatched(ShouldStartPost::class);
+        Bus::assertDispatched(StartPost::class, 1);
     }
 
     public function notShowDates(): array
@@ -284,7 +372,9 @@ class RecurrentTest extends TestCase
 
                         $test[$string] = [
                             'recurrence' => $data['recurrence'],
-                            'date'       => $notShowDate
+                            'date'       => $notShowDate,
+                            'startTime'  => $eventTime['start'],
+                            'endTime'    => $eventTime['end'],
                         ];
                     }
                 }
