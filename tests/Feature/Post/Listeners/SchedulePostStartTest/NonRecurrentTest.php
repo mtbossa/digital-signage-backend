@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Post\Listeners;
+namespace Post\Listeners\SchedulePostStartTest;
 
 use App\Events\Post\ShouldEndPost;
 use App\Jobs\Post\StartPost;
@@ -17,7 +17,7 @@ use Tests\Feature\Post\Traits\PostTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
 
-class SchedulePostStartTest extends TestCase
+class NonRecurrentTest extends TestCase
 {
     use RefreshDatabase, PostTestsTrait, AuthUserTrait;
 

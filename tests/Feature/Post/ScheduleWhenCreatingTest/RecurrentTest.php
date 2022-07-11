@@ -1,6 +1,6 @@
 <?php
 
-namespace Post\ScheduleWhenCreating;
+namespace Post\ScheduleWhenCreatingTest;
 
 use App\Events\Post\ShouldStartPost;
 use App\Jobs\Post\StartPost;

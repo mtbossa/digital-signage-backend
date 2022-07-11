@@ -1,6 +1,6 @@
 <?php
 
-namespace Post\ScheduleWhenCreating;
+namespace Post\ScheduleWhenCreatingTest;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Post\Enums\PostShouldDo;
