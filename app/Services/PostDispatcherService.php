@@ -97,7 +97,7 @@ class PostDispatcherService
         }
     }
 
-    private function getOnlyNotNullRecurrenceValues(Recurrence $recurrence
+    public function getOnlyNotNullRecurrenceValues(Recurrence $recurrence
     ): Collection {
         $recurrenceAttributes = $recurrence->getAttributes();
         return Collection::make($recurrenceAttributes)
