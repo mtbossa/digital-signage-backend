@@ -11,6 +11,8 @@ use App\Models\Recurrence;
 use App\Notifications\Post\PostExpired;
 use App\Services\PostDispatcherService;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use DateTimeImmutable;
 use Illuminate\Support\Collection;
 
 class SchedulePostStart
@@ -18,9 +20,8 @@ class SchedulePostStart
     private Collection $possibleRecurrentCases;
     private Post $post;
     private Recurrence|null $recurrence;
-    private Carbon $startTime;
-    private Carbon $endTime;
-    private Carbon $startTimeCopy;
+    private CarbonImmutable|DateTimeImmutable $startTime;
+    private CarbonImmutable $endTime;
 
     /**
      * Create the event listener.
@@ -101,7 +102,6 @@ class SchedulePostStart
     public function handle(ShouldEndPost $event): void
     {
         $this->setValues($event);
-        $this->configureStartTimeCopy();
 
         if ($this->recurrence) {
             $this->scheduleRecurrent();
@@ -114,25 +114,29 @@ class SchedulePostStart
     {
         $this->post = $event->post;
         $this->recurrence = $this->post->recurrence;
-        $this->startTime
-            = Carbon::createFromTimeString($this->post->start_time);
-        $this->endTime = Carbon::createFromTimeString($this->post->end_time);
+        $this->createTimes();
     }
 
-    private function configureStartTimeCopy()
+    private function createTimes(): void
     {
-        $this->startTimeCopy = $this->startTime->copy();
+        // End time will always be today's date, that's why we can create
+        // using ::createFromTimeString, since it sets the date to today's date
+        $this->endTime
+            = CarbonImmutable::createFromTimeString($this->post->end_time);
 
-        if (DateAndTimeHelper::isPostFromCurrentDayToNext($this->startTime,
+        if (DateAndTimeHelper::isPostFromCurrentDayToNext($this->post->start_time,
             $this->endTime)
         ) {
-            $this->startTimeCopy->subDay();
+            $this->startTime
+                = CarbonImmutable::parse("yesterday {$this->post->start_time}");
+        } else {
+            $this->startTime
+                = CarbonImmutable::createFromTimeString($this->post->start_time);
         }
     }
 
-    private function scheduleRecurrent()
+    private function scheduleRecurrent(): void
     {
-
         // Case Only day, must schedule to next available day, where day = $recurrence->day
         switch ($this->chooseRecurrenceLogic($this->recurrence)) {
             case RecurrenceCases::Day:
@@ -161,38 +165,33 @@ class SchedulePostStart
         return $foundRecurrenceCase['name'];
     }
 
-    private function scheduleDay(): Carbon
+    private function scheduleDay(): CarbonImmutable
     {
-        // Tries to add one month without overflowing to the next one
-        $test1 = $this->startTimeCopy->copy()->addMonthWithNoOverflow();
-
-        // In case it's not the same day 30 days after, means it's a month with less days
+        // In case it's not the same day 30 days after, means it's a month with fewer days
         // so need to go to next month
-        if ($test1->day !== $this->recurrence->day) {
-            $this->startTimeCopy->addMonthsWithNoOverflow(2);
+        if ($this->startTime->addMonthWithNoOverflow()->day
+            !== $this->recurrence->day
+        ) {
+            return $this->startTime->addMonthsWithNoOverflow(2);
         } else {
-            $this->startTimeCopy->addMonthWithNoOverflow();
+            return $this->startTime->addMonthWithNoOverflow();
         }
 
-        return $this->startTimeCopy;
     }
 
     private function scheduleIsoWeekday()
     {
+        // Carbon Sunday is 0, not 7
         $isoWeekday = $this->recurrence->isoweekday === 7 ? 0
             : $this->recurrence->isoweekday;
 
-        $this->startTimeCopy->next($isoWeekday)
+        return $this->startTime->next($isoWeekday)
             ->setTimeFrom($this->startTime);
-
-        return $this->startTimeCopy;
     }
 
     private function scheduleNonRecurrent(): void
     {
         $endDate = Carbon::createFromFormat('Y-m-d', $this->post->end_date);
-        $endTime = Carbon::createFromTimeString($this->post->end_time);
-        $startTime = Carbon::createFromTimeString($this->post->start_time);
 
         if ($this->now->isSameUnit('day', $endDate)) {
             foreach ($this->post->displays as $display) {
@@ -205,13 +204,16 @@ class SchedulePostStart
             return;
         }
 
-        if (!DateAndTimeHelper::isPostFromCurrentDayToNext($startTime,
-            $endTime)
+        if (!DateAndTimeHelper::isPostFromCurrentDayToNext($this->startTime,
+            $this->endTime)
         ) {
-            $startTime->addDay();
+            StartPost::dispatch($this->post)
+                ->delay($this->endTime->diffInSeconds($this->startTime->addDay()));
+        } else {
+            StartPost::dispatch($this->post)
+                ->delay($this->endTime->diffInSeconds($this->startTime));
         }
 
-        StartPost::dispatch($this->post)
-            ->delay($endTime->diffInSeconds($startTime));
+
     }
 }
