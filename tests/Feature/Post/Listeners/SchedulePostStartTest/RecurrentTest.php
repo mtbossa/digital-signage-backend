@@ -128,6 +128,103 @@ class RecurrentTest extends TestCase
                     ],
                 ]
             ],
+            [
+                'Month' => [
+                    'Month = 1'  => [
+                        'recurrence' => ['month' => 1],
+                        'assertions' => [
+                            [
+                                'nowDate'      => '2022-01-01',
+                                'scheduleDate' => '2022-01-02'
+                            ],
+                            [
+                                'nowDate'      => '2022-01-30',
+                                'scheduleDate' => '2022-01-31'
+                            ],
+                            [
+                                'nowDate'      => '2022-01-31',
+                                'scheduleDate' => '2023-01-01'
+                            ],
+                        ]
+                    ],
+                    'Month = 12' => [
+                        'recurrence' => ['month' => 12],
+                        'assertions' => [
+                            [
+                                'nowDate'      => '2022-12-10',
+                                'scheduleDate' => '2022-12-11'
+                            ],
+                            [
+                                'nowDate'      => '2022-12-31',
+                                'scheduleDate' => '2023-12-01'
+                            ],
+                        ]
+                    ],
+                    'Month = 2'  => [
+                        'recurrence' => ['month' => 2],
+                        'assertions' => [
+                            [
+                                'nowDate'      => '2022-02-27', // Saturday
+                                'scheduleDate' => '2022-02-28' // Next monday
+                            ],
+                            [
+                                'nowDate'      => '2022-02-28', // Wednesday
+                                'scheduleDate' => '2023-02-01' // Next monday
+                            ],
+                        ]
+                    ],
+                ]
+            ],
+            [
+                'Year' => [
+                    'Year = 2022' => [
+                        'recurrence' => ['year' => 2022],
+                        'assertions' => [
+                            [
+                                'nowDate'      => '2022-01-01',
+                                'scheduleDate' => '2022-01-02'
+                            ],
+                            [
+                                'nowDate'      => '2022-01-03',
+                                'scheduleDate' => '2022-01-04'
+                            ],
+                            [
+                                'nowDate'      => '2022-06-15',
+                                'scheduleDate' => '2022-06-16'
+                            ],
+                            [
+                                'nowDate'      => '2022-12-30',
+                                'scheduleDate' => '2022-12-31'
+                            ],
+                        ]
+                    ],
+                    'Year = 2023' => [
+                        'recurrence' => ['year' => 2023],
+                        'assertions' => [
+                            [
+                                'nowDate'      => '2023-01-01',
+                                'scheduleDate' => '2023-01-02'
+                            ],
+                            [
+                                'nowDate'      => '2023-02-27',
+                                'scheduleDate' => '2023-02-28'
+                            ],
+                            [
+                                'nowDate'      => '2023-01-03',
+                                'scheduleDate' => '2023-01-04'
+                            ],
+                            [
+                                'nowDate'      => '2023-06-15',
+                                'scheduleDate' => '2023-06-16'
+                            ],
+                            [
+                                'nowDate'      => '2023-12-30',
+                                'scheduleDate' => '2023-12-31'
+                            ],
+                        ]
+                    ],
+                ]
+            ],
         ];
 
 

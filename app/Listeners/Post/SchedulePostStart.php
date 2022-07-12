@@ -163,6 +163,14 @@ class SchedulePostStart
                 $rule->setFreq('WEEKLY')
                     ->setByDay([$byDay]);
                 break;
+            case RecurrenceCases::Month:
+                $rule->setFreq('DAILY')
+                    ->setByMonth([$this->recurrence->month]);
+                break;
+            case RecurrenceCases::Year:
+                $rule->setFreq('DAILY')
+                    ->setEndDate(now()->endOfYear());
+                break;
         }
         $nextScheduleDate = (new ArrayTransformer)->transform($rule,
             $constraint)
