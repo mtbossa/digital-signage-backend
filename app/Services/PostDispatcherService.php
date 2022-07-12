@@ -6,9 +6,7 @@ use App\Events\Post\ShouldStartPost;
 use App\Helpers\DateAndTimeHelper;
 use App\Jobs\Post\StartPost;
 use App\Models\Post;
-use App\Models\Recurrence;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
 
 class PostDispatcherService
 {
@@ -56,7 +54,7 @@ class PostDispatcherService
     {
         $recurrence = $this->post->recurrence;
         $recurrenceValues
-            = $this->getOnlyNotNullRecurrenceValues($recurrence);
+            = $recurrence->getOnlyNotNullRecurrenceValues($recurrence);
 
         $allPassed = $recurrenceValues->map(function (
             int $value,
@@ -97,16 +95,6 @@ class PostDispatcherService
         }
     }
 
-    public function getOnlyNotNullRecurrenceValues(Recurrence $recurrence
-    ): Collection {
-        $recurrenceAttributes = $recurrence->getAttributes();
-        return Collection::make($recurrenceAttributes)
-            ->filter(fn($item, $key) => $item
-                && ($key === 'isoweekday' || $key === 'day'
-                    || $key === 'month'
-                    || $key === 'year')
-            );
-    }
 
     private function checkTimesAndDispatch(): void
     {

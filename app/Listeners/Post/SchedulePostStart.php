@@ -9,11 +9,16 @@ use App\Jobs\Post\StartPost;
 use App\Models\Post;
 use App\Models\Recurrence;
 use App\Notifications\Post\PostExpired;
-use App\Services\PostDispatcherService;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use DateTimeImmutable;
 use Illuminate\Support\Collection;
+use Recurr\Exception\InvalidArgument;
+use Recurr\Exception\InvalidRRule;
+use Recurr\Exception\InvalidWeekday;
+use Recurr\Rule;
+use Recurr\Transformer\ArrayTransformer;
+use Recurr\Transformer\Constraint\AfterConstraint;
 
 class SchedulePostStart
 {
@@ -30,7 +35,6 @@ class SchedulePostStart
      */
     public function __construct(
         private Carbon $now,
-        private PostDispatcherService $postDispatcherService
     ) {
         $this->now = Carbon::now();
         $this->possibleRecurrentCases
@@ -135,18 +139,35 @@ class SchedulePostStart
         }
     }
 
+    /**
+     * @throws InvalidRRule
+     * @throws InvalidArgument
+     * @throws InvalidWeekday
+     */
     private function scheduleRecurrent(): void
     {
+        $rule = (new Rule)
+            ->setStartDate($this->startTime)
+            ->setCount(2);
+        $constraint = new AfterConstraint($this->startTime);
+
         // Case Only day, must schedule to next available day, where day = $recurrence->day
         switch ($this->chooseRecurrenceLogic($this->recurrence)) {
             case RecurrenceCases::Day:
             default:
-                $nextScheduleDate = $this->scheduleDay();
+                $rule->setFreq('MONTHLY')
+                    ->setByMonthDay([$this->recurrence->day]);
                 break;
             case RecurrenceCases::IsoWeekday:
-                $nextScheduleDate = $this->scheduleIsoWeekday();
+                $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
+                $rule->setFreq('WEEKLY')
+                    ->setByDay([$byDay]);
                 break;
         }
+        $nextScheduleDate = (new ArrayTransformer)->transform($rule,
+            $constraint)
+            ->first()
+            ->getStart();
 
         StartPost::dispatch($this->post)
             ->delay($this->endTime->diffInSeconds($nextScheduleDate));
@@ -155,7 +176,7 @@ class SchedulePostStart
     private function chooseRecurrenceLogic(Recurrence $recurrence
     ): RecurrenceCases {
         $notNullKeys
-            = $this->postDispatcherService->getOnlyNotNullRecurrenceValues($recurrence)
+            = $this->recurrence->getOnlyNotNullRecurrenceValues($recurrence)
             ->keys()->toArray();
 
         $foundRecurrenceCase
@@ -165,28 +186,25 @@ class SchedulePostStart
         return $foundRecurrenceCase['name'];
     }
 
-    private function scheduleDay(): CarbonImmutable
+    /**
+     * MO indicates Monday; TU indicates Tuesday; WE indicates Wednesday;
+     * TH indicates Thursday; FR indicates Friday; SA indicates Saturday;
+     * SU indicates Sunday.
+     */
+    private function mapIsoWeekdayIntoRecurrByDayString(): string
     {
-        // In case it's not the same day 30 days after, means it's a month with fewer days
-        // so need to go to next month
-        if ($this->startTime->addMonthWithNoOverflow()->day
-            !== $this->recurrence->day
-        ) {
-            return $this->startTime->addMonthsWithNoOverflow(2);
-        } else {
-            return $this->startTime->addMonthWithNoOverflow();
-        }
+        $byDayStrings = [
+            'MO',
+            'TU',
+            'WE',
+            'TH',
+            'FR',
+            'SA',
+            'SU'
+        ];
 
-    }
-
-    private function scheduleIsoWeekday()
-    {
-        // Carbon Sunday is 0, not 7
-        $isoWeekday = $this->recurrence->isoweekday === 7 ? 0
-            : $this->recurrence->isoweekday;
-
-        return $this->startTime->next($isoWeekday)
-            ->setTimeFrom($this->startTime);
+        // -1 because isoweekday 1 => 'MO' is index 0
+        return $byDayStrings[$this->recurrence->isoweekday - 1];
     }
 
     private function scheduleNonRecurrent(): void
@@ -214,6 +232,30 @@ class SchedulePostStart
                 ->delay($this->endTime->diffInSeconds($this->startTime));
         }
 
+
+    }
+
+    private function scheduleIsoWeekday()
+    {
+        // Carbon Sunday is 0, not 7
+        $isoWeekday = $this->recurrence->isoweekday === 7 ? 0
+            : $this->recurrence->isoweekday;
+
+        return $this->startTime->next($isoWeekday)
+            ->setTimeFrom($this->startTime);
+    }
+
+    private function scheduleDay(): CarbonImmutable
+    {
+        // In case it's not the same day 30 days after, means it's a month with fewer days
+        // so need to go to next month
+        if ($this->startTime->addMonthWithNoOverflow()->day
+            !== $this->recurrence->day
+        ) {
+            return $this->startTime->addMonthsWithNoOverflow(2);
+        } else {
+            return $this->startTime->addMonthWithNoOverflow();
+        }
 
     }
 }
