@@ -413,6 +413,44 @@ class RecurrentTest extends TestCase
                     ],
                 ]
             ],
+            [
+                'Day + Year' => [
+                    'Day = 01 / Year = 2022' => [
+                        'recurrence' => [
+                            'day' => 1, 'year' => 2022,
+                        ],
+                        'assertions' => [
+                            [
+                                'nowDate'      => '2022-01-01',
+                                'scheduleDate' => '2022-02-01'
+                            ],
+                            [
+                                'nowDate'      => '2022-02-11',
+                                'scheduleDate' => '2022-03-01',
+                            ],
+                            [
+                                'nowDate'      => '2022-08-28',
+                                'scheduleDate' => '2022-09-01',
+                            ],
+                        ],
+                    ],
+                    'Day = 31 / Year = 2023' => [
+                        'recurrence' => [
+                            'day' => 31, 'year' => 2023,
+                        ],
+                        'assertions' => [
+                            [
+                                'nowDate'      => '2022-05-01',
+                                'scheduleDate' => '2023-01-31'
+                            ],
+                            [
+                                'nowDate'      => '2023-01-31',
+                                'scheduleDate' => '2023-03-31',
+                            ],
+                        ],
+                    ],
+                ]
+            ],
 
         ];
 
