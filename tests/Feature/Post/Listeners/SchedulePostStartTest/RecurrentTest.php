@@ -253,7 +253,7 @@ class RecurrentTest extends TestCase
                         'assertions' => [
                             [
                                 'nowDate'      => '2022-01-05',
-                                'scheduleDate' => '2022-05-05'
+                                'scheduleDate' => '2022-06-05'
                             ],
                             [
                                 'nowDate'      => '2022-05-05',
@@ -523,15 +523,17 @@ class RecurrentTest extends TestCase
     public function showDates(): array
     {
         $test = [];
-        foreach ($this->eventTimes as $eventTime) {
+        foreach ($this->eventTimes as $time => $eventTime) {
             foreach ($this->recurrences as $recurrenceData) {
                 foreach (
                     $recurrenceData as $name => $data
                 ) {
-                    foreach ($data as $key => $assertionsData) {
-                        foreach ($assertionsData['assertions'] as $assertion) {
+                    foreach ($data as $case => $assertionsData) {
+                        foreach (
+                            $assertionsData['assertions'] as $key => $assertion
+                        ) {
                             $string
-                                = "Recurrence $name - Case $key";
+                                = "Time: $time - Recurrence $name - Case $case - $key";
 
                             // Now date must be = endDate, so we can fake the ShouldEndPost event
                             $now = Carbon::createFromFormat('Y-m-d H:i:s',
