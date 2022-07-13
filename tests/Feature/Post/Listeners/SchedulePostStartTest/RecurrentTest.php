@@ -356,6 +356,25 @@ class RecurrentTest extends TestCase
                     ],
                 ]
             ],
+            [
+                'IsoWeekday + Day + Month' => [
+                    'IsoWeekday = 1 / Month = 01 / Day = 01' => [
+                        'recurrence' => [
+                            'isoweekday' => 1, 'day' => 1, 'month' => 1,
+                        ],
+                        'assertions' => [
+                            [
+                                'nowDate'      => '2022-01-01',
+                                'scheduleDate' => '2024-01-01'
+                            ],
+                            [
+                                'nowDate'      => '2024-01-01',
+                                'scheduleDate' => '2029-01-01'
+                            ],
+                        ],
+                    ],
+                ]
+            ],
 
         ];
 
