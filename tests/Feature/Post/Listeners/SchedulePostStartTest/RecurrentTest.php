@@ -260,7 +260,7 @@ class RecurrentTest extends TestCase
                                 'scheduleDate' => '2022-06-05'
                             ],
                             [
-                                'nowDate'      => '2022-05-05',
+                                'nowDate'      => '2022-06-05',
                                 'scheduleDate' => '2023-02-05'
                             ],
                             [
@@ -333,7 +333,7 @@ class RecurrentTest extends TestCase
                             ],
                             [
                                 'nowDate'      => '2022-02-01',
-                                'scheduleDate' => '2023-02-07'
+                                'scheduleDate' => '2022-02-07'
                             ],
                             [
                                 'nowDate'      => '2022-12-01',

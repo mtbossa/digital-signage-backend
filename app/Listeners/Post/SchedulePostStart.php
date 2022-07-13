@@ -182,8 +182,16 @@ class SchedulePostStart
                 break;
             case RecurrenceCases::IsoWeekdayYear:
                 $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
+
+                $startDate = $this->recurrence->year > now()->year ? now()
+                    ->setYear($this->recurrence->year)
+                    ->startOfYear()->setTimeFrom($this->startTime)
+                    : $this->startTime;
+
                 $rule->setByDay([$byDay])
-                    ->setEndDate(now()->endOfYear());
+                    ->setStartDate($startDate)
+                    ->setEndDate(Carbon::createFromFormat('Y',
+                        $this->recurrence->year)->endOfYear());
                 break;
             case RecurrenceCases::IsoWeekdayDayMonth:
                 $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
@@ -197,9 +205,15 @@ class SchedulePostStart
                     ->setByMonth([$this->recurrence->month]);
                 break;
             case RecurrenceCases::DayYear:
+                $startDate = $this->recurrence->year > now()->year ? now()
+                    ->setYear($this->recurrence->year)
+                    ->startOfYear()->setTimeFrom($this->startTime)
+                    : $this->startTime;
                 $rule
+                    ->setStartDate($startDate)
                     ->setByMonthDay([$this->recurrence->day])
-                    ->setEndDate(now()->endOfYear());
+                    ->setEndDate((Carbon::createFromFormat('Y',
+                        $this->recurrence->year)->endOfYear()));
                 break;
         }
         $nextScheduleDate = (new ArrayTransformer)->transform($rule,
