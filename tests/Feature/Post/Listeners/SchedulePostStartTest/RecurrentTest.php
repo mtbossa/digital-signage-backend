@@ -316,8 +316,48 @@ class RecurrentTest extends TestCase
                     ],
                 ]
             ],
-        ];
+            [
+                'IsoWeekday + Year' => [
+                    'IsoWeekday = 01 / Year = 2022' => [
+                        'recurrence' => [
+                            'isoweekday' => 1, 'year' => 2022
+                        ],
+                        'assertions' => [
+                            [
+                                'nowDate'      => '2022-01-05',
+                                'scheduleDate' => '2022-01-10'
+                            ],
+                            [
+                                'nowDate'      => '2022-01-10',
+                                'scheduleDate' => '2022-01-17'
+                            ],
+                            [
+                                'nowDate'      => '2022-02-01',
+                                'scheduleDate' => '2023-02-07'
+                            ],
+                            [
+                                'nowDate'      => '2022-12-01',
+                                'scheduleDate' => '2022-12-05'
+                            ],
+                        ],
+                    ],
+                    'IsoWeekday = 07 / Year = 2023' => [
+                        'recurrence' => ['isoweekday' => 7, 'year' => 2023],
+                        'assertions' => [
+                            [
+                                'nowDate'      => '2022-01-05',
+                                'scheduleDate' => '2023-01-01'
+                            ],
+                            [
+                                'nowDate'      => '2023-01-02',
+                                'scheduleDate' => '2023-01-08'
+                            ],
+                        ]
+                    ],
+                ]
+            ],
 
+        ];
 
     public function setUp(): void
     {

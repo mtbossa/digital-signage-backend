@@ -180,6 +180,11 @@ class SchedulePostStart
                 $rule->setByDay([$byDay])
                     ->setByMonth([$this->recurrence->month]);
                 break;
+            case RecurrenceCases::IsoWeekdayYear:
+                $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
+                $rule->setByDay([$byDay])
+                    ->setEndDate(now()->endOfYear());
+                break;
         }
         $nextScheduleDate = (new ArrayTransformer)->transform($rule,
             $constraint)
