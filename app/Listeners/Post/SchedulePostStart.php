@@ -148,6 +148,7 @@ class SchedulePostStart
     {
         $rule = (new Rule)
             ->setStartDate($this->startTime)
+            ->setFreq('DAILY')
             ->setCount(2);
         $constraint = new AfterConstraint($this->startTime);
 
@@ -155,21 +156,25 @@ class SchedulePostStart
         switch ($this->chooseRecurrenceLogic($this->recurrence)) {
             case RecurrenceCases::Day:
             default:
-                $rule->setFreq('MONTHLY')
+                $rule
                     ->setByMonthDay([$this->recurrence->day]);
                 break;
             case RecurrenceCases::IsoWeekday:
                 $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
-                $rule->setFreq('WEEKLY')
-                    ->setByDay([$byDay]);
+                $rule->setByDay([$byDay]);
                 break;
             case RecurrenceCases::Month:
-                $rule->setFreq('DAILY')
-                    ->setByMonth([$this->recurrence->month]);
+                $rule->setByMonth([$this->recurrence->month]);
                 break;
+            // TODO This one expires on last day of the year
             case RecurrenceCases::Year:
-                $rule->setFreq('DAILY')
-                    ->setEndDate(now()->endOfYear());
+                $rule->setEndDate(now()->endOfYear());
+                break;
+            case RecurrenceCases::IsoWeekdayDay:
+                $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
+                $rule->setByDay([$byDay])
+                    ->setByMonthDay([$this->recurrence->day]);
+
                 break;
         }
         $nextScheduleDate = (new ArrayTransformer)->transform($rule,

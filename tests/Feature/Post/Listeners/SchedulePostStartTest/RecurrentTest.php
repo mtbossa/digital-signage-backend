@@ -225,6 +225,56 @@ class RecurrentTest extends TestCase
                     ],
                 ]
             ],
+            [
+                'IsoWeekday + Day' => [
+                    'IsoWeekday = 01 / Day = 01' => [
+                        'recurrence' => ['isoweekday' => 1, 'day' => 1],
+                        'assertions' => [
+                            [
+                                'nowDate'      => '2022-01-05',
+                                'scheduleDate' => '2022-08-01'
+                            ],
+                            [
+                                'nowDate'      => '2022-06-15',
+                                'scheduleDate' => '2022-08-01'
+                            ],
+                            [
+                                'nowDate'      => '2022-08-01',
+                                'scheduleDate' => '2023-05-01'
+                            ],
+                            [
+                                'nowDate'      => '2023-05-01',
+                                'scheduleDate' => '2024-01-01'
+                            ],
+                        ]
+                    ],
+                    'IsoWeekday = 07 / Day = 05' => [
+                        'recurrence' => ['isoweekday' => 7, 'day' => 5],
+                        'assertions' => [
+                            [
+                                'nowDate'      => '2022-01-05',
+                                'scheduleDate' => '2022-05-05'
+                            ],
+                            [
+                                'nowDate'      => '2022-05-05',
+                                'scheduleDate' => '2022-06-05'
+                            ],
+                            [
+                                'nowDate'      => '2022-05-05',
+                                'scheduleDate' => '2023-02-05'
+                            ],
+                            [
+                                'nowDate'      => '2023-02-05',
+                                'scheduleDate' => '2023-03-05'
+                            ],
+                            [
+                                'nowDate'      => '2023-03-05',
+                                'scheduleDate' => '2023-11-05'
+                            ],
+                        ]
+                    ],
+                ]
+            ],
         ];
 
 
