@@ -275,6 +275,47 @@ class RecurrentTest extends TestCase
                     ],
                 ]
             ],
+            [
+                'IsoWeekday + Month' => [
+                    'IsoWeekday = 1 / Month = 01' => [
+                        'recurrence' => ['isoweekday' => 1, 'month' => 1],
+                        'assertions' => [
+                            [
+                                'nowDate'      => '2022-01-01', // Saturday
+                                'scheduleDate' => '2022-01-03' // Monday
+                            ],
+                            [
+                                'nowDate'      => '2022-01-03', // Monday
+                                'scheduleDate' => '2022-01-10' // Next Monday
+                            ],
+                            [
+                                // Last day of January 2022
+                                'nowDate'      => '2022-01-31',
+                                // Next January Monday 2023
+                                'scheduleDate' => '2023-01-02'
+                            ],
+                        ]
+                    ],
+                    'IsoWeekday = 7 / Month = 12' => [
+                        'recurrence' => ['isoweekday' => 7, 'month' => 12],
+                        'assertions' => [
+                            [
+                                'nowDate'      => '2022-01-01',
+                                'scheduleDate' => '2022-12-04'
+                            ],
+                            [
+                                'nowDate'      => '2022-12-04',
+                                'scheduleDate' => '2022-12-11'
+                            ],
+                            [
+                                'nowDate'      => '2022-12-31', // Random date
+                                // Next December Sunday
+                                'scheduleDate' => '2023-12-03'
+                            ],
+                        ]
+                    ],
+                ]
+            ],
         ];
 
 

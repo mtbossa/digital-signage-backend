@@ -174,7 +174,11 @@ class SchedulePostStart
                 $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
                 $rule->setByDay([$byDay])
                     ->setByMonthDay([$this->recurrence->day]);
-
+                break;
+            case RecurrenceCases::IsoWeekdayMonth:
+                $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
+                $rule->setByDay([$byDay])
+                    ->setByMonth([$this->recurrence->month]);
                 break;
         }
         $nextScheduleDate = (new ArrayTransformer)->transform($rule,
