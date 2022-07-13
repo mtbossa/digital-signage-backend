@@ -191,6 +191,11 @@ class SchedulePostStart
                     ->setByMonthDay([$this->recurrence->day])
                     ->setByMonth([$this->recurrence->month]);
                 break;
+            case RecurrenceCases::DayMonth:
+                $rule
+                    ->setByMonthDay([$this->recurrence->day])
+                    ->setByMonth([$this->recurrence->month]);
+                break;
         }
         $nextScheduleDate = (new ArrayTransformer)->transform($rule,
             $constraint)
