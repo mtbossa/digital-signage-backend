@@ -149,25 +149,4 @@ class SchedulePostStart
 
 
     }
-
-    /**
-     * MO indicates Monday; TU indicates Tuesday; WE indicates Wednesday;
-     * TH indicates Thursday; FR indicates Friday; SA indicates Saturday;
-     * SU indicates Sunday.
-     */
-    private function mapIsoWeekdayIntoRecurrByDayString(): string
-    {
-        $byDayStrings = [
-            'MO',
-            'TU',
-            'WE',
-            'TH',
-            'FR',
-            'SA',
-            'SU'
-        ];
-
-        // -1 because isoweekday 1 => 'MO' is index 0
-        return $byDayStrings[$this->recurrence->isoweekday - 1];
-    }
 }
