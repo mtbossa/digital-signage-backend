@@ -146,8 +146,21 @@ class SchedulePostStart
      */
     private function scheduleRecurrent(): void
     {
+
+        $startDate = $this->recurrence->year > $this->startTime->year
+            ? $this->startTime
+                ->setYear($this->recurrence->year)
+                ->startOfYear()->setTimeFrom($this->startTime)
+            : $this->startTime;
+
+        if ($this->recurrence->isoweekday) {
+            $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
+        } else {
+            $byDay = '';
+        }
+
         $rule = (new Rule)
-            ->setStartDate($this->startTime)
+            ->setStartDate($startDate)
             ->setFreq('DAILY')
             ->setCount(2);
         $constraint = new AfterConstraint($this->startTime);
@@ -160,7 +173,6 @@ class SchedulePostStart
                     ->setByMonthDay([$this->recurrence->day]);
                 break;
             case RecurrenceCases::IsoWeekday:
-                $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
                 $rule->setByDay([$byDay]);
                 break;
             case RecurrenceCases::Month:
@@ -171,30 +183,19 @@ class SchedulePostStart
                 $rule->setEndDate(now()->endOfYear());
                 break;
             case RecurrenceCases::IsoWeekdayDay:
-                $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
                 $rule->setByDay([$byDay])
                     ->setByMonthDay([$this->recurrence->day]);
                 break;
             case RecurrenceCases::IsoWeekdayMonth:
-                $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
                 $rule->setByDay([$byDay])
                     ->setByMonth([$this->recurrence->month]);
                 break;
             case RecurrenceCases::IsoWeekdayYear:
-                $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
-
-                $startDate = $this->recurrence->year > now()->year ? now()
-                    ->setYear($this->recurrence->year)
-                    ->startOfYear()->setTimeFrom($this->startTime)
-                    : $this->startTime;
-
                 $rule->setByDay([$byDay])
-                    ->setStartDate($startDate)
                     ->setEndDate(Carbon::createFromFormat('Y',
                         $this->recurrence->year)->endOfYear());
                 break;
             case RecurrenceCases::IsoWeekdayDayMonth:
-                $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
                 $rule->setByDay([$byDay])
                     ->setByMonthDay([$this->recurrence->day])
                     ->setByMonth([$this->recurrence->month]);
@@ -205,12 +206,7 @@ class SchedulePostStart
                     ->setByMonth([$this->recurrence->month]);
                 break;
             case RecurrenceCases::DayYear:
-                $startDate = $this->recurrence->year > now()->year ? now()
-                    ->setYear($this->recurrence->year)
-                    ->startOfYear()->setTimeFrom($this->startTime)
-                    : $this->startTime;
                 $rule
-                    ->setStartDate($startDate)
                     ->setByMonthDay([$this->recurrence->day])
                     ->setEndDate((Carbon::createFromFormat('Y',
                         $this->recurrence->year)->endOfYear()));
@@ -223,19 +219,6 @@ class SchedulePostStart
 
         StartPost::dispatch($this->post)
             ->delay($this->endTime->diffInSeconds($nextScheduleDate));
-    }
-
-    private function chooseRecurrenceLogic(Recurrence $recurrence
-    ): RecurrenceCases {
-        $notNullKeys
-            = $this->recurrence->getOnlyNotNullRecurrenceValues($recurrence)
-            ->keys()->toArray();
-
-        $foundRecurrenceCase
-            = $this->possibleRecurrentCases->firstWhere('attributes',
-            $notNullKeys);
-
-        return $foundRecurrenceCase['name'];
     }
 
     /**
@@ -257,6 +240,19 @@ class SchedulePostStart
 
         // -1 because isoweekday 1 => 'MO' is index 0
         return $byDayStrings[$this->recurrence->isoweekday - 1];
+    }
+
+    private function chooseRecurrenceLogic(Recurrence $recurrence
+    ): RecurrenceCases {
+        $notNullKeys
+            = $this->recurrence->getOnlyNotNullRecurrenceValues($recurrence)
+            ->keys()->toArray();
+
+        $foundRecurrenceCase
+            = $this->possibleRecurrentCases->firstWhere('attributes',
+            $notNullKeys);
+
+        return $foundRecurrenceCase['name'];
     }
 
     private function scheduleNonRecurrent(): void
