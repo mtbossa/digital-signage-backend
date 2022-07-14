@@ -12,9 +12,6 @@ use App\Notifications\Post\PostExpired;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use DateTimeImmutable;
-use Recurr\Exception\InvalidArgument;
-use Recurr\Exception\InvalidRRule;
-use Recurr\Exception\InvalidWeekday;
 
 class SchedulePostStart
 {
@@ -30,7 +27,7 @@ class SchedulePostStart
      */
     public function __construct(
         private Carbon $now,
-        private RecurrenceScheduler $recurrenceScheduler
+        private readonly RecurrenceScheduler $recurrenceScheduler
     ) {
         $this->now = Carbon::now();
     }
@@ -46,7 +43,7 @@ class SchedulePostStart
         }
     }
 
-    private function setValues(ShouldEndPost $event)
+    private function setValues(ShouldEndPost $event): void
     {
         $this->post = $event->post;
         $this->recurrence = $this->post->recurrence;
@@ -71,11 +68,6 @@ class SchedulePostStart
         }
     }
 
-    /**
-     * @throws InvalidRRule
-     * @throws InvalidArgument
-     * @throws InvalidWeekday
-     */
     private function scheduleRecurrent(): void
     {
         $this->recurrenceScheduler->configure($this->recurrence->filteredRecurrence,
@@ -102,16 +94,7 @@ class SchedulePostStart
             return;
         }
 
-        if (!DateAndTimeHelper::isPostFromCurrentDayToNext($this->startTime,
-            $this->endTime)
-        ) {
-            StartPost::dispatch($this->post)
-                ->delay($this->endTime->diffInSeconds($this->startTime->addDay()));
-        } else {
-            StartPost::dispatch($this->post)
-                ->delay($this->endTime->diffInSeconds($this->startTime));
-        }
-
-
+        StartPost::dispatch($this->post)
+            ->delay($this->endTime->diffInSeconds($this->startTime->addDay()));
     }
 }
