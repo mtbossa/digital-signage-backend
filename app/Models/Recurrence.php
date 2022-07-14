@@ -52,23 +52,4 @@ class Recurrence extends Model
         );
     }
 
-    protected function recurrIsoWeekDay(): Attribute
-    {
-        return Attribute::make(
-            get: function ($value, $attributes) {
-                $byDayStrings = [
-                    'MO',
-                    'TU',
-                    'WE',
-                    'TH',
-                    'FR',
-                    'SA',
-                    'SU'
-                ];
-
-                // -1 because isoweekday 1 => 'MO' is index 0
-                return $byDayStrings[$attributes['isoweekday'] - 1];
-            }
-        );
-    }
 }

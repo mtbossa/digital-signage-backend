@@ -4,6 +4,7 @@ namespace App\Listeners\Post;
 
 use App\Events\Post\ShouldEndPost;
 use App\Helpers\DateAndTimeHelper;
+use App\Interfaces\RecurrenceScheduler;
 use App\Jobs\Post\StartPost;
 use App\Models\Post;
 use App\Models\Recurrence;
@@ -14,9 +15,6 @@ use DateTimeImmutable;
 use Recurr\Exception\InvalidArgument;
 use Recurr\Exception\InvalidRRule;
 use Recurr\Exception\InvalidWeekday;
-use Recurr\Rule;
-use Recurr\Transformer\ArrayTransformer;
-use Recurr\Transformer\Constraint\AfterConstraint;
 
 class SchedulePostStart
 {
@@ -32,6 +30,7 @@ class SchedulePostStart
      */
     public function __construct(
         private Carbon $now,
+        private RecurrenceScheduler $recurrenceScheduler
     ) {
         $this->now = Carbon::now();
     }
@@ -79,44 +78,10 @@ class SchedulePostStart
      */
     private function scheduleRecurrent(): void
     {
-        $rule = (new Rule)
-            ->setStartDate($this->startTime)
-            ->setFreq('DAILY')
-            ->setCount(2);
-        $constraint = new AfterConstraint($this->startTime);
+        $this->recurrenceScheduler->configure($this->recurrence->filteredRecurrence,
+            $this->startTime);
 
-        foreach (
-            $this->recurrence->filteredRecurrence as $recurrenceName => $value
-        ) {
-            switch ($recurrenceName) {
-                case 'isoweekday':
-                    $rule->setByDay([$this->recurrence->recurrIsoWeekDay]);
-                    break;
-                case 'day':
-                    $rule->setByMonthDay([$this->recurrence->day]);
-                    break;
-                case 'month':
-                    $rule->setByMonth([$this->recurrence->month]);
-                    break;
-                case 'year':
-                    $startDate = $this->recurrence->year
-                    > $this->startTime->year
-                        ? $this->startTime
-                            ->setYear($this->recurrence->year)
-                            ->startOfYear()->setTimeFrom($this->startTime)
-                        : $this->startTime;
-
-                    $rule->setStartDate($startDate)
-                        ->setEndDate(Carbon::createFromFormat('Y',
-                            $this->recurrence->year)->endOfYear());
-                    break;
-            }
-        }
-
-        $nextScheduleDate = (new ArrayTransformer)->transform($rule,
-            $constraint)
-            ->first()
-            ->getStart();
+        $nextScheduleDate = $this->recurrenceScheduler->scheduleStart();
 
         StartPost::dispatch($this->post)
             ->delay($this->endTime->diffInSeconds($nextScheduleDate));
