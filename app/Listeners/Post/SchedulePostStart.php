@@ -2,7 +2,6 @@
 
 namespace App\Listeners\Post;
 
-use App\Enums\RecurrenceCases;
 use App\Events\Post\ShouldEndPost;
 use App\Helpers\DateAndTimeHelper;
 use App\Jobs\Post\StartPost;
@@ -12,7 +11,6 @@ use App\Notifications\Post\PostExpired;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use DateTimeImmutable;
-use Illuminate\Support\Collection;
 use Recurr\Exception\InvalidArgument;
 use Recurr\Exception\InvalidRRule;
 use Recurr\Exception\InvalidWeekday;
@@ -22,7 +20,6 @@ use Recurr\Transformer\Constraint\AfterConstraint;
 
 class SchedulePostStart
 {
-    private Collection $possibleRecurrentCases;
     private Post $post;
     private Recurrence|null $recurrence;
     private CarbonImmutable|DateTimeImmutable $startTime;
@@ -37,70 +34,6 @@ class SchedulePostStart
         private Carbon $now,
     ) {
         $this->now = Carbon::now();
-        $this->possibleRecurrentCases
-            = new Collection($this->getRecurrenceCases());
-    }
-
-    private function getRecurrenceCases(): array
-    {
-        return [
-            [
-                'name'       => RecurrenceCases::IsoWeekday,
-                'attributes' => ['isoweekday']
-            ],
-            [
-                'name'       => RecurrenceCases::IsoWeekdayDay,
-                'attributes' => ['isoweekday', 'day'],
-            ],
-            [
-                'name'       => RecurrenceCases::IsoWeekdayMonth,
-                'attributes' => ['isoweekday', 'month'],
-            ],
-            [
-                'name'       => RecurrenceCases::IsoWeekdayYear,
-                'attributes' => ['isoweekday', 'year'],
-            ],
-            [
-                'name'       => RecurrenceCases::IsoWeekdayDayMonth,
-                'attributes' => ['isoweekday', 'day', 'month'],
-            ],
-            [
-                'name'       => RecurrenceCases::IsoWeekdayDayYear,
-                'attributes' => ['isoweekday', 'day', 'year'],
-            ],
-            [
-                'name'       => RecurrenceCases::IsoWeekdayDayMonthYear,
-                'attributes' => ['isoweekday', 'day', 'month', 'year'],
-            ],
-            [
-                'name'       => RecurrenceCases::Day,
-                'attributes' => ['day'],
-            ],
-            [
-                'name'       => RecurrenceCases::DayMonth,
-                'attributes' => ['day', 'month'],
-            ],
-            [
-                'name'       => RecurrenceCases::DayYear,
-                'attributes' => ['day', 'year'],
-            ],
-            [
-                'name'       => RecurrenceCases::DayMonthYear,
-                'attributes' => ['day', 'month', 'year'],
-            ],
-            [
-                'name'       => RecurrenceCases::Month,
-                'attributes' => ['month'],
-            ],
-            [
-                'name'       => RecurrenceCases::MonthYear,
-                'attributes' => ['month', 'year'],
-            ],
-            [
-                'name'       => RecurrenceCases::Year,
-                'attributes' => ['year'],
-            ],
-        ];
     }
 
     public function handle(ShouldEndPost $event): void
@@ -146,72 +79,40 @@ class SchedulePostStart
      */
     private function scheduleRecurrent(): void
     {
-
-        $startDate = $this->recurrence->year > $this->startTime->year
-            ? $this->startTime
-                ->setYear($this->recurrence->year)
-                ->startOfYear()->setTimeFrom($this->startTime)
-            : $this->startTime;
-
-        if ($this->recurrence->isoweekday) {
-            $byDay = $this->mapIsoWeekdayIntoRecurrByDayString();
-        } else {
-            $byDay = '';
-        }
-
         $rule = (new Rule)
-            ->setStartDate($startDate)
+            ->setStartDate($this->startTime)
             ->setFreq('DAILY')
             ->setCount(2);
         $constraint = new AfterConstraint($this->startTime);
 
-        // Case Only day, must schedule to next available day, where day = $recurrence->day
-        switch ($this->chooseRecurrenceLogic($this->recurrence)) {
-            case RecurrenceCases::Day:
-            default:
-                $rule
-                    ->setByMonthDay([$this->recurrence->day]);
-                break;
-            case RecurrenceCases::IsoWeekday:
-                $rule->setByDay([$byDay]);
-                break;
-            case RecurrenceCases::Month:
-                $rule->setByMonth([$this->recurrence->month]);
-                break;
-            // TODO This one expires on last day of the year
-            case RecurrenceCases::Year:
-                $rule->setEndDate(now()->endOfYear());
-                break;
-            case RecurrenceCases::IsoWeekdayDay:
-                $rule->setByDay([$byDay])
-                    ->setByMonthDay([$this->recurrence->day]);
-                break;
-            case RecurrenceCases::IsoWeekdayMonth:
-                $rule->setByDay([$byDay])
-                    ->setByMonth([$this->recurrence->month]);
-                break;
-            case RecurrenceCases::IsoWeekdayYear:
-                $rule->setByDay([$byDay])
-                    ->setEndDate(Carbon::createFromFormat('Y',
-                        $this->recurrence->year)->endOfYear());
-                break;
-            case RecurrenceCases::IsoWeekdayDayMonth:
-                $rule->setByDay([$byDay])
-                    ->setByMonthDay([$this->recurrence->day])
-                    ->setByMonth([$this->recurrence->month]);
-                break;
-            case RecurrenceCases::DayMonth:
-                $rule
-                    ->setByMonthDay([$this->recurrence->day])
-                    ->setByMonth([$this->recurrence->month]);
-                break;
-            case RecurrenceCases::DayYear:
-                $rule
-                    ->setByMonthDay([$this->recurrence->day])
-                    ->setEndDate((Carbon::createFromFormat('Y',
-                        $this->recurrence->year)->endOfYear()));
-                break;
+        foreach (
+            $this->recurrence->filteredRecurrence as $recurrenceName => $value
+        ) {
+            switch ($recurrenceName) {
+                case 'isoweekday':
+                    $rule->setByDay([$this->recurrence->recurrIsoWeekDay]);
+                    break;
+                case 'day':
+                    $rule->setByMonthDay([$this->recurrence->day]);
+                    break;
+                case 'month':
+                    $rule->setByMonth([$this->recurrence->month]);
+                    break;
+                case 'year':
+                    $startDate = $this->recurrence->year
+                    > $this->startTime->year
+                        ? $this->startTime
+                            ->setYear($this->recurrence->year)
+                            ->startOfYear()->setTimeFrom($this->startTime)
+                        : $this->startTime;
+
+                    $rule->setStartDate($startDate)
+                        ->setEndDate(Carbon::createFromFormat('Y',
+                            $this->recurrence->year)->endOfYear());
+                    break;
+            }
         }
+
         $nextScheduleDate = (new ArrayTransformer)->transform($rule,
             $constraint)
             ->first()
@@ -219,40 +120,6 @@ class SchedulePostStart
 
         StartPost::dispatch($this->post)
             ->delay($this->endTime->diffInSeconds($nextScheduleDate));
-    }
-
-    /**
-     * MO indicates Monday; TU indicates Tuesday; WE indicates Wednesday;
-     * TH indicates Thursday; FR indicates Friday; SA indicates Saturday;
-     * SU indicates Sunday.
-     */
-    private function mapIsoWeekdayIntoRecurrByDayString(): string
-    {
-        $byDayStrings = [
-            'MO',
-            'TU',
-            'WE',
-            'TH',
-            'FR',
-            'SA',
-            'SU'
-        ];
-
-        // -1 because isoweekday 1 => 'MO' is index 0
-        return $byDayStrings[$this->recurrence->isoweekday - 1];
-    }
-
-    private function chooseRecurrenceLogic(Recurrence $recurrence
-    ): RecurrenceCases {
-        $notNullKeys
-            = $this->recurrence->getOnlyNotNullRecurrenceValues($recurrence)
-            ->keys()->toArray();
-
-        $foundRecurrenceCase
-            = $this->possibleRecurrentCases->firstWhere('attributes',
-            $notNullKeys);
-
-        return $foundRecurrenceCase['name'];
     }
 
     private function scheduleNonRecurrent(): void
@@ -283,27 +150,24 @@ class SchedulePostStart
 
     }
 
-    private function scheduleIsoWeekday()
+    /**
+     * MO indicates Monday; TU indicates Tuesday; WE indicates Wednesday;
+     * TH indicates Thursday; FR indicates Friday; SA indicates Saturday;
+     * SU indicates Sunday.
+     */
+    private function mapIsoWeekdayIntoRecurrByDayString(): string
     {
-        // Carbon Sunday is 0, not 7
-        $isoWeekday = $this->recurrence->isoweekday === 7 ? 0
-            : $this->recurrence->isoweekday;
+        $byDayStrings = [
+            'MO',
+            'TU',
+            'WE',
+            'TH',
+            'FR',
+            'SA',
+            'SU'
+        ];
 
-        return $this->startTime->next($isoWeekday)
-            ->setTimeFrom($this->startTime);
-    }
-
-    private function scheduleDay(): CarbonImmutable
-    {
-        // In case it's not the same day 30 days after, means it's a month with fewer days
-        // so need to go to next month
-        if ($this->startTime->addMonthWithNoOverflow()->day
-            !== $this->recurrence->day
-        ) {
-            return $this->startTime->addMonthsWithNoOverflow(2);
-        } else {
-            return $this->startTime->addMonthWithNoOverflow();
-        }
-
+        // -1 because isoweekday 1 => 'MO' is index 0
+        return $byDayStrings[$this->recurrence->isoweekday - 1];
     }
 }
