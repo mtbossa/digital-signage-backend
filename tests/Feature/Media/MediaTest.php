@@ -21,8 +21,8 @@ class MediaTest extends TestCase
 
     $this->_authUser();
     $this->defaultLocation = [
-      'image' => 'intus/caxias/images',
-      'video' => 'intus/caxias/videos'
+      'image' => 'intus/caxias/image',
+      'video' => 'intus/caxias/video'
     ];
 
     $this->media = $this->_createMedia();

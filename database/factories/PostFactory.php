@@ -29,7 +29,7 @@ class PostFactory extends Factory
       'description' => $this->faker->text(100),
       'start_time' => $start_time->format('H:i:s'),
       'end_time' => $end_time->format('H:i:s'),
-      'expose_time' => $this->faker->numberBetween(1, 86400),
+      'expose_time' => $this->faker->numberBetween(1000, 86400),
     ];
   }
 
