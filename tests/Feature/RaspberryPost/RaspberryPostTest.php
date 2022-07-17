@@ -91,7 +91,9 @@ class RaspberryPostTest extends TestCase
     /** @test */
     public function ensure_json_structure_is_clean_and_correct()
     {
-        $posts = Post::factory(2)->create(['media_id' => $this->media->id]);
+        $posts = Post::factory(2)->create([
+            'media_id' => $this->media->id, 'showing' => true
+        ]);
 
         $json_structure = [];
         foreach ($posts as $post) {
@@ -104,6 +106,7 @@ class RaspberryPostTest extends TestCase
                 'start_time'  => $post->start_time,
                 'end_time'    => $post->end_time,
                 'expose_time' => $post->expose_time,
+                'showing'     => $post->showing,
                 'media'       => [
                     'id'       => $post->media->id,
                     'path'     => $post->media->path,

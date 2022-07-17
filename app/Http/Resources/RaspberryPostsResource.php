@@ -23,6 +23,7 @@ class RaspberryPostsResource extends JsonResource
             'start_time'  => $this->start_time,
             'end_time'    => $this->end_time,
             'expose_time' => $this->expose_time,
+            'showing'     => $this->showing,
             $this->mergeWhen($this->whenLoaded('medias'), [
                 'media' => [
                     'id'       => $this->media->id,
