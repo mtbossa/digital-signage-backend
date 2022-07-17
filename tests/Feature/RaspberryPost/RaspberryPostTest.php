@@ -31,16 +31,23 @@ class RaspberryPostTest extends TestCase
     }
 
     /** @test */
-    public function fetch_all_display_posts()
+    public function fetch_all_current_raspberry_posts()
     {
+        // Added a second display and raspberry because this route could
+        // return the posts of the incorrect raspberry (the ones from $this->raspberry)
+        // so need to make sure it's returning only the ones from the passed
+        // so creates two to compare
+        $secondDisplay = Display::factory()->create();
+        $secondRaspberry = Raspberry::factory()
+            ->create(['display_id' => $secondDisplay->id]);
         $posts = Post::factory(2)->create(['media_id' => $this->media->id]);
 
         foreach ($posts as $post) {
-            $post->displays()->attach($this->display->id);
+            $post->displays()->attach($secondDisplay->id);
         }
 
         $response = $this->getJson(route('raspberry.posts.index',
-                ['raspberry' => $this->raspberry->id])
+                ['raspberry' => $secondRaspberry->id])
         )->assertOk();
 
         foreach ($posts as $key => $post) {
@@ -51,6 +58,9 @@ class RaspberryPostTest extends TestCase
     /** @test */
     public function fetch_only_showing_posts()
     {
+        $secondDisplay = Display::factory()->create();
+        $secondRaspberry = Raspberry::factory()
+            ->create(['display_id' => $secondDisplay->id]);
         $showingPosts = Post::factory(2)->create([
             'media_id' => $this->media->id, 'showing' => true
         ]);
@@ -61,11 +71,11 @@ class RaspberryPostTest extends TestCase
         $allPosts = [...$showingPosts, ...$notShowingPosts];
 
         foreach ($allPosts as $post) {
-            $post->displays()->attach($this->display->id);
+            $post->displays()->attach($secondDisplay->id);
         }
 
         $response = $this->getJson(route('raspberry.posts.index',
-                ['raspberry' => $this->raspberry->id, 'showing' => true])
+                ['raspberry' => $secondRaspberry, 'showing' => true])
         )->assertOk();
 
         foreach ($showingPosts as $key => $post) {

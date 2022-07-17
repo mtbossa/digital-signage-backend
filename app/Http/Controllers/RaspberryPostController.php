@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\RaspberryPostsResource;
+use App\Models\Display;
 use App\Models\Raspberry;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -20,7 +21,9 @@ class RaspberryPostController extends Controller
     ): AnonymousResourceCollection {
         $showing = $request->showing;
 
-        $display_with_posts = $raspberry->display->query()
+        $displayId = $raspberry->display->id;
+
+        $display_with_posts = Display::query()
             ->with([
                 'posts' => function (BelongsToMany $query) use ($showing) {
                     $query->when($showing, function (Builder $query) {
@@ -30,7 +33,7 @@ class RaspberryPostController extends Controller
                     $query->with('recurrence');
                 },
             ])
-            ->first();
+            ->find($displayId);
 
         return RaspberryPostsResource::collection($display_with_posts->posts);
     }
