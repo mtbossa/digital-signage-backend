@@ -2,13 +2,15 @@
 
 namespace App\Notifications\Post;
 
+use App\Http\Resources\RaspberryPostsResource;
 use App\Models\Display;
 use App\Models\Post;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class PostStarted extends Notification
+class PostStarted extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -19,7 +21,6 @@ class PostStarted extends Notification
      */
     public function __construct(public Post $post, public Display $display)
     {
-        //
     }
 
     /**
@@ -43,10 +44,7 @@ class PostStarted extends Notification
      */
     public function toBroadcast($notifiable): BroadcastMessage
     {
-        return new BroadcastMessage([
-            'post'  => $this->post,
-            'media' => $this->post->media,
-        ]);
+        return new BroadcastMessage(['post' => (new RaspberryPostsResource($this->post))->resolve()]);
     }
 
     /**
