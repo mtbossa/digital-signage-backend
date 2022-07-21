@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Raspberry;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -14,9 +15,10 @@ use Illuminate\Support\Facades\Broadcast;
 */
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-  return (int) $user->id === (int) $id;
+    return (int) $user->id === (int) $id;
 });
 
-Broadcast::channel('raspberry.{raspberry}', function ($authRaspberry, \App\Models\Raspberry $raspberry) {
-  return true;
-});
+Broadcast::channel('App.Models.Raspberry.{raspberry}',
+    function ($authRaspberry, Raspberry $raspberry) {
+        return true;
+    });
