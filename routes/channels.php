@@ -19,6 +19,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('App.Models.Raspberry.{raspberry}',
-    function ($authRaspberry, Raspberry $raspberry) {
-        return true;
+    function (Raspberry $authRaspberry, Raspberry $raspberry) {
+        return $raspberry->id === $authRaspberry->id;
     });
