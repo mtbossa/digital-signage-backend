@@ -32,6 +32,15 @@ class RaspberryPostsResource extends JsonResource
                     'filename' => $this->media->filename
                 ],
             ]),
+            $this->mergeWhen($this->whenLoaded('recurrence')
+                && $this->whenNotNull($this->recurrence), [
+                'recurrence' => [
+                    'isoweekday' => $this->recurrence?->isoweekday,
+                    'day'        => $this->recurrence?->day,
+                    'month'      => $this->recurrence?->month,
+                    'year'       => $this->recurrence?->year
+                ],
+            ]),
         ];
     }
 }

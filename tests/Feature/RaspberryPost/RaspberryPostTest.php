@@ -6,6 +6,7 @@ use App\Models\Display;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\Raspberry;
+use App\Models\Recurrence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
@@ -91,15 +92,20 @@ class RaspberryPostTest extends TestCase
     /** @test */
     public function ensure_json_structure_is_clean_and_correct()
     {
+        $recurrence = Recurrence::factory()->create();
         $posts = Post::factory(2)->create([
-            'media_id' => $this->media->id, 'showing' => true
+            'media_id'      => $this->media->id, 'showing' => true,
+            'recurrence_id' => $recurrence->id
         ]);
+        $nonRecurrentPost = Post::factory()->nonRecurrent()
+            ->create(['media_id' => $this->media->id, 'showing' => true]);
+        $posts = [...$posts, $nonRecurrentPost];
 
         $json_structure = [];
-        foreach ($posts as $post) {
+        foreach ($posts as $key => $post) {
             $post->displays()->attach($this->display->id);
 
-            $json_structure[] = [
+            $structure = [
                 'id'          => $post->id,
                 'start_date'  => $post->start_date,
                 'end_date'    => $post->end_date,
@@ -112,8 +118,20 @@ class RaspberryPostTest extends TestCase
                     'path'     => $post->media->path,
                     'type'     => $post->media->type,
                     'filename' => $post->media->filename
-                ]
+                ],
             ];
+
+            if ($post->recurrence) {
+                $structure['recurrence'] = [
+                    'isoweekday' => $post->recurrence->isoweekday,
+                    'day'        => $post->recurrence->day,
+                    'month'      => $post->recurrence->month,
+                    'year'       => $post->recurrence->year
+                ];
+            }
+
+            $json_structure[$key] = $structure;
+
         }
         $complete_json = ['data' => $json_structure];
 

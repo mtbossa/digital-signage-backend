@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Post;
 
+use App\Http\Resources\RaspberryPostsResource;
 use App\Models\Display;
 use App\Models\Post;
 use Illuminate\Bus\Queueable;
@@ -43,10 +44,7 @@ class PostEnded extends Notification
      */
     public function toBroadcast($notifiable): BroadcastMessage
     {
-        return new BroadcastMessage([
-            'post'  => $this->post,
-            'media' => $this->post->media,
-        ]);
+        return new BroadcastMessage(['post' => (new RaspberryPostsResource($this->post))->resolve()]);
     }
 
     /**
