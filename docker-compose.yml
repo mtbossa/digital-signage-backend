@@ -2,6 +2,7 @@
 version: '3'
 services:
     laravel.test:
+        container_name: laravel
         build:
             context: ./docker/8.1
             dockerfile: Dockerfile
