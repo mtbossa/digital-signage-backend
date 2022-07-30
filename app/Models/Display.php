@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -11,7 +12,7 @@ class Display extends Model
 {
   use HasFactory;
 
-  protected $fillable = ['name', 'size', 'width', 'height', 'touch', 'observation'];
+  protected $fillable = ['name', 'size', 'width', 'height', 'touch', 'observation', 'store_id'];
 
   public function raspberry(): HasOne
   {
@@ -21,5 +22,10 @@ class Display extends Model
   public function posts(): BelongsToMany
   {
     return $this->belongsToMany(Post::class);
+  }
+  
+  public function store(): BelongsTo
+  {
+    return $this->belongsTo(Store::class);
   }
 }

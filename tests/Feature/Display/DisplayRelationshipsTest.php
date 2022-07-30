@@ -6,6 +6,7 @@ use App\Models\Display;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\Raspberry;
+use App\Models\Store;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Display\Traits\DisplayTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
@@ -20,6 +21,17 @@ class DisplayRelationshipsTest extends TestCase
     parent::setUp();
 
     $this->_authUser();
+  }
+
+  /** @test */
+  public function a_raspberry_may_belong_to_a_store()
+  {
+    $store = Store::factory()->create();
+    $display = Display::factory()->create(['store_id' => $store->id]);
+
+    $this->assertInstanceOf(Store::class, $display->store);
+    $this->assertEquals(1, $display->store->count());
+    $this->assertDatabaseHas('displays', ['id' => $display->id, 'store_id' => $store->id]);
   }
 
   /** @test */
