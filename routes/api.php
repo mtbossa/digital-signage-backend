@@ -11,6 +11,7 @@ use App\Http\Controllers\RaspberryController;
 use App\Http\Controllers\RaspberryPostController;
 use App\Http\Controllers\RecurrenceController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\StoreDisplaysController;
 use App\Http\Controllers\UserController;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -52,6 +53,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->only('index');
     Route::get('media/{filename}/download', MediaDownloadController::class)
         ->name('media.download');
+    Route::apiResource('store.displays', StoreDisplaysController::class)
+        ->only('index');
 
     Route::apiResources([
         'users'       => UserController::class,
