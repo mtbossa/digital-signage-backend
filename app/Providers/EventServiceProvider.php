@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use App\Events\Post\ShouldEndPost;
 use App\Events\Post\ShouldStartPost;
-use App\Listeners\Post\BroadcastToRaspberries;
+use App\Listeners\Post\BroadcastToDisplays;
 use App\Listeners\Post\SchedulePostEnd;
 use App\Listeners\Post\SchedulePostStart;
 use App\Listeners\Post\SetShowingFalse;
@@ -27,12 +27,12 @@ class EventServiceProvider extends ServiceProvider
             ],
             ShouldStartPost::class => [
                 SetShowingTrue::class,
-                BroadcastToRaspberries::class,
+                BroadcastToDisplays::class,
                 SchedulePostEnd::class,
             ],
             ShouldEndPost::class   => [
                 SetShowingFalse::class,
-                BroadcastToRaspberries::class,
+                BroadcastToDisplays::class,
                 SchedulePostStart::class,
             ]
         ];

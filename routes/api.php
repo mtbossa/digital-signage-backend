@@ -3,6 +3,7 @@
 use App\Events\Post\ShouldEndPost;
 use App\Events\Post\ShouldStartPost;
 use App\Http\Controllers\DisplayController;
+use App\Http\Controllers\DisplayPostController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MediaDownloadController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\RaspberryController;
 use App\Http\Controllers\RaspberryPostController;
 use App\Http\Controllers\RecurrenceController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\StoreDisplaysController;
 use App\Http\Controllers\UserController;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -50,8 +52,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('raspberry.posts', RaspberryPostController::class)
         ->only('index');
+    Route::apiResource('displays.posts', DisplayPostController::class)
+        ->only('index');
     Route::get('media/{filename}/download', MediaDownloadController::class)
         ->name('media.download');
+    Route::apiResource('stores.displays', StoreDisplaysController::class)
+        ->only('index');
 
     Route::apiResources([
         'users'       => UserController::class,
