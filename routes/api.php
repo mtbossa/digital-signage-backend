@@ -52,11 +52,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('raspberry.posts', RaspberryPostController::class)
         ->only('index');
-    Route::apiResource('display.posts', DisplayPostController::class)
+    Route::apiResource('displays.posts', DisplayPostController::class)
         ->only('index');
     Route::get('media/{filename}/download', MediaDownloadController::class)
         ->name('media.download');
-    Route::apiResource('store.displays', StoreDisplaysController::class)
+    Route::apiResource('stores.displays', StoreDisplaysController::class)
         ->only('index');
 
     Route::apiResources([
