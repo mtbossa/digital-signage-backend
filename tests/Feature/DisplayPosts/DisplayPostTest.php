@@ -42,7 +42,7 @@ class DisplayPostTest extends TestCase
             $post->displays()->attach($secondDisplay->id);
         }
 
-        $response = $this->getJson(route('display.posts.index',
+        $response = $this->getJson(route('displays.posts.index',
                 ['display' => $secondDisplay->id])
         )->assertOk();
 
@@ -68,7 +68,7 @@ class DisplayPostTest extends TestCase
             $post->displays()->attach($secondDisplay->id);
         }
 
-        $response = $this->getJson(route('display.posts.index',
+        $response = $this->getJson(route('displays.posts.index',
                 ['display' => $secondDisplay, 'showing' => true])
         )->assertOk();
 
@@ -128,7 +128,7 @@ class DisplayPostTest extends TestCase
         }
         $complete_json = ['data' => $json_structure];
 
-        $response = $this->getJson(route('display.posts.index',
+        $response = $this->getJson(route('displays.posts.index',
             ['display' => $this->display->id]))->assertOk();
         $response->assertExactJson($complete_json);
     }
@@ -147,7 +147,7 @@ class DisplayPostTest extends TestCase
             ->create(['media_id' => $this->media->id]);
         $post_for_display_two->displays()->attach($display_two);
 
-        $response = $this->getJson(route('display.posts.index',
+        $response = $this->getJson(route('displays.posts.index',
             ['display' => $this->display->id]))->assertOk();
 
         foreach ($posts as $key => $post) {

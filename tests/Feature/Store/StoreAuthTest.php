@@ -52,7 +52,7 @@ class StoreAuthTest extends TestCase
     public function authenticated_store_should_be_able_to_make_requests_to_store_displays_index_route(
     )
     {
-        $response = $this->getJson(route('store.displays.index',
+        $response = $this->getJson(route('stores.displays.index',
             ['store' => $this->store->id]),
             ['Authorization' => "Bearer {$this->store->plainTextToken}"])
             ->assertOk();
@@ -62,7 +62,7 @@ class StoreAuthTest extends TestCase
     public function authenticated_store_should_be_able_to_make_requests_to_display_posts_index_route(
     )
     {
-        $response = $this->getJson(route('display.posts.index',
+        $response = $this->getJson(route('displays.posts.index',
             ['display' => $this->display->id]),
             ['Authorization' => "Bearer {$this->store->plainTextToken}"])
             ->assertOk();
@@ -72,7 +72,7 @@ class StoreAuthTest extends TestCase
     public function unauthenticated_store_should_not_be_able_to_make_requests_to_store_displays_index_route(
     )
     {
-        $this->getJson(route('store.displays.index',
+        $this->getJson(route('stores.displays.index',
             ['store' => $this->store->id]))->assertUnauthorized();
     }
 }

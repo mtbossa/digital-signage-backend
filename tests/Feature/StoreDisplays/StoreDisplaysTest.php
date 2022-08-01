@@ -46,7 +46,7 @@ class StoreDisplaysTest extends TestCase
         $displays = Display::factory(2)
             ->create(['store_id' => $this->store->id]);
 
-        $response = $this->getJson(route('store.displays.index',
+        $response = $this->getJson(route('stores.displays.index',
                 ['store' => $this->store->id])
         )->assertOk();
 
