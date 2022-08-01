@@ -7,7 +7,7 @@ use App\Events\Post\ShouldStartPost;
 use App\Notifications\Post\PostEnded;
 use App\Notifications\Post\PostStarted;
 
-class BroadcastToRaspberries
+class BroadcastToDisplays
 {
     /**
      * Create the event listener.
@@ -29,17 +29,15 @@ class BroadcastToRaspberries
     public function handle(ShouldStartPost|ShouldEndPost $event): void
     {
         foreach ($event->post->displays as $display) {
-            if ($display->raspberry) {
-                if ($event instanceof ShouldStartPost) {
-                    $notification = new PostStarted($event->post,
-                        $display);
-                } else {
-                    $notification = new PostEnded($event->post,
-                        $display);
-                }
-
-                $display->raspberry->notify($notification);
+            if ($event instanceof ShouldStartPost) {
+                $notification = new PostStarted($event->post,
+                    $display);
+            } else {
+                $notification = new PostEnded($event->post,
+                    $display);
             }
+
+            $display->notify($notification);
         }
     }
 }
