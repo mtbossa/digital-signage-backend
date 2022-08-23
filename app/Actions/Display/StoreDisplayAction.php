@@ -23,6 +23,9 @@ class StoreDisplayAction
             $display->store()->associate($store);
         }
 
+        $new_token = $display->createToken('display_access_token');
+        $display->token = $new_token;
+
         return $display;
     }
 }

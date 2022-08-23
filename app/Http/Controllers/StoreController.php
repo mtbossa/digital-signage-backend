@@ -20,10 +20,7 @@ class StoreController extends Controller
                 'required', 'string', 'max:255', 'unique:stores'
             ]
         ]);
-        $store = Store::create($request->all());
-        $new_token = $store->createToken('store_access_token');
-        $store->token = $new_token;
-        return $store;
+      return Store::create($request->all());
     }
 
     public function show(Request $request, Store $store)

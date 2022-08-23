@@ -56,7 +56,7 @@ class DisplayTest extends TestCase
   /** @test */
   public function fetch_single_display()
   {
-    $this->getJson(route('displays.show', $this->display->id))->assertOk()->assertJson($this->display->toArray());
+    $this->getJson(route('displays.show', $this->display->id))->assertOk()->assertJsonFragment(['id' => $this->display->id]);
   }
 
   /** @test */
