@@ -54,9 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
       return new \App\Http\Resources\LoggedUserResource($request->user());
     });
-
-    Route::apiResource('raspberry.posts', RaspberryPostController::class)
-        ->only('index');
+    
     Route::apiResource('displays.posts', DisplayPostController::class)
         ->only('index');
     Route::get('media/{filename}/download', MediaDownloadController::class)
