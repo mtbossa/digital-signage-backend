@@ -132,6 +132,7 @@ class MediaTest extends TestCase
   {
     $this->_createMedia();
 
-    $this->getJson(route('medias.index'))->assertOk()->assertJsonCount(2)->assertJsonFragment($this->media->toArray());
+    $this->getJson(route('medias.index'))->assertOk()->assertJsonCount(2,
+      'data')->assertJsonFragment($this->media->toArray());
   }
 }
