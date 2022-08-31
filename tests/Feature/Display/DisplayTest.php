@@ -63,7 +63,10 @@ class DisplayTest extends TestCase
   public function fetch_all_displays()
   {
     $display = $this->_createDisplay();
+    
+    Display::all(['id'])->toArray();
 
-    $this->getJson(route('displays.index'))->assertOk()->assertJsonCount(2);
+    $this->getJson(route('displays.index'))->assertOk()->assertJsonCount(2,
+      'data')->assertJsonFragment(['id' => $display->id]);
   }
 }

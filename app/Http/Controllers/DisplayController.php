@@ -6,15 +6,17 @@ use App\Actions\Display\StoreDisplayAction;
 use App\Actions\Display\UpdateDisplayAction;
 use App\Http\Requests\Display\StoreDisplayRequest;
 use App\Models\Display;
+use App\Models\Media;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 class DisplayController extends Controller
 {
 
-  public function index(): Collection
+  public function index(Request $request): LengthAwarePaginator
   {
-    return Display::all();
+    return Display::query()->paginate($request->size);
   }
 
   public function store(StoreDisplayRequest $request, StoreDisplayAction $action): Display
