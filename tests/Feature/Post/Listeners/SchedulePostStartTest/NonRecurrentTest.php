@@ -245,23 +245,24 @@ class NonRecurrentTest extends TestCase
      * @test
      * @dataProvider expireDatesWithBothTypesOfTimes
      */
-    public function when_expire_date_is_today_must_dispatch_post_expired_event_only_to_displays_with_raspberry(
-        $startDate,
-        $endDate,
-        $startTime,
-        $endTime
+    public function when_expire_date_is_today_must_dispatch_post_expired_event_to_all_displays(
+      $startDate,
+      $endDate,
+      $startTime,
+      $endTime
     ) {
 
-        Notification::fake([PostExpired::class]);
+      Notification::fake([PostExpired::class]);
 
-        $post = Post::factory()->create([
-            'start_date' => $startDate, 'start_time' => $startTime,
+      $post = Post::factory()->create([
+        'start_date' => $startDate, 'start_time' => $startTime,
             'end_date'   => $endDate, 'end_time' => $endTime,
             'media_id'   => $this->media->id
         ]);
 
         $displaysWithRaspberry = Display::factory(3)->create();
-        $displayWithoutRaspberry = Display::factory(2)->create();
+      $displayWithoutRaspberry = Display::factory(2)->create();
+      $randomDisplay = Display::factory()->create();
 
         foreach (
             [...$displaysWithRaspberry, ...$displayWithoutRaspberry] as $display
@@ -283,15 +284,15 @@ class NonRecurrentTest extends TestCase
 
         event(new ShouldEndPost($post));
 
-        Notification::assertTimesSent(count($displaysWithRaspberry),
-            PostExpired::class);
+      Notification::assertTimesSent(count($displaysWithRaspberry) + count($displayWithoutRaspberry),
+        PostExpired::class);
         Notification::assertSentTo(
-            Raspberry::query()->whereNotNull('display_id')->get(),
-            PostExpired::class
+          $post->displays,
+          PostExpired::class
         );
         Notification::assertNotSentTo(
-            Raspberry::query()->whereNull('display_id')->get(),
-            PostExpired::class
+          $randomDisplay,
+          PostExpired::class
         );
     }
 

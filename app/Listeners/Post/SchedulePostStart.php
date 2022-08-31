@@ -85,10 +85,8 @@ class SchedulePostStart
 
         if ($this->now->isSameUnit('day', $endDate)) {
             foreach ($this->post->displays as $display) {
-                if ($display->raspberry) {
-                    $display->raspberry->notify(new PostExpired($this->post,
-                        $display));
-                }
+              $display->notify(new PostExpired($this->post,
+                $display));
             }
 
             return;
