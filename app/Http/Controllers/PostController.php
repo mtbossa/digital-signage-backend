@@ -7,17 +7,18 @@ use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Models\Post;
 use App\Services\PostDispatcherService;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    public function index(): Collection
-    {
-        return Post::all();
-    }
+  public function index(Request $request): LengthAwarePaginator
+  {
+    return Post::query()->paginate($request->size);
+  }
 
-    public function store(
-        StorePostRequest $request,
+  public function store(
+    StorePostRequest $request,
         StorePostAction $action,
         PostDispatcherService $service
     ): Post {

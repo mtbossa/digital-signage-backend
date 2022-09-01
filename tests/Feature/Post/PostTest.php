@@ -62,10 +62,10 @@ class PostTest extends TestCase
     /** @test */
     public function fetch_all_posts()
     {
-        $this->_createPost(['media_id' => $this->media->id]);
+      $this->_createPost(['media_id' => $this->media->id]);
 
-        $this->getJson(route('posts.index'))->assertOk()->assertJsonCount(2)
-            ->assertJsonFragment($this->post->toArray());
+      $this->getJson(route('posts.index'))->assertOk()->assertJsonCount(2,
+        'data')->assertJsonFragment($this->post->toArray());
     }
 
     /** @test */
