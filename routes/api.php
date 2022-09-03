@@ -8,13 +8,15 @@ use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MediaDownloadController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostMediaOptions;
 use App\Http\Controllers\RaspberryController;
-use App\Http\Controllers\RaspberryPostController;
 use App\Http\Controllers\RecurrenceController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\StoreDisplaysController;
 use App\Http\Controllers\UserController;
+use App\Http\Resources\LoggedUserResource;
 use App\Models\Post;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,7 +33,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('test',
   function () {
-    return new \Illuminate\Http\JsonResponse(['test' => 'oi'], 200);
+    return new JsonResponse(['test' => 'oi'], 200);
   });
 
 Route::get('/event/{post}/{eventName}',
@@ -52,7 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('/user', function (Request $request) {
-      return new \App\Http\Resources\LoggedUserResource($request->user());
+      return new LoggedUserResource($request->user());
     });
     
     Route::apiResource('displays.posts', DisplayPostController::class)
@@ -62,18 +64,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('stores.displays', StoreDisplaysController::class)
         ->only('index');
 
-    Route::apiResources([
-        'users'       => UserController::class,
-        'displays'    => DisplayController::class,
-        'raspberries' => RaspberryController::class,
-        'posts'       => PostController::class,
-        'medias'      => MediaController::class,
-        'recurrences' => RecurrenceController::class,
-        'stores'      => StoreController::class,
-    ]);
+  Route::apiResources([
+    'users' => UserController::class,
+    'displays' => DisplayController::class,
+    'raspberries' => RaspberryController::class,
+    'posts' => PostController::class,
+    'medias' => MediaController::class,
+    'recurrences' => RecurrenceController::class,
+    'stores' => StoreController::class,
+  ]);
 
-    Route::apiResource('invitations', InvitationController::class,
-        ['except' => ['update', 'show']]);
+  Route::get('posts/medias/options', PostMediaOptions::class)->name("post.media.options");
+
+  Route::apiResource('invitations', InvitationController::class,
+    ['except' => ['update', 'show']]);
 });
 
 Route::get('invitations/{token}', [InvitationController::class, 'show'])
