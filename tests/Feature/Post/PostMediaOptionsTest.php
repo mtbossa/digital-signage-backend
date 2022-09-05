@@ -35,7 +35,7 @@ class PostMediaOptionsTest extends TestCase
     $medias = Media::factory(2)->create();
 
     $correctStructure = $medias->map(function (Media $media) {
-      return ['id' => $media->id, 'description' => $media->description, 'path' => $media->path];
+      return ['id' => $media->id, 'description' => $media->description, 'path' => $media->path, 'type' => $media->type];
     });
 
     $this->getJson(route('post.media.options'))->assertExactJson($correctStructure->toArray());
