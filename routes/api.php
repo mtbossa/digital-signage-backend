@@ -8,6 +8,7 @@ use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MediaDownloadController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostDisplayOptions;
 use App\Http\Controllers\PostMediaOptions;
 use App\Http\Controllers\RaspberryController;
 use App\Http\Controllers\RecurrenceController;
@@ -75,6 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
   ]);
 
   Route::get('posts/medias/options', PostMediaOptions::class)->name("post.media.options");
+  Route::get('posts/displays/options', PostDisplayOptions::class)->name("post.display.options");
 
   Route::apiResource('invitations', InvitationController::class,
     ['except' => ['update', 'show']]);
