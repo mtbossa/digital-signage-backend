@@ -3,7 +3,7 @@
 
 namespace Post\Listeners;
 
-use App\Events\Post\ShouldStartPost;
+use App\Events\Post\PostMustStart;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
@@ -32,14 +32,14 @@ class SetShowingTrueTest extends TestCase
      */
     public function must_set_post_showing_column_to_true()
     {
-        Notification::fake();
-        Bus::fake();
-        Event::fakeExcept([ShouldStartPost::class]);
+      Notification::fake();
+      Bus::fake();
+      Event::fakeExcept([PostMustStart::class]);
 
-        event(new ShouldStartPost($this->post));
+      event(new PostMustStart($this->post));
 
-        $this->assertDatabaseHas('posts',
-            ['id' => $this->post->id, 'showing' => true]);
+      $this->assertDatabaseHas('posts',
+        ['id' => $this->post->id, 'showing' => true]);
 
     }
 }

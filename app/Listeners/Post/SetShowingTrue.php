@@ -2,13 +2,13 @@
 
 namespace App\Listeners\Post;
 
-use App\Events\Post\ShouldStartPost;
+use App\Events\Post\PostMustStart;
 
 class SetShowingTrue
 {
-    public function handle(ShouldStartPost $event): void
-    {
-        $event->post->showing = true;
-        $event->post->save();
-    }
+  public function handle(PostMustStart $event): void
+  {
+    $event->post->showing = true;
+    $event->post->save();
+  }
 }

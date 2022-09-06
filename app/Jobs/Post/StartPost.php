@@ -2,7 +2,7 @@
 
 namespace App\Jobs\Post;
 
-use App\Events\Post\ShouldStartPost;
+use App\Events\Post\PostMustStart;
 use App\Models\Post;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -31,6 +31,6 @@ class StartPost implements ShouldQueue
      */
     public function handle()
     {
-        event(new ShouldStartPost($this->post));
+      event(new PostMustStart($this->post));
     }
 }

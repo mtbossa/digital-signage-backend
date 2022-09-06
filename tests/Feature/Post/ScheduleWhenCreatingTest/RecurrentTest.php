@@ -2,7 +2,7 @@
 
 namespace Post\ScheduleWhenCreatingTest;
 
-use App\Events\Post\ShouldStartPost;
+use App\Events\Post\PostMustStart;
 use App\Jobs\Post\StartPost;
 use App\Models\Post;
 use App\Models\Recurrence;
@@ -232,36 +232,36 @@ class RecurrentTest extends TestCase
 
     public function setUp(): void
     {
-        parent::setUp();
+      parent::setUp();
 
-        $this->_authUser();
-        $this->media = $this->_createMedia();
+      $this->_authUser();
+      $this->media = $this->_createMedia();
     }
 
-    /**
-     * @test
-     * @dataProvider showDates
-     */
-    public function when_creating_recurrent_post_should_dispatch_ShouldStartPost(
-        $recurrenceData,
-        $nowDate,
-        $startTime,
-        $endTime,
-    ) {
-        Event::fake();
-        Bus::fake();
+  /**
+   * @test
+   * @dataProvider showDates
+   */
+  public function when_creating_recurrent_post_should_dispatch_PostMustStart(
+    $recurrenceData,
+    $nowDate,
+    $startTime,
+    $endTime,
+  ) {
+    Event::fake();
+    Bus::fake();
 
-        $emptyRecurrence = [
-            'isoweekday' => null,
-            'day'        => null,
-            'month'      => null,
-            'year'       => null,
-        ];
+    $emptyRecurrence = [
+      'isoweekday' => null,
+      'day' => null,
+      'month' => null,
+      'year' => null,
+    ];
 
-        $recurrenceMakeData = [
-            ...$emptyRecurrence,
-            ...$recurrenceData,
-        ];
+    $recurrenceMakeData = [
+      ...$emptyRecurrence,
+      ...$recurrenceData,
+    ];
 
         $now = Carbon::createFromFormat('Y-m-d', $nowDate);
         $now->setTimeFromTimeString($startTime)->addSecond();
@@ -271,19 +271,19 @@ class RecurrentTest extends TestCase
         $recurrence = Recurrence::factory()->create($recurrenceMakeData);
         $displays_ids
             = $this->createDisplaysAndReturnIds($this->displaysAmount);
-        $post_data = Post::factory()->make([
-            'start_time'    => $startTime,
-            'end_time'      => $endTime,
-            'media_id'      => $this->media->id,
-            'displays_ids'  => $displays_ids,
-            'recurrence_id' => $recurrence->id
-        ])->toArray();
+    $post_data = Post::factory()->make([
+      'start_time' => $startTime,
+      'end_time' => $endTime,
+      'media_id' => $this->media->id,
+      'displays_ids' => $displays_ids,
+      'recurrence_id' => $recurrence->id
+    ])->toArray();
 
-        $response = $this->postJson(route('posts.store'), $post_data);
+    $response = $this->postJson(route('posts.store'), $post_data);
 
-        Event::assertDispatched(ShouldStartPost::class, 1);
-        Bus::assertNotDispatched(StartPost::class);
-    }
+    Event::assertDispatched(PostMustStart::class, 1);
+    Bus::assertNotDispatched(StartPost::class);
+  }
 
     public function showDates(): array
     {
@@ -343,18 +343,18 @@ class RecurrentTest extends TestCase
         $recurrence = Recurrence::factory()->create($recurrenceMakeData);
         $displays_ids
             = $this->createDisplaysAndReturnIds($this->displaysAmount);
-        $post_data = Post::factory()->make([
-            'start_time'    => $startTime,
-            'end_time'      => $endTime,
-            'media_id'      => $this->media->id,
-            'displays_ids'  => $displays_ids,
-            'recurrence_id' => $recurrence->id
-        ])->toArray();
+      $post_data = Post::factory()->make([
+        'start_time' => $startTime,
+        'end_time' => $endTime,
+        'media_id' => $this->media->id,
+        'displays_ids' => $displays_ids,
+        'recurrence_id' => $recurrence->id
+      ])->toArray();
 
-        $response = $this->postJson(route('posts.store'), $post_data);
+      $response = $this->postJson(route('posts.store'), $post_data);
 
-        Event::assertNotDispatched(ShouldStartPost::class);
-        Bus::assertDispatched(StartPost::class, 1);
+      Event::assertNotDispatched(PostMustStart::class);
+      Bus::assertDispatched(StartPost::class, 1);
     }
 
     public function notShowDates(): array

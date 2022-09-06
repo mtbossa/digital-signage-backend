@@ -3,8 +3,8 @@
 
 namespace Post\Listeners;
 
+use App\Events\Post\PostMustStart;
 use App\Events\Post\ShouldEndPost;
-use App\Events\Post\ShouldStartPost;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
@@ -15,32 +15,32 @@ use Tests\TestCase;
 
 class SetShowingFalseTest extends TestCase
 {
-    use RefreshDatabase, PostTestsTrait, AuthUserTrait;
+  use RefreshDatabase, PostTestsTrait, AuthUserTrait;
 
-    public function setUp(): void
-    {
-        parent::setUp();
+  public function setUp(): void
+  {
+    parent::setUp();
 
-        $this->_authUser();
-        $this->media = $this->_createMedia();
-        $this->post = $this->_createPost([
-            'media_id' => $this->media->id,
-        ]);
-    }
+    $this->_authUser();
+    $this->media = $this->_createMedia();
+    $this->post = $this->_createPost([
+      'media_id' => $this->media->id,
+    ]);
+  }
 
-    /**
-     * @test
-     */
-    public function must_set_post_showing_column_to_true()
-    {
-        Notification::fake();
-        Bus::fake();
-        Event::fakeExcept([ShouldStartPost::class]);
+  /**
+   * @test
+   */
+  public function must_set_post_showing_column_to_true()
+  {
+    Notification::fake();
+    Bus::fake();
+    Event::fakeExcept([PostMustStart::class]);
 
-        event(new ShouldEndPost($this->post));
+    event(new ShouldEndPost($this->post));
 
-        $this->assertDatabaseHas('posts',
-            ['id' => $this->post->id, 'showing' => false]);
+    $this->assertDatabaseHas('posts',
+      ['id' => $this->post->id, 'showing' => false]);
 
-    }
+  }
 }

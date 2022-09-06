@@ -3,8 +3,8 @@
 
 namespace Post\Listeners;
 
+use App\Events\Post\PostMustStart;
 use App\Events\Post\ShouldEndPost;
-use App\Events\Post\ShouldStartPost;
 use App\Models\Display;
 use App\Models\Post;
 use App\Notifications\Post\PostEnded;
@@ -19,201 +19,201 @@ use Tests\TestCase;
 
 class BroadcastToDisplaysTest extends TestCase
 {
-    use RefreshDatabase, PostTestsTrait, AuthUserTrait;
+  use RefreshDatabase, PostTestsTrait, AuthUserTrait;
 
-    public function setUp(): void
-    {
-        parent::setUp();
+  public function setUp(): void
+  {
+    parent::setUp();
 
-        $this->_authUser();
-        $this->media = $this->_createMedia();
-        $this->post = Post::factory()->nonRecurrent()
-            ->create(['media_id' => $this->media->id]);
+    $this->_authUser();
+    $this->media = $this->_createMedia();
+    $this->post = Post::factory()->nonRecurrent()
+      ->create(['media_id' => $this->media->id]);
+  }
+
+  /**
+   * @test
+   */
+  public function when_event_is_PostMustStart_should_notify_all_displays_that_have_this_post_with_PostStarted_notification(
+  )
+  {
+    Notification::fake();
+    Bus::fake();
+    Event::fakeExcept([PostMustStart::class]);
+
+
+    $displaysWithThisPost = Display::factory(3)->create();
+    $displaysNoPost = Display::factory(2)->create();
+
+    foreach (
+      $displaysWithThisPost as $display
+    ) {
+      $this->post->displays()->attach($display->id);
     }
 
-    /**
-     * @test
-     */
-    public function when_event_is_ShouldStartPost_should_notify_all_displays_that_have_this_post_with_PostStarted_notification(
-    )
-    {
-        Notification::fake();
-        Bus::fake();
-        Event::fakeExcept([ShouldStartPost::class]);
+    event(new PostMustStart($this->post));
+
+    Notification::assertSentTo(
+      $displaysWithThisPost,
+      PostStarted::class
+    );
+  }
+
+  /**
+   * @test
+   */
+  public function when_event_is_ShouldEndPost_should_notify_all_displays_that_have_this_post_with_PostEnded_notification(
+  )
+  {
+    Notification::fake();
+    Bus::fake();
+    Event::fakeExcept([ShouldEndPost::class]);
 
 
-        $displaysWithThisPost = Display::factory(3)->create();
-        $displaysNoPost = Display::factory(2)->create();
+    $displaysWithThisPost = Display::factory(3)->create();
+    $displaysNoPost = Display::factory(2)->create();
 
-        foreach (
-            $displaysWithThisPost as $display
-        ) {
-            $this->post->displays()->attach($display->id);
-        }
-
-        event(new ShouldStartPost($this->post));
-
-        Notification::assertSentTo(
-            $displaysWithThisPost,
-            PostStarted::class
-        );
+    foreach (
+      $displaysWithThisPost as $display
+    ) {
+      $this->post->displays()->attach($display->id);
     }
 
-    /**
-     * @test
-     */
-    public function when_event_is_ShouldEndPost_should_notify_all_displays_that_have_this_post_with_PostEnded_notification(
-    )
-    {
-        Notification::fake();
-        Bus::fake();
-        Event::fakeExcept([ShouldEndPost::class]);
+    event(new ShouldEndPost($this->post));
 
+    Notification::assertSentTo(
+      $displaysWithThisPost,
+      PostEnded::class
+    );
+  }
 
-        $displaysWithThisPost = Display::factory(3)->create();
-        $displaysNoPost = Display::factory(2)->create();
+  /**
+   * @test
+   */
+  public function when_event_is_PostMustStart_should_notify_all_displays_that_have_this_post_one_time_each_with_PostStarted_notification(
+  )
+  {
+    Notification::fake();
+    Bus::fake();
+    Event::fakeExcept([PostMustStart::class]);
 
-        foreach (
-            $displaysWithThisPost as $display
-        ) {
-            $this->post->displays()->attach($display->id);
-        }
+    $displaysWithThisPost = Display::factory(3)->create();
+    $displaysNoPost = Display::factory(2)->create();
 
-        event(new ShouldEndPost($this->post));
-
-        Notification::assertSentTo(
-            $displaysWithThisPost,
-            PostEnded::class
-        );
+    foreach (
+      $displaysWithThisPost as $display
+    ) {
+      $this->post->displays()->attach($display->id);
     }
 
-    /**
-     * @test
-     */
-    public function when_event_is_ShouldStartPost_should_notify_all_displays_that_have_this_post_one_time_each_with_PostStarted_notification(
-    )
-    {
-        Notification::fake();
-        Bus::fake();
-        Event::fakeExcept([ShouldStartPost::class]);
+    event(new PostMustStart($this->post));
 
-        $displaysWithThisPost = Display::factory(3)->create();
-        $displaysNoPost = Display::factory(2)->create();
+    foreach ($displaysWithThisPost as $display) {
+      Notification::assertSentToTimes(
+        $display,
+        PostStarted::class,
+        1
+      );
+    }
+  }
 
-        foreach (
-            $displaysWithThisPost as $display
-        ) {
-            $this->post->displays()->attach($display->id);
-        }
+  /**
+   * @test
+   */
+  public function when_event_is_ShouldEndPost_should_notify_all_displays_that_have_this_post_one_time_each_with_PostEnded_notification(
+  )
+  {
+    Notification::fake();
+    Bus::fake();
+    Event::fakeExcept([ShouldEndPost::class]);
 
-        event(new ShouldStartPost($this->post));
+    $displaysWithThisPost = Display::factory(3)->create();
+    $displaysNoPost = Display::factory(2)->create();
 
-        foreach ($displaysWithThisPost as $display) {
-            Notification::assertSentToTimes(
-                $display,
-                PostStarted::class,
-                1
-            );
-        }
+    foreach (
+      $displaysWithThisPost as $display
+    ) {
+      $this->post->displays()->attach($display->id);
     }
 
-    /**
-     * @test
-     */
-    public function when_event_is_ShouldEndPost_should_notify_all_displays_that_have_this_post_one_time_each_with_PostEnded_notification(
-    )
-    {
-        Notification::fake();
-        Bus::fake();
-        Event::fakeExcept([ShouldEndPost::class]);
+    event(new ShouldEndPost($this->post));
 
-        $displaysWithThisPost = Display::factory(3)->create();
-        $displaysNoPost = Display::factory(2)->create();
+    foreach ($displaysWithThisPost as $display) {
+      Notification::assertSentToTimes(
+        $display,
+        PostEnded::class,
+        1
+      );
+    }
+  }
 
-        foreach (
-            $displaysWithThisPost as $display
-        ) {
-            $this->post->displays()->attach($display->id);
-        }
+  /**
+   * @test
+   */
+  public function when_event_is_PostMustStart_should_not_notify_displays_that_dont_have_this_post_with_PostStarted_notification(
+  )
+  {
+    Notification::fake();
+    Bus::fake();
+    Event::fakeExcept([PostMustStart::class]);
 
-        event(new ShouldEndPost($this->post));
+    $displaysWithThisPost = Display::factory(3)->create();
+    $displaysNoPost = Display::factory(2)->create();
 
-        foreach ($displaysWithThisPost as $display) {
-            Notification::assertSentToTimes(
-                $display,
-                PostEnded::class,
-                1
-            );
-        }
+    $newPost = Post::factory()->create(['media_id' => $this->media->id]);
+    $displayForNewPost = Display::factory()->create();
+    $newPost->displays()->attach($displayForNewPost->id);
+
+    $notNotifiableDisplays = [...$displaysNoPost, $displayForNewPost];
+
+    foreach (
+      $displaysWithThisPost as $display
+    ) {
+      $this->post->displays()->attach($display->id);
     }
 
-    /**
-     * @test
-     */
-    public function when_event_is_ShouldStartPost_should_not_notify_displays_that_dont_have_this_post_with_PostStarted_notification(
-    )
-    {
-        Notification::fake();
-        Bus::fake();
-        Event::fakeExcept([ShouldStartPost::class]);
+    event(new PostMustStart($this->post));
 
-        $displaysWithThisPost = Display::factory(3)->create();
-        $displaysNoPost = Display::factory(2)->create();
+    foreach ($notNotifiableDisplays as $display) {
+      Notification::assertNotSentTo(
+        $display,
+        PostStarted::class
+      );
+    }
+  }
 
-        $newPost = Post::factory()->create(['media_id' => $this->media->id]);
-        $displayForNewPost = Display::factory()->create();
-        $newPost->displays()->attach($displayForNewPost->id);
+  /**
+   * @test
+   */
+  public function when_event_is_ShouldEndPost_should_not_notify_displays_that_dont_have_this_post_with_PostEnded_notification(
+  )
+  {
+    Notification::fake();
+    Bus::fake();
+    Event::fakeExcept([ShouldEndPost::class]);
 
-        $notNotifiableDisplays = [...$displaysNoPost, $displayForNewPost];
+    $displaysWithThisPost = Display::factory(3)->create();
+    $displaysNoPost = Display::factory(2)->create();
 
-        foreach (
-            $displaysWithThisPost as $display
-        ) {
-            $this->post->displays()->attach($display->id);
-        }
+    $newPost = Post::factory()->create(['media_id' => $this->media->id]);
+    $displayForNewPost = Display::factory()->create();
+    $newPost->displays()->attach($displayForNewPost->id);
 
-        event(new ShouldStartPost($this->post));
+    $notNotifiableDisplays = [...$displaysNoPost, $displayForNewPost];
 
-        foreach ($notNotifiableDisplays as $display) {
-            Notification::assertNotSentTo(
-                $display,
-                PostStarted::class
-            );
-        }
+    foreach (
+      $displaysWithThisPost as $display
+    ) {
+      $this->post->displays()->attach($display->id);
     }
 
-    /**
-     * @test
-     */
-    public function when_event_is_ShouldEndPost_should_not_notify_displays_that_dont_have_this_post_with_PostEnded_notification(
-    )
-    {
-        Notification::fake();
-        Bus::fake();
-        Event::fakeExcept([ShouldEndPost::class]);
+    event(new ShouldEndPost($this->post));
 
-        $displaysWithThisPost = Display::factory(3)->create();
-        $displaysNoPost = Display::factory(2)->create();
-
-        $newPost = Post::factory()->create(['media_id' => $this->media->id]);
-        $displayForNewPost = Display::factory()->create();
-        $newPost->displays()->attach($displayForNewPost->id);
-
-        $notNotifiableDisplays = [...$displaysNoPost, $displayForNewPost];
-
-        foreach (
-            $displaysWithThisPost as $display
-        ) {
-            $this->post->displays()->attach($display->id);
-        }
-
-        event(new ShouldEndPost($this->post));
-
-        foreach ($notNotifiableDisplays as $display) {
-            Notification::assertNotSentTo(
-                $display,
-                PostEnded::class
-            );
-        }
+    foreach ($notNotifiableDisplays as $display) {
+      Notification::assertNotSentTo(
+        $display,
+        PostEnded::class
+      );
     }
+  }
 }

@@ -456,36 +456,36 @@ class RecurrentTest extends TestCase
 
     public function setUp(): void
     {
-        parent::setUp();
+      parent::setUp();
 
-        $this->_authUser();
-        $this->media = $this->_createMedia();
+      $this->_authUser();
+      $this->media = $this->_createMedia();
     }
 
-    /**
-     * @test
-     * @dataProvider showDates
-     */
-    public function when_creating_recurrent_post_should_dispatch_ShouldStartPost(
-        $recurrenceData,
-        $nowDate,
-        $correctScheduleDate,
-        $startTime,
-        $endTime,
-    ) {
-        Bus::fake([StartPost::class]);
+  /**
+   * @test
+   * @dataProvider showDates
+   */
+  public function when_creating_recurrent_post_should_dispatch_PostMustStart(
+    $recurrenceData,
+    $nowDate,
+    $correctScheduleDate,
+    $startTime,
+    $endTime,
+  ) {
+    Bus::fake([StartPost::class]);
 
-        $emptyRecurrence = [
-            'isoweekday' => null,
-            'day'        => null,
-            'month'      => null,
-            'year'       => null,
-        ];
+    $emptyRecurrence = [
+      'isoweekday' => null,
+      'day' => null,
+      'month' => null,
+      'year' => null,
+    ];
 
-        $recurrenceMakeData = [
-            ...$emptyRecurrence,
-            ...$recurrenceData,
-        ];
+    $recurrenceMakeData = [
+      ...$emptyRecurrence,
+      ...$recurrenceData,
+    ];
 
         $recurrence = Recurrence::factory()->create($recurrenceMakeData);
 

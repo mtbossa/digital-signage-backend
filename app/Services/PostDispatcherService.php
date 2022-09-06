@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Events\Post\ShouldStartPost;
+use App\Events\Post\PostMustStart;
 use App\Helpers\DateAndTimeHelper;
 use App\Jobs\Post\StartPost;
 use App\Models\Post;
@@ -106,13 +106,13 @@ class PostDispatcherService
             ) {
                 $this->dispatchStartPostJob();
             } else {
-                $this->dispatchShouldStartPostEvent();
+              $this->dispatchPostMustStartEvent();
             }
         } else {
             if ($this->isNowBetweenStartAndEndHourAndMinute($this->startTime,
                 $this->endTime)
             ) {
-                $this->dispatchShouldStartPostEvent();
+              $this->dispatchPostMustStartEvent();
             } else {
                 $this->dispatchStartPostJob();
             }
@@ -121,30 +121,30 @@ class PostDispatcherService
 
     private function isNowBetweenStartAndEndHourAndMinute(
         Carbon $startTime,
-        Carbon $endTime
+      Carbon $endTime
     ): bool {
-        return $this->now->isBetween($this->startTime, $this->endTime);
+      return $this->now->isBetween($this->startTime, $this->endTime);
     }
 
-    private function dispatchStartPostJob(): void
-    {
-        StartPost::dispatch($this->post);
-    }
+  private function dispatchStartPostJob(): void
+  {
+    StartPost::dispatch($this->post);
+  }
 
-    private function dispatchShouldStartPostEvent(): void
-    {
-        event(new ShouldStartPost($this->post));
-    }
+  private function dispatchPostMustStartEvent(): void
+  {
+    event(new PostMustStart($this->post));
+  }
 
-    private function handleNonRecurrent()
-    {
-        // When start date is not today or before, must go to queue
-        if ($this->isTodayBeforeStartDate()) {
-            $this->dispatchStartPostJob();
-        } else {
-            $this->checkTimesAndDispatch();
-        }
+  private function handleNonRecurrent()
+  {
+    // When start date is not today or before, must go to queue
+    if ($this->isTodayBeforeStartDate()) {
+      $this->dispatchStartPostJob();
+    } else {
+      $this->checkTimesAndDispatch();
     }
+  }
 
     private function isTodayBeforeStartDate(): bool
     {

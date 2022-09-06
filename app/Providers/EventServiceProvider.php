@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\Post\PostMustStart;
 use App\Events\Post\ShouldEndPost;
-use App\Events\Post\ShouldStartPost;
 use App\Listeners\Post\BroadcastToDisplays;
 use App\Listeners\Post\SchedulePostEnd;
 use App\Listeners\Post\SchedulePostStart;
@@ -15,45 +15,45 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 
 class EventServiceProvider extends ServiceProvider
 {
-    /**
-     * The event listener mappings for the application.
-     *
-     * @var array<class-string, array<int, class-string>>
-     */
-    protected $listen
-        = [
-            Registered::class      => [
-                SendEmailVerificationNotification::class,
-            ],
-            ShouldStartPost::class => [
-                SetShowingTrue::class,
-                BroadcastToDisplays::class,
-                SchedulePostEnd::class,
-            ],
-            ShouldEndPost::class   => [
-                SetShowingFalse::class,
-                BroadcastToDisplays::class,
-                SchedulePostStart::class,
-            ]
-        ];
+  /**
+   * The event listener mappings for the application.
+   *
+   * @var array<class-string, array<int, class-string>>
+   */
+  protected $listen
+    = [
+      Registered::class => [
+        SendEmailVerificationNotification::class,
+      ],
+      PostMustStart::class => [
+        SetShowingTrue::class,
+        BroadcastToDisplays::class,
+        SchedulePostEnd::class,
+      ],
+      ShouldEndPost::class => [
+        SetShowingFalse::class,
+        BroadcastToDisplays::class,
+        SchedulePostStart::class,
+      ]
+    ];
 
-    /**
-     * Register any events for your application.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        //
-    }
+  /**
+   * Register any events for your application.
+   *
+   * @return void
+   */
+  public function boot()
+  {
+    //
+  }
 
-    /**
-     * Determine if events and listeners should be automatically discovered.
-     *
-     * @return bool
-     */
-    public function shouldDiscoverEvents()
-    {
-        return false;
-    }
+  /**
+   * Determine if events and listeners should be automatically discovered.
+   *
+   * @return bool
+   */
+  public function shouldDiscoverEvents()
+  {
+    return false;
+  }
 }

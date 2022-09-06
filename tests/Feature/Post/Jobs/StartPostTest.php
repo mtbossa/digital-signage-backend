@@ -1,9 +1,9 @@
 <?php
 
 
-namespace Post\Listeners;
+namespace Post\Jobs;
 
-use App\Events\Post\ShouldStartPost;
+use App\Events\Post\PostMustStart;
 use App\Jobs\Post\StartPost;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,22 +21,22 @@ class StartPostTest extends TestCase
     {
         parent::setUp();
 
-        $this->_authUser();
-        $this->media = $this->_createMedia();
-        $this->post = Post::factory()->nonRecurrent()
-            ->create(['media_id' => $this->media->id]);
+      $this->_authUser();
+      $this->media = $this->_createMedia();
+      $this->post = Post::factory()->nonRecurrent()
+        ->create(['media_id' => $this->media->id]);
     }
 
-    /**
-     * @test
-     */
-    public function when_completed_must_fire_ShouldStartPost_event()
-    {
-        Notification::fake();
-        Event::fake();
+  /**
+   * @test
+   */
+  public function when_completed_must_fire_PostMustStart_event()
+  {
+    Notification::fake();
+    Event::fake();
 
-        StartPost::dispatch($this->post);
+    StartPost::dispatch($this->post);
 
-        Event::assertDispatched(ShouldStartPost::class, 1);
-    }
+    Event::assertDispatched(PostMustStart::class, 1);
+  }
 }
