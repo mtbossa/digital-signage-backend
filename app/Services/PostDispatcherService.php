@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Events\Post\PostMustStart;
 use App\Helpers\DateAndTimeHelper;
+use App\Interfaces\RecurrenceScheduler;
 use App\Jobs\Post\StartPost;
 use App\Models\Post;
 use Carbon\Carbon;
@@ -16,7 +17,7 @@ class PostDispatcherService
   private Carbon $startTime;
   private Carbon $endTime;
 
-  public function __construct()
+  public function __construct(private readonly RecurrenceScheduler $recurrenceScheduler)
   {
     $this->now = Carbon::now();
   }
@@ -91,7 +92,7 @@ class PostDispatcherService
     if ($allPassed) {
       $this->checkTimesAndDispatch();
     } else {
-      $this->dispatchStartPostJob();
+      $this->dispatchStartPostJob('date');
     }
   }
 
@@ -126,19 +127,34 @@ class PostDispatcherService
     return $this->now->isBetween($this->startTime, $this->endTime);
   }
 
-  private function dispatchStartPostJob(string $byTimeOrDate = null): void
+  private function dispatchStartPostJob(string $byTimeOrDate): void
   {
     if ($this->post->recurrence) {
-//      $this->handleRecurrent();
-      StartPost::dispatch($this->post);
+      $this->scheduleRecurrent($byTimeOrDate);
     } else {
       $this->scheduleNonRecurrent($byTimeOrDate);
     }
   }
 
+  private function scheduleRecurrent(string $byTimeOrDate): void
+  {
+    if ($byTimeOrDate === 'time') {
+      $delay = $this->now->diffInSeconds($this->startTime);
+    } else {
+      $this->recurrenceScheduler->configure($this->post->recurrence->filteredRecurrence,
+        $this->startTime);
+
+      $nextScheduleDate = $this->recurrenceScheduler->scheduleStart();
+
+      $delay = $this->now->diffInSeconds($nextScheduleDate);
+    }
+
+    StartPost::dispatch($this->post)
+      ->delay($delay);
+  }
+
   private function scheduleNonRecurrent(string $byTimeOrDate): void
   {
-
     if ($byTimeOrDate === 'time') {
       $delay = $this->now->diffInSeconds($this->startTime);
     } else {

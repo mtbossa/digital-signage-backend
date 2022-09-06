@@ -67,20 +67,25 @@ class RecurrScheduler implements RecurrenceScheduler
                     $this->rule->setByMonthDay([$this->recurrence['day']]);
                     break;
                 case 'month':
-                    $this->rule->setByMonth([$this->recurrence['month']]);
-                    break;
-                case 'year':
-                    $startDate = $this->recurrence['year']
-                    > $this->startTime->year
-                        ? $this->startTime
-                            ->setYear($this->recurrence['year'])
-                            ->startOfYear()->setTimeFrom($this->startTime)
-                        : $this->startTime;
+                  $this->rule->setByMonth([$this->recurrence['month']]);
+                  break;
+              case 'year':
+                $startTimeCopy = $this->startTime->copy();
 
-                    $this->rule->setStartDate($startDate)
-                        ->setEndDate(Carbon::createFromFormat('Y',
-                            $this->recurrence['year'])->endOfYear());
-                    break;
+                if ($this->recurrence['year'] > $this->startTime->year) {
+                  $startDate = $this->startTime
+                    ->setYear($this->recurrence['year'])
+                    ->startOfYear()->setTimeFrom($startTimeCopy);
+
+                  $constraint = new AfterConstraint($this->startTime, true);
+                } else {
+                  $startDate = $this->startTime;
+                }
+
+                $this->rule->setStartDate($startDate)
+                  ->setEndDate(Carbon::createFromFormat('Y',
+                    $this->recurrence['year'])->endOfYear());
+                break;
             }
         }
 
