@@ -2,7 +2,7 @@
 
 namespace App\Jobs\Post;
 
-use App\Events\Post\ShouldEndPost;
+use App\Events\Post\PostMustEnd;
 use App\Models\Post;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -20,6 +20,6 @@ class EndPost implements ShouldQueue
 
     public function handle(): void
     {
-        event(new ShouldEndPost($this->post));
+      event(new PostMustEnd($this->post));
     }
 }

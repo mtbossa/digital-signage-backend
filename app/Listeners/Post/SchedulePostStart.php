@@ -2,7 +2,7 @@
 
 namespace App\Listeners\Post;
 
-use App\Events\Post\ShouldEndPost;
+use App\Events\Post\PostMustEnd;
 use App\Helpers\DateAndTimeHelper;
 use App\Interfaces\RecurrenceScheduler;
 use App\Jobs\Post\StartPost;
@@ -25,40 +25,40 @@ class SchedulePostStart
      *
      * @return void
      */
-    public function __construct(
-        private Carbon $now,
-        private readonly RecurrenceScheduler $recurrenceScheduler
-    ) {
-        $this->now = Carbon::now();
+  public function __construct(
+    private Carbon $now,
+    private readonly RecurrenceScheduler $recurrenceScheduler
+  ) {
+    $this->now = Carbon::now();
+  }
+
+  public function handle(PostMustEnd $event): void
+  {
+    $this->setValues($event);
+
+    if ($this->recurrence) {
+      $this->scheduleRecurrent();
+    } else {
+      $this->scheduleNonRecurrent();
     }
+  }
 
-    public function handle(ShouldEndPost $event): void
-    {
-        $this->setValues($event);
+  private function setValues(PostMustEnd $event): void
+  {
+    $this->post = $event->post;
+    $this->recurrence = $this->post->recurrence;
+    $this->createTimes();
+  }
 
-        if ($this->recurrence) {
-            $this->scheduleRecurrent();
-        } else {
-            $this->scheduleNonRecurrent();
-        }
-    }
+  private function createTimes(): void
+  {
+    // End time will always be today's date, that's why we can create
+    // using ::createFromTimeString, since it sets the date to today's date
+    $this->endTime
+      = CarbonImmutable::createFromTimeString($this->post->end_time);
 
-    private function setValues(ShouldEndPost $event): void
-    {
-        $this->post = $event->post;
-        $this->recurrence = $this->post->recurrence;
-        $this->createTimes();
-    }
-
-    private function createTimes(): void
-    {
-        // End time will always be today's date, that's why we can create
-        // using ::createFromTimeString, since it sets the date to today's date
-        $this->endTime
-            = CarbonImmutable::createFromTimeString($this->post->end_time);
-
-        if (DateAndTimeHelper::isPostFromCurrentDayToNext($this->post->start_time,
-            $this->endTime)
+    if (DateAndTimeHelper::isPostFromCurrentDayToNext($this->post->start_time,
+      $this->endTime)
         ) {
             $this->startTime
                 = CarbonImmutable::parse("yesterday {$this->post->start_time}");

@@ -3,8 +3,8 @@
 
 namespace Post\Listeners;
 
+use App\Events\Post\PostMustEnd;
 use App\Events\Post\PostMustStart;
-use App\Events\Post\ShouldEndPost;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
@@ -37,7 +37,7 @@ class SetShowingFalseTest extends TestCase
     Bus::fake();
     Event::fakeExcept([PostMustStart::class]);
 
-    event(new ShouldEndPost($this->post));
+    event(new PostMustEnd($this->post));
 
     $this->assertDatabaseHas('posts',
       ['id' => $this->post->id, 'showing' => false]);

@@ -7,11 +7,11 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ShouldEndPost
+class PostMustEnd
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+  use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public function __construct(public Post $post)
-    {
-    }
+  public function __construct(public Post $post)
+  {
+  }
 }

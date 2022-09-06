@@ -2,8 +2,8 @@
 
 namespace App\Listeners\Post;
 
+use App\Events\Post\PostMustEnd;
 use App\Events\Post\PostMustStart;
-use App\Events\Post\ShouldEndPost;
 use App\Notifications\Post\PostEnded;
 use App\Notifications\Post\PostStarted;
 
@@ -26,7 +26,7 @@ class BroadcastToDisplays
    *
    * @return void
    */
-  public function handle(PostMustStart|ShouldEndPost $event): void
+  public function handle(PostMustStart|PostMustEnd $event): void
   {
     foreach ($event->post->displays as $display) {
       if ($event instanceof PostMustStart) {

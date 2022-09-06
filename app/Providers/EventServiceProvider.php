@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\Post\PostMustEnd;
 use App\Events\Post\PostMustStart;
-use App\Events\Post\ShouldEndPost;
 use App\Listeners\Post\BroadcastToDisplays;
 use App\Listeners\Post\SchedulePostEnd;
 use App\Listeners\Post\SchedulePostStart;
@@ -30,7 +30,7 @@ class EventServiceProvider extends ServiceProvider
         BroadcastToDisplays::class,
         SchedulePostEnd::class,
       ],
-      ShouldEndPost::class => [
+      PostMustEnd::class => [
         SetShowingFalse::class,
         BroadcastToDisplays::class,
         SchedulePostStart::class,

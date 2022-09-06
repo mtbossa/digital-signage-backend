@@ -1,7 +1,7 @@
 <?php
 
+use App\Events\Post\PostMustEnd;
 use App\Events\Post\PostMustStart;
-use App\Events\Post\ShouldEndPost;
 use App\Http\Controllers\DisplayController;
 use App\Http\Controllers\DisplayPostController;
 use App\Http\Controllers\InvitationController;
@@ -43,7 +43,7 @@ Route::get('/event/{post}/{eventName}',
       event(new PostMustStart($post));
     } else {
       if ($eventName === 'end') {
-        event(new ShouldEndPost($post));
+        event(new PostMustEnd($post));
       }
     }
     });

@@ -3,7 +3,7 @@
 
 namespace Post\Listeners\SchedulePostStartTest;
 
-use App\Events\Post\ShouldEndPost;
+use App\Events\Post\PostMustEnd;
 use App\Jobs\Post\StartPost;
 use App\Models\Display;
 use App\Models\Post;
@@ -168,7 +168,7 @@ class NonRecurrentTest extends TestCase
         $this->travelTo(Carbon::createFromFormat('Y-m-d H:i:s',
             $endDate.$endTime)->subDay());
 
-        event(new ShouldEndPost($post));
+      event(new PostMustEnd($post));
 
         Bus::assertDispatched(StartPost::class, 1);
         Bus::assertDispatched(function (StartPost $job) use (
@@ -215,7 +215,7 @@ class NonRecurrentTest extends TestCase
         $this->travelTo(Carbon::createFromFormat('Y-m-d H:i:s',
             $endDate.$endTime)->subDay());
 
-        event(new ShouldEndPost($post));
+      event(new PostMustEnd($post));
 
         Bus::assertDispatched(StartPost::class, 1);
         Bus::assertDispatched(function (StartPost $job) use (
@@ -282,7 +282,7 @@ class NonRecurrentTest extends TestCase
         $this->travelTo(Carbon::createFromFormat('Y-m-d H:i:s',
             $endDate.$endTime));
 
-        event(new ShouldEndPost($post));
+      event(new PostMustEnd($post));
 
       Notification::assertTimesSent(count($displaysWithRaspberry) + count($displayWithoutRaspberry),
         PostExpired::class);

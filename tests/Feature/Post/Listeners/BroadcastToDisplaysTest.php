@@ -3,8 +3,8 @@
 
 namespace Post\Listeners;
 
+use App\Events\Post\PostMustEnd;
 use App\Events\Post\PostMustStart;
-use App\Events\Post\ShouldEndPost;
 use App\Models\Display;
 use App\Models\Post;
 use App\Notifications\Post\PostEnded;
@@ -62,12 +62,11 @@ class BroadcastToDisplaysTest extends TestCase
   /**
    * @test
    */
-  public function when_event_is_ShouldEndPost_should_notify_all_displays_that_have_this_post_with_PostEnded_notification(
-  )
+  public function when_event_is_PostMustEnd_should_notify_all_displays_that_have_this_post_with_PostEnded_notification()
   {
     Notification::fake();
     Bus::fake();
-    Event::fakeExcept([ShouldEndPost::class]);
+    Event::fakeExcept([PostMustEnd::class]);
 
 
     $displaysWithThisPost = Display::factory(3)->create();
@@ -79,7 +78,7 @@ class BroadcastToDisplaysTest extends TestCase
       $this->post->displays()->attach($display->id);
     }
 
-    event(new ShouldEndPost($this->post));
+    event(new PostMustEnd($this->post));
 
     Notification::assertSentTo(
       $displaysWithThisPost,
@@ -120,12 +119,12 @@ class BroadcastToDisplaysTest extends TestCase
   /**
    * @test
    */
-  public function when_event_is_ShouldEndPost_should_notify_all_displays_that_have_this_post_one_time_each_with_PostEnded_notification(
+  public function when_event_is_PostMustEnd_should_notify_all_displays_that_have_this_post_one_time_each_with_PostEnded_notification(
   )
   {
     Notification::fake();
     Bus::fake();
-    Event::fakeExcept([ShouldEndPost::class]);
+    Event::fakeExcept([PostMustEnd::class]);
 
     $displaysWithThisPost = Display::factory(3)->create();
     $displaysNoPost = Display::factory(2)->create();
@@ -136,7 +135,7 @@ class BroadcastToDisplaysTest extends TestCase
       $this->post->displays()->attach($display->id);
     }
 
-    event(new ShouldEndPost($this->post));
+    event(new PostMustEnd($this->post));
 
     foreach ($displaysWithThisPost as $display) {
       Notification::assertSentToTimes(
@@ -185,12 +184,12 @@ class BroadcastToDisplaysTest extends TestCase
   /**
    * @test
    */
-  public function when_event_is_ShouldEndPost_should_not_notify_displays_that_dont_have_this_post_with_PostEnded_notification(
+  public function when_event_is_PostMustEnd_should_not_notify_displays_that_dont_have_this_post_with_PostEnded_notification(
   )
   {
     Notification::fake();
     Bus::fake();
-    Event::fakeExcept([ShouldEndPost::class]);
+    Event::fakeExcept([PostMustEnd::class]);
 
     $displaysWithThisPost = Display::factory(3)->create();
     $displaysNoPost = Display::factory(2)->create();
@@ -207,7 +206,7 @@ class BroadcastToDisplaysTest extends TestCase
       $this->post->displays()->attach($display->id);
     }
 
-    event(new ShouldEndPost($this->post));
+    event(new PostMustEnd($this->post));
 
     foreach ($notNotifiableDisplays as $display) {
       Notification::assertNotSentTo(

@@ -1,9 +1,9 @@
 <?php
 
 
-namespace Post\Listeners;
+namespace Post\Jobs;
 
-use App\Events\Post\ShouldEndPost;
+use App\Events\Post\PostMustEnd;
 use App\Jobs\Post\EndPost;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,22 +21,22 @@ class EndPostTest extends TestCase
     {
         parent::setUp();
 
-        $this->_authUser();
-        $this->media = $this->_createMedia();
-        $this->post = Post::factory()->nonRecurrent()
-            ->create(['media_id' => $this->media->id]);
+      $this->_authUser();
+      $this->media = $this->_createMedia();
+      $this->post = Post::factory()->nonRecurrent()
+        ->create(['media_id' => $this->media->id]);
     }
 
-    /**
-     * @test
-     */
-    public function when_completed_must_fire_ShouldEndPost_event()
-    {
-        Notification::fake();
-        Event::fake();
+  /**
+   * @test
+   */
+  public function when_completed_must_fire_PostMustEnd_event()
+  {
+    Notification::fake();
+    Event::fake();
 
-        EndPost::dispatch($this->post);
+    EndPost::dispatch($this->post);
 
-        Event::assertDispatched(ShouldEndPost::class, 1);
-    }
+    Event::assertDispatched(PostMustEnd::class, 1);
+  }
 }

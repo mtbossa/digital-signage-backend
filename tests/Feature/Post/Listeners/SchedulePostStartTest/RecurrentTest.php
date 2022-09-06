@@ -2,7 +2,7 @@
 
 namespace Post\Listeners\SchedulePostStartTest;
 
-use App\Events\Post\ShouldEndPost;
+use App\Events\Post\PostMustEnd;
 use App\Helpers\DateAndTimeHelper;
 use App\Jobs\Post\StartPost;
 use App\Models\Post;
@@ -499,7 +499,7 @@ class RecurrentTest extends TestCase
         $now = Carbon::createFromFormat('Y-m-d H:i:s', $nowDate);
         $this->travelTo($now);
 
-        event(new ShouldEndPost($post));
+    event(new PostMustEnd($post));
 
         Bus::assertDispatched(StartPost::class, 1);
         Bus::assertDispatched(function (StartPost $job) use (
@@ -535,7 +535,7 @@ class RecurrentTest extends TestCase
                             $string
                                 = "Time: $time - Recurrence $name - Case $case - $key";
 
-                            // Now date must be = endDate, so we can fake the ShouldEndPost event
+                          // Now date must be = endDate, so we can fake the PostMustEnd event
                             $now = Carbon::createFromFormat('Y-m-d H:i:s',
                                 $assertion['nowDate']
                                 .' '.$eventTime['end']);
