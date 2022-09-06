@@ -14,17 +14,17 @@ use Tests\Feature\Post\Traits\PostTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
 
-class RecurrentTest extends TestCase
+class RecurrentDispatchTest extends TestCase
 {
-    use RefreshDatabase, PostTestsTrait, AuthUserTrait;
+  use RefreshDatabase, PostTestsTrait, AuthUserTrait;
 
-    private int $displaysAmount = 3;
+  private int $displaysAmount = 3;
 
-    /**
-     * All values here are based on chosen $nowDate;
-     */
+  /**
+   * All values here are based on chosen $nowDate;
+   */
 
-    // Between these times, must always dispatch event
+  // Between these times, must always dispatch event
     private array $eventTimes
         = [
             ['start' => '15:14:00', 'end' => '15:16:00'],

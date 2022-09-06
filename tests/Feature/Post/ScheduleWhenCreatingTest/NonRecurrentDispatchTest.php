@@ -8,16 +8,16 @@ use Tests\Feature\Post\Traits\PostTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
 
-class NonRecurrentTest extends TestCase
+class NonRecurrentDispatchTest extends TestCase
 {
-    use RefreshDatabase, PostTestsTrait, AuthUserTrait;
+  use RefreshDatabase, PostTestsTrait, AuthUserTrait;
 
-    private int $displaysAmount = 3;
-    private string $nowDate = '2022-01-01 15:15:00';
+  private int $displaysAmount = 3;
+  private string $nowDate = '2022-01-01 15:15:00';
 
-    /**
-     * All values here are based on chosen $nowDate;
-     */
+  /**
+   * All values here are based on chosen $nowDate;
+   */
 
     // Between these times, must always dispatch event
     private array $eventTimes
