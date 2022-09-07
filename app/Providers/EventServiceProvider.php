@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Events\DisplayPost\DisplayPostCreated;
+use App\Events\DisplayPost\DisplayPostDeleted;
 use App\Events\Post\PostMustEnd;
 use App\Events\Post\PostMustStart;
+use App\Listeners\DisplayPost\BroadcastToDisplay;
 use App\Listeners\Post\BroadcastToDisplays;
 use App\Listeners\Post\SchedulePostEnd;
 use App\Listeners\Post\SchedulePostStart;
@@ -34,7 +37,13 @@ class EventServiceProvider extends ServiceProvider
         SetShowingFalse::class,
         BroadcastToDisplays::class,
         SchedulePostStart::class,
-      ]
+      ],
+      DisplayPostCreated::class => [
+        BroadcastToDisplay::class,
+      ],
+      DisplayPostDeleted::class => [
+        BroadcastToDisplay::class,
+      ],
     ];
 
   /**
