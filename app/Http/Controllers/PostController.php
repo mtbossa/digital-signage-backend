@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Post\StorePostAction;
 use App\Events\DisplayPost\DisplayPostCreated;
-use App\Events\DisplayPostDeleted;
+use App\Events\DisplayPost\DisplayPostDeleted;
 use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Models\Display;

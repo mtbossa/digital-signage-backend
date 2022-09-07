@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\DisplayPost;
 
 use App\Models\Display;
 use App\Models\Post;

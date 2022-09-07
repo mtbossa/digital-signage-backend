@@ -3,7 +3,7 @@
 namespace Tests\Feature\Post;
 
 use App\Events\DisplayPost\DisplayPostCreated;
-use App\Events\DisplayPostDeleted;
+use App\Events\DisplayPost\DisplayPostDeleted;
 use App\Models\Display;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
