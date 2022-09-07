@@ -74,7 +74,7 @@ class ExpirePostSchedulingTest extends TestCase
 
     $this->postJson(route('posts.store'),
       [...$post_data, 'displays_ids' => null])->assertCreated();
-
+    
     Bus::assertDispatchedTimes(ExpirePost::class, 1);
   }
 

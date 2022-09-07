@@ -20,6 +20,7 @@ class ExpirePost implements ShouldQueue
 
   public function handle()
   {
-    //
+    $this->post->expired = true;
+    $this->post->save();
   }
 }
