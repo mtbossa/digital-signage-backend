@@ -133,4 +133,27 @@ class PostTest extends TestCase
       [...$post->toArray(), 'displays_ids' => []])->assertOk();
     Event::assertDispatchedTimes(DisplayPostDeleted::class, $displaysAmount);
   }
+
+  /** @test */
+  public function should_fire_display_post_created_event_after_updating_post_with_new_displays_ids_for_every_display_attached(
+  )
+  {
+    $newDisplaysAmount = 4;
+    Event::fake(DisplayPostCreated::class);
+
+    Display::factory()->create(); // Random Display
+    $post = Post::factory()->nonRecurrent()->create(['media_id' => $this->media->id]);
+    $displays = Display::factory(2)->create();
+    $displays_ids = $displays->pluck('id')->toArray();
+
+    $post->displays()->attach($displays_ids);
+
+    $newDisplays = Display::factory($newDisplaysAmount)->create();
+    $new_displays_ids = $newDisplays->pluck('id')->toArray();
+
+
+    $this->patchJson(route('posts.update', $post->id),
+      [...$post->toArray(), 'displays_ids' => $new_displays_ids])->assertOk();
+    Event::assertDispatchedTimes(DisplayPostCreated::class, $newDisplaysAmount);
+  }
 }

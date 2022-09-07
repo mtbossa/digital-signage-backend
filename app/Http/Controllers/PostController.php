@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Post\StorePostAction;
+use App\Events\DisplayPost\DisplayPostCreated;
 use App\Events\DisplayPostDeleted;
 use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
@@ -57,6 +58,11 @@ class PostController extends Controller
       foreach ($result['detached'] as $removedDisplayId) {
         $display = Display::query()->find($removedDisplayId);
         DisplayPostDeleted::dispatch($display, $post);
+      }
+
+      foreach ($result['attached'] as $newDisplayId) {
+        $display = Display::query()->find($newDisplayId);
+        DisplayPostCreated::dispatch($display, $post);
       }
 
       $post['displays'] = $post->displays->toArray();
