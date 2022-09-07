@@ -4,12 +4,13 @@ namespace Tests\Feature\Post;
 
 use App\Events\DisplayPost\DisplayPostCreated;
 use App\Events\DisplayPost\DisplayPostDeleted;
-use App\Events\Post\PostDeleted;
 use App\Models\Display;
 use App\Models\Post;
+use App\Notifications\DisplayPost\PostDeleted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Tests\Feature\Post\Traits\PostTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
@@ -157,13 +158,18 @@ class PostTest extends TestCase
       [...$post->toArray(), 'displays_ids' => $new_displays_ids])->assertOk();
     Event::assertDispatchedTimes(DisplayPostCreated::class, $newDisplaysAmount);
   }
-
+  
   /** @test */
-  public function when_post_is_deleted_should_dispatch_post_deleted_event()
+  public function when_post_is_deleted_should_dispatch_post_deleted_notification_for_each_displays()
   {
-    Event::fake(PostDeleted::class);
+    Notification::fake(PostDeleted::class);
+    $this->withoutExceptionHandling();
 
+    $displays = Display::factory(2)->create();
+    $displaysIds = $displays->pluck('id')->toArray();
+    $this->post->displays()->sync($displaysIds);
     $this->deleteJson(route('posts.destroy', $this->post->id))->assertOk();
-    Event::assertDispatchedTimes(PostDeleted::class, 1);
+
+    Notification::assertSentTo($displays[0], PostDeleted::class);
   }
 }

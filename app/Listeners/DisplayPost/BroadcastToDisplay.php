@@ -35,8 +35,7 @@ class BroadcastToDisplay
       $notification = new PostCreated($post,
         $display);
     } else {
-      $notification = new PostDeleted($post,
-        $display);
+      $notification = new PostDeleted($display, $post->id, $post->media->id);
     }
 
     $display->notify($notification);

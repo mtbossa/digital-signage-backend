@@ -9,6 +9,7 @@ use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Models\Display;
 use App\Models\Post;
+use App\Notifications\DisplayPost\PostDeleted;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
@@ -66,12 +67,16 @@ class PostController extends Controller
       $post['displays'] = $post->displays->toArray();
     }
 
-        return $post;
-    }
+    return $post;
+  }
 
-    public function destroy(Post $post): bool
-    {
-        \App\Events\Post\PostDeleted::dispatch($post);
-        return $post->delete();
+  public function destroy(Post $post)
+  {
+    foreach ($post->displays as $display) {
+      $notification = new PostDeleted($display, $post->id, $post->media->id);
+
+      $display->notify($notification);
     }
+    return $post->delete();
+  }
 }

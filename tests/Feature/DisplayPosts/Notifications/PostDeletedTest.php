@@ -39,7 +39,7 @@ class PostDeletedTest extends TestCase
       'canDeleteMedia' => true,
     ];
 
-    $notification = new PostDeleted($removedPost, $display);
+    $notification = new PostDeleted($display, $removedPost->id, $removedPost->media->id);
     $sendData = $notification->toBroadcast($display)->data;
 
     $this->assertEquals($sendData, $correctStructure);
@@ -59,7 +59,7 @@ class PostDeletedTest extends TestCase
 
     $removedPost->displays()->detach($display->id);
 
-    $notification = new PostDeleted($removedPost, $display);
+    $notification = new PostDeleted($display, $removedPost->id, $removedPost->media->id);
     $sendData = $notification->toBroadcast($display)->data;
 
     $this->assertFalse($sendData['canDeleteMedia']);
@@ -81,7 +81,7 @@ class PostDeletedTest extends TestCase
     $removedPost = Post::factory()->create(['media_id' => $this->media->id]);
     $removedPost->displays()->attach($randomDisplay->id);
 
-    $notification = new PostDeleted($removedPost, $display);
+    $notification = new PostDeleted($display, $removedPost->id, $removedPost->media->id);
     $sendData = $notification->toBroadcast($display)->data;
 
     $this->assertTrue($sendData['canDeleteMedia']);

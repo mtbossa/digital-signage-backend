@@ -3,7 +3,6 @@
 namespace App\Notifications\DisplayPost;
 
 use App\Models\Display;
-use App\Models\Post;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,7 +18,7 @@ class PostDeleted extends Notification implements ShouldQueue
    *
    * @return void
    */
-  public function __construct(public Post $post, public Display $display)
+  public function __construct(public Display $display, public int $post_id, public int $media_id)
   {
   }
 
@@ -47,13 +46,13 @@ class PostDeleted extends Notification implements ShouldQueue
     $postAmountThatDependsOnDeletedPostMedia = $this->display->posts()->where(function (
       Builder $query
     ) {
-      $query->where('media_id', $this->post->media->id);
+      $query->where('media_id', $this->media_id);
     })->count("posts.id");
 
     $canDeleteMedia = $postAmountThatDependsOnDeletedPostMedia === 0;
 
     return new BroadcastMessage([
-      'post_id' => $this->post->id, 'media_id' => $this->post->media->id, 'canDeleteMedia' => $canDeleteMedia
+      'post_id' => $this->post_id, 'media_id' => $this->media_id, 'canDeleteMedia' => $canDeleteMedia
     ]);
   }
 
