@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Post;
 
+use App\Events\DisplayPost\DisplayPostCreated;
 use App\Models\Display;
+use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
@@ -94,5 +96,21 @@ class PostTest extends TestCase
       'description' => $new_values['description'],
       'media_id' => $old_media_id
     ]);
+  }
+
+  /** @test */
+  public function should_fire_display_post_created_event_after_creating_post_with_displays_ids_for_every_display_attached_to_post(
+  )
+  {
+    $displaysAmount = 2;
+    Event::fake(DisplayPostCreated::class);
+
+    Display::factory()->create(); // Random Display
+    $post = Post::factory()->nonRecurrent()->make(['media_id' => $this->media->id]);
+    $displays_ids = Display::factory(2)->create()->pluck('id')->toArray();
+
+    $response = $this->postJson(route('posts.store',
+      [...$post->toArray(), 'displays_ids' => $displays_ids]))->assertCreated();
+    Event::assertDispatchedTimes(DisplayPostCreated::class, $displaysAmount);
   }
 }
