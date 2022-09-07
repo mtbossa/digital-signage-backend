@@ -15,7 +15,6 @@ return new class extends Migration {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('description', 100);
-            $table->boolean('showing')->default(false);
 
             // nullable because could have a recurrence, so it will know when to show by recurrence
             $table->date('start_date')->nullable();

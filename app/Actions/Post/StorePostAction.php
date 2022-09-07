@@ -7,14 +7,12 @@ use App\Models\Display;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\Recurrence;
-use App\Services\PostDispatcherService;
 use Illuminate\Http\Request;
 
 class StorePostAction
 {
   public function handle(
     Request $request,
-    PostDispatcherService $postDispatcherService
   ): Post {
     $media = Media::findOrFail($request->media_id);
     $post = $media->posts()->create($request->except(['media_id']));
@@ -36,8 +34,6 @@ class StorePostAction
 
       $post->load('displays');
     }
-
-    $postDispatcherService->setPost($post)->run();
 
     return $post;
   }

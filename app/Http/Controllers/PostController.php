@@ -9,7 +9,6 @@ use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Models\Display;
 use App\Models\Post;
-use App\Services\PostDispatcherService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
@@ -24,9 +23,8 @@ class PostController extends Controller
   public function store(
     StorePostRequest $request,
     StorePostAction $action,
-    PostDispatcherService $service
   ): Post {
-    return $action->handle($request, $service);
+    return $action->handle($request);
   }
 
   public function show(Request $request, Post $post): Post
