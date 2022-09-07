@@ -2,11 +2,11 @@
 
 namespace App\Notifications\DisplayPost;
 
-use App\Http\Resources\RaspberryPostsResource;
 use App\Models\Display;
 use App\Models\Post;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
@@ -44,7 +44,17 @@ class PostDeleted extends Notification implements ShouldQueue
    */
   public function toBroadcast($notifiable): BroadcastMessage
   {
-    return new BroadcastMessage(['post' => (new RaspberryPostsResource($this->post))->resolve()]);
+    $postAmountThatDependsOnDeletedPostMedia = $this->display->posts()->where(function (
+      Builder $query
+    ) {
+      $query->where('media_id', $this->post->media->id);
+    })->count("posts.id");
+
+    $canDeleteMedia = $postAmountThatDependsOnDeletedPostMedia === 0;
+
+    return new BroadcastMessage([
+      'id' => $this->post->id, 'media_id' => $this->post->media->id, 'canDeleteMedia' => $canDeleteMedia
+    ]);
   }
 
   /**
@@ -57,7 +67,6 @@ class PostDeleted extends Notification implements ShouldQueue
   public function toArray($notifiable)
   {
     return [
-      //
     ];
   }
 }
