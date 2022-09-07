@@ -3,6 +3,7 @@
 namespace Tests\Feature\Post;
 
 use App\Events\DisplayPost\DisplayPostCreated;
+use App\Events\DisplayPostDeleted;
 use App\Models\Display;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -112,5 +113,24 @@ class PostTest extends TestCase
     $response = $this->postJson(route('posts.store',
       [...$post->toArray(), 'displays_ids' => $displays_ids]))->assertCreated();
     Event::assertDispatchedTimes(DisplayPostCreated::class, $displaysAmount);
+  }
+
+  /** @test */
+  public function should_fire_display_post_deleted_event_after_updating_post_with_displays_ids_for_every_display_detached(
+  )
+  {
+    $displaysAmount = 2;
+    Event::fake(DisplayPostDeleted::class);
+
+    Display::factory()->create(); // Random Display
+    $displays = Display::factory($displaysAmount)->create();
+    $displays_ids = $displays->pluck('id')->toArray();
+    $post = Post::factory()->nonRecurrent()->create(['media_id' => $this->media->id]);
+
+    $post->displays()->attach($displays_ids);
+
+    $this->patchJson(route('posts.update', $post->id),
+      [...$post->toArray(), 'displays_ids' => []])->assertOk();
+    Event::assertDispatchedTimes(DisplayPostDeleted::class, $displaysAmount);
   }
 }

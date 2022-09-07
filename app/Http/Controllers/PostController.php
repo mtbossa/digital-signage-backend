@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Post\StorePostAction;
+use App\Events\DisplayPostDeleted;
 use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Models\Display;
@@ -51,7 +52,13 @@ class PostController extends Controller
     $post->update($request->validated());
 
     if ($request->has('displays_ids')) {
-      $post->displays()->sync($request->displays_ids);
+      $result = $post->displays()->sync($request->displays_ids);
+
+      foreach ($result['detached'] as $removedDisplayId) {
+        $display = Display::query()->find($removedDisplayId);
+        DisplayPostDeleted::dispatch($display, $post);
+      }
+
       $post['displays'] = $post->displays->toArray();
     }
 
