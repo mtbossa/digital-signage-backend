@@ -71,6 +71,7 @@ class PostController extends Controller
 
     public function destroy(Post $post): bool
     {
+        \App\Events\Post\PostDeleted::dispatch($post);
         return $post->delete();
     }
 }

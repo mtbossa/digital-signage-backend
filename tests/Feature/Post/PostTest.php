@@ -4,6 +4,7 @@ namespace Tests\Feature\Post;
 
 use App\Events\DisplayPost\DisplayPostCreated;
 use App\Events\DisplayPost\DisplayPostDeleted;
+use App\Events\Post\PostDeleted;
 use App\Models\Display;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -155,5 +156,14 @@ class PostTest extends TestCase
     $this->patchJson(route('posts.update', $post->id),
       [...$post->toArray(), 'displays_ids' => $new_displays_ids])->assertOk();
     Event::assertDispatchedTimes(DisplayPostCreated::class, $newDisplaysAmount);
+  }
+
+  /** @test */
+  public function when_post_is_deleted_should_dispatch_post_deleted_event()
+  {
+    Event::fake(PostDeleted::class);
+
+    $this->deleteJson(route('posts.destroy', $this->post->id))->assertOk();
+    Event::assertDispatchedTimes(PostDeleted::class, 1);
   }
 }
