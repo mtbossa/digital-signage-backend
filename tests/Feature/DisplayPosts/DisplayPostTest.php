@@ -29,17 +29,17 @@ class DisplayPostTest extends TestCase
     }
 
     /** @test */
-    public function fetch_all_current_raspberry_posts()
+    public function fetch_all_current_display_posts()
     {
-        // Added a second display and raspberry because this route could
-        // return the posts of the incorrect raspberry (the ones from $this->raspberry)
-        // so need to make sure it's returning only the ones from the passed
-        // so creates two to compare
-        $secondDisplay = Display::factory()->create();
-        $posts = Post::factory(2)->create(['media_id' => $this->media->id]);
+      // Added a second display and raspberry because this route could
+      // return the posts of the incorrect raspberry (the ones from $this->raspberry)
+      // so need to make sure it's returning only the ones from the passed
+      // so creates two to compare
+      $secondDisplay = Display::factory()->create();
+      $posts = Post::factory(2)->create(['media_id' => $this->media->id]);
 
-        foreach ($posts as $post) {
-            $post->displays()->attach($secondDisplay->id);
+      foreach ($posts as $post) {
+        $post->displays()->attach($secondDisplay->id);
         }
 
         $response = $this->getJson(route('displays.posts.index',
