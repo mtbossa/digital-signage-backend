@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Events\DisplayPost\DisplayPostCreated;
 use App\Events\DisplayPost\DisplayPostDeleted;
+use App\Events\Post\PostDeleted;
 use App\Listeners\DisplayPost\BroadcastToDisplay;
+use App\Listeners\Post\BroadcastToPostDisplays;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -26,6 +28,9 @@ class EventServiceProvider extends ServiceProvider
       ],
       DisplayPostDeleted::class => [
         BroadcastToDisplay::class,
+      ],
+      PostDeleted::class => [
+        BroadcastToPostDisplays::class,
       ],
     ];
 
