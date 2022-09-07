@@ -25,7 +25,7 @@ class StorePostAction
       $post->save();
     }
 
-    if ($request->has('displays_ids')) {
+    if (!is_null($request->displays_ids)) {
       $displays_ids = $request->displays_ids;
       $post->displays()->attach($displays_ids);
 
