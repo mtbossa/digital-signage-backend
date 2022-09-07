@@ -2,13 +2,9 @@
 
 namespace App\Providers;
 
-use App\Events\Post\PostMustEnd;
-use App\Events\Post\PostMustStart;
-use App\Listeners\Post\BroadcastToDisplays;
-use App\Listeners\Post\SchedulePostEnd;
-use App\Listeners\Post\SchedulePostStart;
-use App\Listeners\Post\SetShowingFalse;
-use App\Listeners\Post\SetShowingTrue;
+use App\Events\DisplayPost\DisplayPostCreated;
+use App\Events\DisplayPost\DisplayPostDeleted;
+use App\Listeners\DisplayPost\BroadcastToDisplay;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -25,16 +21,12 @@ class EventServiceProvider extends ServiceProvider
       Registered::class => [
         SendEmailVerificationNotification::class,
       ],
-      PostMustStart::class => [
-        SetShowingTrue::class,
-        BroadcastToDisplays::class,
-        SchedulePostEnd::class,
+      DisplayPostCreated::class => [
+        BroadcastToDisplay::class,
       ],
-      PostMustEnd::class => [
-        SetShowingFalse::class,
-        BroadcastToDisplays::class,
-        SchedulePostStart::class,
-      ]
+      DisplayPostDeleted::class => [
+        BroadcastToDisplay::class,
+      ],
     ];
 
   /**

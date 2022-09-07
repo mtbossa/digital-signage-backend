@@ -29,17 +29,17 @@ class DisplayPostTest extends TestCase
     }
 
     /** @test */
-    public function fetch_all_current_raspberry_posts()
+    public function fetch_all_current_display_posts()
     {
-        // Added a second display and raspberry because this route could
-        // return the posts of the incorrect raspberry (the ones from $this->raspberry)
-        // so need to make sure it's returning only the ones from the passed
-        // so creates two to compare
-        $secondDisplay = Display::factory()->create();
-        $posts = Post::factory(2)->create(['media_id' => $this->media->id]);
+      // Added a second display and raspberry because this route could
+      // return the posts of the incorrect raspberry (the ones from $this->raspberry)
+      // so need to make sure it's returning only the ones from the passed
+      // so creates two to compare
+      $secondDisplay = Display::factory()->create();
+      $posts = Post::factory(2)->create(['media_id' => $this->media->id]);
 
-        foreach ($posts as $post) {
-            $post->displays()->attach($secondDisplay->id);
+      foreach ($posts as $post) {
+        $post->displays()->attach($secondDisplay->id);
         }
 
         $response = $this->getJson(route('displays.posts.index',
@@ -51,58 +51,28 @@ class DisplayPostTest extends TestCase
         }
     }
 
-    /** @test */
-    public function fetch_only_showing_posts()
-    {
-        $secondDisplay = Display::factory()->create();
-        $showingPosts = Post::factory(2)->create([
-            'media_id' => $this->media->id, 'showing' => true
-        ]);
-        $notShowingPosts = Post::factory(2)->create([
-            'media_id' => $this->media->id, 'showing' => false
-        ]);
 
-        $allPosts = [...$showingPosts, ...$notShowingPosts];
-
-        foreach ($allPosts as $post) {
-            $post->displays()->attach($secondDisplay->id);
-        }
-
-        $response = $this->getJson(route('displays.posts.index',
-                ['display' => $secondDisplay, 'showing' => true])
-        )->assertOk();
-
-        foreach ($showingPosts as $key => $post) {
-            $response->assertJsonFragment(['id' => $post->id]);
-        }
-
-        foreach ($notShowingPosts as $key => $post) {
-            $response->assertJsonMissing(['id' => $post->id]);
-        }
-
-    }
-
-    /** @test */
+  /** @test */
     public function ensure_json_structure_is_clean_and_correct()
     {
-        $recurrence = Recurrence::factory()->create();
-        $posts = Post::factory(2)->create([
-            'media_id'      => $this->media->id, 'showing' => true,
-            'recurrence_id' => $recurrence->id
-        ]);
-        $nonRecurrentPost = Post::factory()->nonRecurrent()
-            ->create(['media_id' => $this->media->id, 'showing' => true]);
-        $posts = [...$posts, $nonRecurrentPost];
+      $recurrence = Recurrence::factory()->create();
+      $posts = Post::factory(2)->create([
+        'media_id' => $this->media->id,
+        'recurrence_id' => $recurrence->id
+      ]);
+      $nonRecurrentPost = Post::factory()->nonRecurrent()
+        ->create(['media_id' => $this->media->id]);
+      $posts = [...$posts, $nonRecurrentPost];
 
-        $json_structure = [];
-        foreach ($posts as $key => $post) {
-            $post->displays()->attach($this->display->id);
+      $json_structure = [];
+      foreach ($posts as $key => $post) {
+        $post->displays()->attach($this->display->id);
 
-            $structure = [
-                'id'          => $post->id,
-                'start_date'  => $post->start_date,
-                'end_date'    => $post->end_date,
-                'start_time'  => $post->start_time,
+        $structure = [
+          'id' => $post->id,
+          'start_date' => $post->start_date,
+          'end_date' => $post->end_date,
+          'start_time' => $post->start_time,
                 'end_time'    => $post->end_time,
                 'expose_time' => $post->expose_time,
                 'showing'     => $post->showing,
