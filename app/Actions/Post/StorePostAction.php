@@ -3,10 +3,12 @@
 namespace App\Actions\Post;
 
 use App\Events\DisplayPost\DisplayPostCreated;
+use App\Jobs\ExpirePost;
 use App\Models\Display;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\Recurrence;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class StorePostAction
@@ -21,6 +23,8 @@ class StorePostAction
       $recurrence = Recurrence::findOrFail($request->recurrence_id);
       $post->recurrence()->associate($recurrence);
       $post->save();
+    } else {
+      $this->schedulePostExpiredEvent($post);
     }
 
     if (!is_null($request->displays_ids)) {
@@ -36,5 +40,14 @@ class StorePostAction
     }
 
     return $post;
+  }
+
+  private function schedulePostExpiredEvent(Post $post)
+  {
+    $end_date = $post->end_date;
+    $end_time = $post->end_time;
+    $end = Carbon::createFromFormat('Y-m-d H:i:s', "$end_date $end_time");
+    $delay = $end->diffInSeconds(now());
+    ExpirePost::dispatch($post)->delay($delay);
   }
 }
