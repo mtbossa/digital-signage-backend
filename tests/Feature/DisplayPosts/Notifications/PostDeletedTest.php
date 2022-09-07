@@ -34,7 +34,7 @@ class PostDeletedTest extends TestCase
     $display = Display::factory()->create();
     $removedPost = Post::factory()->create(['media_id' => $this->media->id]);
     $correctStructure = [
-      'id' => $removedPost->id,
+      'post_id' => $removedPost->id,
       'media_id' => $this->media->id,
       'canDeleteMedia' => true,
     ];

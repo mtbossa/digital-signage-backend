@@ -53,7 +53,7 @@ class PostDeleted extends Notification implements ShouldQueue
     $canDeleteMedia = $postAmountThatDependsOnDeletedPostMedia === 0;
 
     return new BroadcastMessage([
-      'id' => $this->post->id, 'media_id' => $this->post->media->id, 'canDeleteMedia' => $canDeleteMedia
+      'post_id' => $this->post->id, 'media_id' => $this->post->media->id, 'canDeleteMedia' => $canDeleteMedia
     ]);
   }
 
