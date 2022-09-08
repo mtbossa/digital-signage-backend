@@ -222,4 +222,55 @@ class DisplayPostTest extends TestCase
     $response->assertJsonCount(count($correctDisplayExpiredPosts), 'data');
   }
 
+  /** @test */
+  public function when_from_app_and_expired_true_should_return_correct_structure()
+  {
+    $posts = Post::factory(2)->create(['media_id' => $this->media->id, 'expired' => true]);
+    foreach ($posts as $key => $post) {
+      $post->displays()->attach($this->display->id);
+
+      $structure = [
+        'post_id' => $post->id,
+        'media_id' => $post->media->id,
+        'canDeleteMedia' => true,
+      ];
+      $json_structure[$key] = $structure;
+    }
+    $complete_json = ['data' => $json_structure];
+
+    $response = $this->getJson(route('displays.posts.index',
+      ['display' => $this->display->id, 'expired' => true, 'fromApp' => true]))->assertOk();
+    $response->assertExactJson($complete_json);
+  }
+
+  /** @test */
+  public function when_not_expired_post_depends_on_expired_post_media_should_send_can_delete_media_as_false()
+  {
+    $noNeededMedia = Media::factory()->create();
+    $expiredPostsMediaNeeded = Post::factory(2)->create(['media_id' => $this->media->id, 'expired' => true]);
+    $expiredPostNoMediaNeeded = Post::factory()->create(['media_id' => $noNeededMedia->id, 'expired' => true]);
+    $nonExpiredPost = Post::factory()->create(['media_id' => $this->media->id, 'expired' => false]);
+
+    foreach ([...$expiredPostsMediaNeeded, $nonExpiredPost, $expiredPostNoMediaNeeded] as $key => $post) {
+      $post->displays()->attach($this->display->id);
+    }
+
+    foreach ([...$expiredPostsMediaNeeded, $expiredPostNoMediaNeeded] as $key => $post) {
+      $structure = [
+        'post_id' => $post->id,
+        'media_id' => $post->media->id,
+        'canDeleteMedia' => false,
+      ];
+      if ($post->id === $expiredPostNoMediaNeeded->id) {
+        $structure['canDeleteMedia'] = true;
+      }
+      $json_structure[$key] = $structure;
+    }
+    $complete_json = ['data' => $json_structure];
+
+    $response = $this->getJson(route('displays.posts.index',
+      ['display' => $this->display->id, 'expired' => true, 'fromApp' => true]))->assertOk();
+    $response->assertExactJson($complete_json);
+  }
+
 }
