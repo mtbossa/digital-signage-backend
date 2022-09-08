@@ -41,26 +41,73 @@ class DisplayPostTest extends TestCase
 
       foreach ($posts as $post) {
         $post->displays()->attach($secondDisplay->id);
-        }
+      }
 
-        $response = $this->getJson(route('displays.posts.index',
-                ['display' => $secondDisplay->id])
-        )->assertOk();
+      $response = $this->getJson(route('displays.posts.index',
+          ['display' => $secondDisplay->id])
+      )->assertOk();
 
-        foreach ($posts as $key => $post) {
-            $response->assertJsonFragment(['id' => $post->id]);
-        }
+      foreach ($posts as $key => $post) {
+        $response->assertJsonFragment(['id' => $post->id]);
+      }
     }
 
   /** @test */
-    public function ensure_json_structure_is_clean_and_correct()
-    {
-      $recurrence = Recurrence::factory()->create();
-      $posts = Post::factory(2)->create([
-        'media_id' => $this->media->id,
-        'recurrence_id' => $recurrence->id,
-        'expired' => false
-      ]);
+  public function ensure_only_non_expired_posts_are_returned_by_default()
+  {
+    $now = Carbon::createFromFormat('Y-m-d H:i:s', '2022-01-01 15:00:00');
+    $this->travelTo($now);
+
+    $randomDisplay = Display::factory()->create();
+    $randomDisplayPosts = Post::factory(2)->create([
+      'start_date' => '2022-01-01', 'end_date' => '2022-01-03', 'media_id' => $this->media->id
+    ]);
+    $randomDisplayExpiredPosts = Post::factory(2)->create([
+      'start_date' => '2022-01-01', 'end_date' => '2022-01-01', 'start_time' => '14:00:00', 'end_time' => '14:59:00',
+      'media_id' => $this->media->id
+    ]);
+    foreach ([...$randomDisplayPosts, ...$randomDisplayExpiredPosts] as $randomDisplayPost) {
+      $randomDisplayPost->displays()->attach($randomDisplay->id);
+    }
+
+    $correctDisplay = Display::factory()->create();
+    $correctDisplayPosts = Post::factory(2)->create([
+      'start_date' => '2022-01-01', 'end_date' => '2022-01-03', 'media_id' => $this->media->id, 'expired' => false
+    ]);
+    $correctDisplayExpiredPosts = Post::factory(2)->create([
+      'start_date' => '2022-01-01', 'end_date' => '2022-01-01', 'start_time' => '14:00:00', 'end_time' => '14:59:00',
+      'expired' => true, 'media_id' => $this->media->id
+    ]);
+    foreach ([...$correctDisplayPosts, ...$correctDisplayExpiredPosts] as $correctDisplayPost) {
+      $correctDisplayPost->displays()->attach($correctDisplay->id);
+    }
+
+    $response = $this->getJson(route('displays.posts.index',
+        ['display' => $correctDisplay->id])
+    )->assertOk();
+
+    foreach ($correctDisplayExpiredPosts as $key => $post) {
+      $response->assertJsonMissing(['id' => $post->id]);
+    }
+    foreach ($correctDisplayPosts as $key => $post) {
+      $response->assertJsonFragment(['id' => $post->id]);
+    }
+    foreach ($randomDisplayExpiredPosts as $key => $post) {
+      $response->assertJsonMissing(['id' => $post->id]);
+    }
+
+    $response->assertJsonCount(count($correctDisplayExpiredPosts), 'data');
+  }
+
+  /** @test */
+  public function ensure_json_structure_is_clean_and_correct()
+  {
+    $recurrence = Recurrence::factory()->create();
+    $posts = Post::factory(2)->create([
+      'media_id' => $this->media->id,
+      'recurrence_id' => $recurrence->id,
+      'expired' => false
+    ]);
       $nonRecurrentPost = Post::factory()->nonRecurrent()
         ->create(['media_id' => $this->media->id, 'expired' => false]);
       $posts = [...$posts, $nonRecurrentPost];
