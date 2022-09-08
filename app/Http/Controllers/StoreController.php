@@ -20,7 +20,7 @@ class StoreController extends Controller
                 'required', 'string', 'max:255', 'unique:stores'
             ]
         ]);
-      return Store::create($request->all());
+      return Store::create(['name' => $request->name]);
     }
 
     public function show(Request $request, Store $store)
