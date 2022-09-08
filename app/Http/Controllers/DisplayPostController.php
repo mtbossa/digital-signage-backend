@@ -18,16 +18,16 @@ class DisplayPostController extends Controller
         Request $request,
         Display $display
     ): AnonymousResourceCollection {
-        $showing = $request->showing;
+        $expired = $request->expired;
 
         $display->load([
-            'posts' => function (BelongsToMany $query) use ($showing) {
-                $query->when($showing, function (Builder $query) {
-                    $query->where('showing', true);
-                });
-                $query->with('media');
-                $query->with('recurrence');
-            },
+          'posts' => function (BelongsToMany $query) use ($expired) {
+            $query->when($expired, function (Builder $query) {
+              $query->where('expired', true);
+            });
+            $query->with('media');
+            $query->with('recurrence');
+          },
         ]);
 
         return DisplayPostsResource::collection($display->posts);
