@@ -1,8 +1,7 @@
 <?php
 
-use App\Events\Post\PostMustEnd;
-use App\Events\Post\PostMustStart;
 use App\Http\Controllers\DisplayController;
+use App\Http\Controllers\DisplayInstallerDownloadController;
 use App\Http\Controllers\DisplayPostController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MediaController;
@@ -16,8 +15,6 @@ use App\Http\Controllers\StoreController;
 use App\Http\Controllers\StoreDisplaysController;
 use App\Http\Controllers\UserController;
 use App\Http\Resources\LoggedUserResource;
-use App\Models\Post;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,38 +29,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('test',
-  function () {
-    return new JsonResponse(['test' => 'oi'], 200);
-  });
-
-Route::get('/event/{post}/{eventName}',
-  function (Post $post, string $eventName) {
-    if ($eventName === 'start') {
-      event(new PostMustStart($post));
-    } else {
-      if ($eventName === 'end') {
-        event(new PostMustEnd($post));
-      }
-    }
-    });
-
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::get('/server-status', function (Request $request) {
-        return response()->json(['status' => 'up']);
-    });
+  Route::get('/server-status', function (Request $request) {
+    return response()->json(['status' => 'up']);
+  });
 
-    Route::get('/user', function (Request $request) {
-      return new LoggedUserResource($request->user());
-    });
-    
-    Route::apiResource('displays.posts', DisplayPostController::class)
-        ->only('index');
-    Route::get('media/{filename}/download', MediaDownloadController::class)
-        ->name('media.download');
-    Route::apiResource('stores.displays', StoreDisplaysController::class)
-        ->only('index');
+  Route::get('/user', function (Request $request) {
+    return new LoggedUserResource($request->user());
+  });
+
+  Route::apiResource('displays.posts', DisplayPostController::class)
+    ->only('index');
+  Route::get('media/{filename}/download', MediaDownloadController::class)
+    ->name('media.download');
+  Route::get('displays/{display}/installer/download', DisplayInstallerDownloadController::class)
+    ->name('displays.installer.download');
+  Route::apiResource('stores.displays', StoreDisplaysController::class)
+    ->only('index');
 
   Route::apiResources([
     'users' => UserController::class,
