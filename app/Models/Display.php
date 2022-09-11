@@ -25,13 +25,19 @@ class Display extends Model
         return $this->hasOne(Raspberry::class);
     }
 
-    public function posts(): BelongsToMany
-    {
-        return $this->belongsToMany(Post::class);
-    }
+  public function posts(): BelongsToMany
+  {
+    return $this->belongsToMany(Post::class);
+  }
 
-    public function store(): BelongsTo
-    {
-        return $this->belongsTo(Store::class);
-    }
+  public function store(): BelongsTo
+  {
+    return $this->belongsTo(Store::class);
+  }
+
+  public function generateInstallationUrl(string $apiToken)
+  {
+    $apiUrl = env('APP_URL');
+    return url("{$apiUrl}/api/displays/{$apiToken}/installer/download");
+  }
 }
