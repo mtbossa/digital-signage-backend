@@ -90,9 +90,9 @@ class DisplayTest extends TestCase
     $this->withoutExceptionHandling();
     $display = Display::factory()->create();
 
-    $mailable = new InstallationLink($display, $display->plainTextToken);
+    $mailable = new InstallationLink($display);
     $apiUrl = env('APP_URL');
-    $correctUrl = url("{$apiUrl}/api/displays/{$display->plainTextToken}/installer/download");
+    $correctUrl = url("{$apiUrl}/api/displays/{$display->id}/installer/download");
 
     $mailable->assertSeeInHtml($correctUrl);
   }

@@ -35,9 +35,9 @@ class Display extends Model
     return $this->belongsTo(Store::class);
   }
 
-  public function generateInstallationUrl(string $apiToken)
+  public function generateInstallationUrl()
   {
     $apiUrl = env('APP_URL');
-    return url("{$apiUrl}/api/displays/{$apiToken}/installer/download");
+    return url("{$apiUrl}/api/displays/{$this->id}/installer/download");
   }
 }

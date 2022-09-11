@@ -18,10 +18,10 @@ class InstallationLink extends Mailable
    *
    * @return void
    */
-  public function __construct(private readonly Display $display, private $token)
+  public function __construct(private readonly Display $display)
   {
     $this->afterCommit();
-    $this->url = $this->display->generateInstallationUrl($token);
+    $this->url = $this->display->generateInstallationUrl();
   }
 
   /**

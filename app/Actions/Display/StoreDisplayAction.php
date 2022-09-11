@@ -28,7 +28,7 @@ class StoreDisplayAction
       $new_token = $display->createToken('display_access_token');
       $display->token = $new_token;
 
-      Mail::to($request->user())->queue(new InstallationLink($display, $new_token->plainTextToken));
+      Mail::to($request->user())->queue(new InstallationLink($display));
 
       return $display;
     }
