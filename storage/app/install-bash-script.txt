@@ -1,0 +1,31 @@
+#!/bin/bash
+
+echo ""
+echo "My Command Line Installer"
+echo ""
+
+# Create destination folder
+DESTINATION="$HOME/intus"
+mkdir -p ${DESTINATION}
+
+string=$(cat << EOF
+NODE_ENV=production
+API_URL='http://192.168.0.108:80'
+DISPLAY_ID=##PLACE##
+DISPLAY_API_TOKEN=##PLACE##
+REPO_USER=mtbossa
+REPO_PASS=Vaw2Pmm1234
+WATCHTOWER_DEBUG=false
+MEDIAS_FOLDER_PATH=${destination}/medias
+DB_FOLDER_PATH=${destination}/data
+LOGS_FOLDER_PATH=${destination}/logs
+EOF
+)
+
+echo $env_string > ${DESTINATION}/.env
+echo ""
+echo "Installation complete."
+echo ""
+
+# Exit from the script with success (0)
+exit 0

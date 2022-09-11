@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Display;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Str;
 
 class DisplayInstallerDownloadController extends Controller
 {
-  public function __invoke(Request $request, Display $display): StreamedResponse|JsonResponse
+  public function __invoke(Request $request, Display $display): Response|JsonResponse|Application|ResponseFactory
   {
     $authenticated = Auth::user();
     if ($authenticated instanceof Display) {
@@ -19,9 +22,11 @@ class DisplayInstallerDownloadController extends Controller
         return response()->json(['message' => 'Not Found!'], 404);
       }
 
-      $path = Storage::put('file.txt', "oi");
+      $installScript = Storage::get("install-bash-script.txt");
+      $replaced = Str::replaceArray('##PLACE##', [$display->id, $request->bearerToken()], $installScript);
 
-      return Storage::download($path);
+      return response($replaced, 200)
+        ->header('Content-Type', 'text/plain');
     }
 
     return response()->json(['message' => 'Not Found!'], 404);

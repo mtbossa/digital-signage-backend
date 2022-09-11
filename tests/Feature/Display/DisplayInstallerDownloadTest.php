@@ -3,7 +3,9 @@
 namespace Tests\Feature\Display;
 
 use App\Models\Display;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 use Tests\Feature\Display\Traits\DisplayTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
@@ -20,6 +22,7 @@ class DisplayInstallerDownloadTest extends TestCase
   /** @test */
   public function ensure_404_when_user_trying_to_access_installer_link()
   {
+    Sanctum::actingAs(User::factory()->create());
     $this->getJson(route('displays.installer.download', Display::factory()->create()->id))->assertNotFound();
   }
 
@@ -31,6 +34,19 @@ class DisplayInstallerDownloadTest extends TestCase
     $plainTextToken = $wrongDisplay->plainTextToken;
     $this->getJson(route('displays.installer.download', $correctDisplay->id),
       ["Authorization" => "Bearer $plainTextToken"])->assertNotFound();
+  }
+
+  /** @test */
+  public function ensure_installer_content_has_api_key_and_display_id()
+  {
+    $display = Display::factory()->create();
+
+    $response = $this->getJson(route('displays.installer.download', $display->id),
+      ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
+    $responseContent = $response->content();
+
+    $this->assertStringContainsString("DISPLAY_ID={$display->id}", $responseContent);
+    $this->assertStringContainsString("DISPLAY_API_TOKEN={$display->plainTextToken}", $responseContent);
   }
 
 
