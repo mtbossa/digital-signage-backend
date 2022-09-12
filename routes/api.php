@@ -3,6 +3,7 @@
 use App\Http\Controllers\DisplayController;
 use App\Http\Controllers\DisplayInstallerDownloadController;
 use App\Http\Controllers\DisplayPostController;
+use App\Http\Controllers\DockerInstallerDownloadController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MediaDownloadController;
@@ -39,6 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
     return new LoggedUserResource($request->user());
   });
 
+
   Route::apiResource('displays.posts', DisplayPostController::class)
     ->only('index');
   Route::get('media/{filename}/download', MediaDownloadController::class)
@@ -64,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::apiResource('invitations', InvitationController::class,
     ['except' => ['update', 'show']]);
 });
+Route::get('docker/installer/download', DockerInstallerDownloadController::class);
 
 Route::get('invitations/{token}', [InvitationController::class, 'show'])
     ->name('invitations.show');
