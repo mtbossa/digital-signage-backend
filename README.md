@@ -24,7 +24,7 @@
 
 ### Install script
 
-`curl -H "Authorization: Bearer <DISPLAY_API_TOKEN>" -H "Accept: text/plain" GET http://192.168.0.108:80/api/displays/<DISPLAY_ID>/installer/download | bash`
+`sudo curl -H "Authorization: Bearer <DISPLAY_API_TOKEN>" -H "Accept: text/plain" GET http://192.168.0.108:80/api/displays/<DISPLAY_ID>/installer/download | bash`
 
 ---
 
