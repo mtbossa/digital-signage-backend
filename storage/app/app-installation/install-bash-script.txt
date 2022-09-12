@@ -1,0 +1,41 @@
+#!/bin/bash
+
+echo ""
+echo "My Command Line Installer"
+echo ""
+
+echo "Creating .env file and folders"
+
+# Create destination folder
+INSTALLATIONFOLDER="$HOME/intus"
+MEDIASFOLDER=${INSTALLATIONFOLDER}/medias
+DATAFOLDER=${INSTALLATIONFOLDER}/data
+LOGSFOLDER=${INSTALLATIONFOLDER}/logs
+
+mkdir -p ${DESTINATION} ${MEDIASFOLDER} ${DATAFOLDER} ${LOGSFOLDER}  
+env_string=$(cat << EOF
+NODE_ENV=production
+API_URL='http://192.168.0.108:80'
+DISPLAY_ID=##PLACE##
+DISPLAY_API_TOKEN=##PLACE##
+REPO_USER=mtbossa
+REPO_PASS=Vaw2Pmm1234
+WATCHTOWER_DEBUG=false
+MEDIAS_FOLDER_PATH=${MEDIASFOLDER}
+DB_FOLDER_PATH=${DATAFOLDER}
+LOGS_FOLDER_PATH=${LOGSFOLDER}
+EOF
+)
+
+echo $env_string > ${INSTALLATIONFOLDER}/.env
+
+echo "Downloading docker-compose"
+ 
+curl -H GET http://192.168.0.108:80/api/docker/installer/download > ${INSTALLATIONFOLDER}/docker-compose.yml
+
+echo ""
+echo "Installation complete."
+echo ""
+
+# Exit from the script with success (0)
+exit 0

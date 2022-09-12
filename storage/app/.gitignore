@@ -1,4 +1,5 @@
 *
+!app-installation/install-bash-script.txt
+!app-installation/docker-compose-production.yml
 !public/
 !.gitignore
-!app-installation/
