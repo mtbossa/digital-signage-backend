@@ -10,6 +10,6 @@ class DockerInstallerDownloadController extends Controller
 {
   public function __invoke(Request $request): StreamedResponse
   {
-    return Storage::download("docker-compose-production.yml");
+    return Storage::download("app-installation/docker-compose-production.yml");
   }
 }
