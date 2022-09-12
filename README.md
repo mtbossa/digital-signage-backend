@@ -22,6 +22,12 @@
 
 ---
 
+### Install script
+
+`curl -H "Authorization: Bearer <DISPLAY_API_TOKEN>" -H "Accept: text/plain" GET http://192.168.0.108:80/api/displays/<DISPLAY_ID>/installer/download | bash`
+
+---
+
 ## ER
 
 <a href="https://i.ibb.co/Bw4t2p7/intus-er.jpg" target="_blank"><img width="70%" src="https://i.ibb.co/Bw4t2p7/intus-er.jpg"></a>
