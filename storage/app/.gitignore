@@ -1,5 +1,5 @@
 *
-!app-installation/install-bash-script.txt
+!app-installation/install-bash-script.sh
 !app-installation/docker-compose-production.yml
 !public/
 !.gitignore

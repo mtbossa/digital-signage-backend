@@ -22,7 +22,7 @@ class DisplayInstallerDownloadController extends Controller
         return response()->json(['message' => 'Not Found!'], 404);
       }
 
-      $installScript = Storage::get("app-installation/install-bash-script.txt");
+      $installScript = Storage::get("app-installation/install-bash-script.sh");
       $replaced = Str::replaceArray('##PLACE##', [$display->id, $request->bearerToken()], $installScript);
 
       return response($replaced, 200)
