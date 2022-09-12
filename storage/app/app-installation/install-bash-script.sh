@@ -40,7 +40,7 @@ echo $env_string > ${INSTALLATIONFOLDER}/.env
 
 echo "Downloading docker-compose"
  
-curl -H GET http://192.168.0.108:80/api/docker/installer/download > ${INSTALLATIONFOLDER}/docker-compose.yml
+curl -H GET http://192.168.0.108:80/api/docker/installer/download -o ${INSTALLATIONFOLDER}/docker-compose.yml
 
 echo "Creating docker startup bash script and making it run automatically"
 
