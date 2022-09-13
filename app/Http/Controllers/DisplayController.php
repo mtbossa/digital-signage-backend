@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use App\Actions\Display\StoreDisplayAction;
 use App\Actions\Display\UpdateDisplayAction;
 use App\Http\Requests\Display\StoreDisplayRequest;
+use App\Http\Requests\Display\UpdateDisplayRequest;
 use App\Models\Display;
-use App\Models\Media;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 class DisplayController extends Controller
@@ -29,7 +28,7 @@ class DisplayController extends Controller
     return $display;
   }
 
-  public function update(Request $request, Display $display, UpdateDisplayAction $action): Display
+  public function update(UpdateDisplayRequest $request, Display $display, UpdateDisplayAction $action): Display
   {
     return $action->handle($request, $display);
   }

@@ -4,7 +4,7 @@ namespace App\Http\Requests\Display;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreDisplayRequest extends FormRequest
+class UpdateDisplayRequest extends FormRequest
 {
   /**
    * Determine if the user is authorized to make this request.
@@ -28,7 +28,7 @@ class StoreDisplayRequest extends FormRequest
       'size' => 'required|numeric|min:1|max:1000',
       'width' => 'required|numeric|min:1|max:20000',
       'height' => 'required|numeric|min:1|max:20000',
-      'touch' => 'boolean',
+      'touch' => 'required|boolean',
       'observation' => 'nullable|string',
       'raspberry_id' => 'nullable|numeric'
     ];
