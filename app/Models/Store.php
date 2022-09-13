@@ -9,7 +9,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Store extends Model
 {
-    use HasFactory, HasApiTokens;
+    use HasFactory;
 
     protected $fillable = ['name'];
 

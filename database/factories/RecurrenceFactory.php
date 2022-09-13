@@ -16,12 +16,39 @@ class RecurrenceFactory extends Factory
    */
   public function definition()
   {
-    return [
+    $recurrence = [
       'description' => $this->faker->text(50),
       'isoweekday' => $this->faker->boolean(50) ? rand(1, 7) : null,
       'day' => $this->faker->boolean(80) ? rand(1, 31) : null,
       'month' => $this->faker->boolean(50) ? rand(1, 12) : null,
       'year' => $this->faker->boolean(50) ? rand(2021, 2025) : null,
     ];
+
+    if ($this->allRecurrenceValuesNull($recurrence)) {
+      $recurrence['isoweekday'] = rand(1, 7);
+    }
+
+    return $recurrence;
+  }
+
+  private function allRecurrenceValuesNull(array $recurrence): bool
+  {
+    $nulls = [];
+    foreach ($recurrence as $property => $value) {
+      if ($property === 'description') {
+        continue;
+      }
+
+      if (!$value) {
+        $nulls[] = $property;
+      }
+    }
+
+    // 4 because: isoweekday | day | month | year
+    if (count($nulls) === 4) {
+      return true;
+    }
+
+    return false;
   }
 }

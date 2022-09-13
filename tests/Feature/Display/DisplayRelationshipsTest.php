@@ -101,33 +101,33 @@ class DisplayRelationshipsTest extends TestCase
     /** @test */
     public function update_displays_raspberry()
     {
-        $this->display = Display::factory()->create();
-        $rasp1 = Raspberry::factory()
-            ->create(['display_id' => $this->display->id]);
-        $rasp2 = Raspberry::factory()->create();
+      $display = Display::factory()->create();
+      $rasp1 = Raspberry::factory()
+        ->create(['display_id' => $display->id]);
+      $rasp2 = Raspberry::factory()->create();
 
-        $response = $this->putJson(route('displays.update', $this->display->id),
-            ['raspberry_id' => $rasp2->id]);
+      $response = $this->putJson(route('displays.update', $display->id),
+        [...$display->toArray(), 'raspberry_id' => $rasp2->id]);
 
-        $this->assertDatabaseHas('raspberries',
-            ['id' => $rasp2->id, 'display_id' => $this->display->id]);
-        $this->assertDatabaseHas('raspberries',
-            ['id' => $rasp1->id, 'display_id' => null]);
+      $this->assertDatabaseHas('raspberries',
+        ['id' => $rasp2->id, 'display_id' => $display->id]);
+      $this->assertDatabaseHas('raspberries',
+        ['id' => $rasp1->id, 'display_id' => null]);
 
-        $response->assertOk();
+      $response->assertOk();
     }
 
     /** @test */
     public function remove_displays_raspberry()
     {
-        $this->display = $this->_createDisplay();
-        Raspberry::factory()->create(['display_id' => $this->display->id]);
+      $display = $this->_createDisplay();
+      Raspberry::factory()->create(['display_id' => $display->id]);
 
-        $response = $this->putJson(route('displays.update', $this->display->id),
-            ['raspberry_id' => null]);
+      $response = $this->putJson(route('displays.update', $display->id),
+        [...$display->toArray(), 'raspberry_id' => null]);
 
-        $this->assertDatabaseHas('raspberries', ['display_id' => null]);
+      $this->assertDatabaseHas('raspberries', ['display_id' => null]);
 
-        $response->assertOk();
+      $response->assertOk();
     }
 }

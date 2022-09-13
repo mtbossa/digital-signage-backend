@@ -2,15 +2,15 @@
 
 namespace App\Actions\Display;
 
+use App\Http\Requests\Display\UpdateDisplayRequest;
 use App\Models\Display;
 use App\Models\Raspberry;
-use Illuminate\Http\Request;
 
 class UpdateDisplayAction
 {
-  public function handle(Request $request, Display $display)
+  public function handle(UpdateDisplayRequest $request, Display $display)
   {
-    $display->update($request->all());
+    $display->update($request->safe()->except(['raspberry_id']));
 
     if ($request->raspberry_id) {
       $current_raspberry = $display->raspberry;

@@ -1,20 +1,21 @@
 <?php
 
-use App\Events\Post\ShouldEndPost;
-use App\Events\Post\ShouldStartPost;
 use App\Http\Controllers\DisplayController;
+use App\Http\Controllers\DisplayInstallerDownloadController;
 use App\Http\Controllers\DisplayPostController;
+use App\Http\Controllers\DockerInstallerDownloadController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MediaDownloadController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostDisplayOptions;
+use App\Http\Controllers\PostMediaOptions;
 use App\Http\Controllers\RaspberryController;
-use App\Http\Controllers\RaspberryPostController;
 use App\Http\Controllers\RecurrenceController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\StoreDisplaysController;
 use App\Http\Controllers\UserController;
-use App\Models\Post;
+use App\Http\Resources\LoggedUserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,49 +30,43 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/event/{post}/{eventName}',
-    function (Post $post, string $eventName) {
-        if ($eventName === 'start') {
-            event(new ShouldStartPost($post));
-        } else {
-            if ($eventName === 'end') {
-                event(new ShouldEndPost($post));
-            }
-        }
-    });
-
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::get('/server-status', function (Request $request) {
-        return response()->json(['status' => 'up']);
-    });
+  Route::get('/server-status', function (Request $request) {
+    return response()->json(['status' => 'up']);
+  });
 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+  Route::get('/user', function (Request $request) {
+    return new LoggedUserResource($request->user());
+  });
 
-    Route::apiResource('raspberry.posts', RaspberryPostController::class)
-        ->only('index');
-    Route::apiResource('displays.posts', DisplayPostController::class)
-        ->only('index');
-    Route::get('media/{filename}/download', MediaDownloadController::class)
-        ->name('media.download');
-    Route::apiResource('stores.displays', StoreDisplaysController::class)
-        ->only('index');
 
-    Route::apiResources([
-        'users'       => UserController::class,
-        'displays'    => DisplayController::class,
-        'raspberries' => RaspberryController::class,
-        'posts'       => PostController::class,
-        'medias'      => MediaController::class,
-        'recurrences' => RecurrenceController::class,
-        'stores'      => StoreController::class,
-    ]);
+  Route::apiResource('displays.posts', DisplayPostController::class)
+    ->only('index');
+  Route::get('media/{filename}/download', MediaDownloadController::class)
+    ->name('media.download');
+  Route::get('displays/{display}/installer/download', DisplayInstallerDownloadController::class)
+    ->name('displays.installer.download');
+  Route::apiResource('stores.displays', StoreDisplaysController::class)
+    ->only('index');
 
-    Route::apiResource('invitations', InvitationController::class,
-        ['except' => ['update', 'show']]);
+  Route::apiResources([
+    'users' => UserController::class,
+    'displays' => DisplayController::class,
+    'raspberries' => RaspberryController::class,
+    'posts' => PostController::class,
+    'medias' => MediaController::class,
+    'recurrences' => RecurrenceController::class,
+    'stores' => StoreController::class,
+  ]);
+
+  Route::get('posts/medias/options', PostMediaOptions::class)->name("post.media.options");
+  Route::get('posts/displays/options', PostDisplayOptions::class)->name("post.display.options");
+
+  Route::apiResource('invitations', InvitationController::class,
+    ['except' => ['update', 'show']]);
 });
+Route::get('docker/installer/download', DockerInstallerDownloadController::class);
 
 Route::get('invitations/{token}', [InvitationController::class, 'show'])
     ->name('invitations.show');

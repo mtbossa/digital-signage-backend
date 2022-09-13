@@ -3,6 +3,7 @@
 namespace Tests\Feature\Post;
 
 use App\Models\Display;
+use App\Models\Media;
 use App\Models\Post;
 use App\Models\Recurrence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -33,15 +34,16 @@ class PostValidationTest extends TestCase
      */
     public function end_date_can_be_same_as_start_date()
     {
-        $post_data = Post::factory()->make([
-            'start_date' => '2022-01-01', 'end_date' => '2022-01-01',
-            'media_id'   => $this->media->id
-        ])->toArray();
-        $this->postJson(route('posts.store'),
-            [...$post_data, 'displays_ids' => null])
-            ->assertCreated()->assertJson($post_data);
+      $videoMedia = Media::factory()->create(['type' => 'video']);
+      $post_data = Post::factory()->make([
+        'start_date' => '2022-01-01', 'end_date' => '2022-01-01',
+        'media_id' => $videoMedia->id, 'expose_time' => null
+      ])->toArray();
+      $this->postJson(route('posts.store'),
+        [...$post_data, 'displays_ids' => null])
+        ->assertCreated()->assertJson($post_data);
 
-        $this->assertDatabaseCount('posts', 1);
+      $this->assertDatabaseCount('posts', 1);
     }
 
     /**
@@ -151,36 +153,79 @@ class PostValidationTest extends TestCase
      */
     public function displays_ids_can_be_null_when_creating_post()
     {
-        $displays_ids = Display::factory(2)->create()->pluck('id')->toArray();
-        $nonExistentId = ++Display::all()->last()->id;
-        $post_data = Post::factory()->nonRecurrent()
-            ->make(['media_id' => $this->media->id])->toArray();
-        $response = $this->postJson(route('posts.store'),
-            [...$post_data, 'displays_ids' => null])->assertCreated();
+      $displays_ids = Display::factory(2)->create()->pluck('id')->toArray();
+      $nonExistentId = ++Display::all()->last()->id;
+      $post_data = Post::factory()->nonRecurrent()
+        ->make(['media_id' => $this->media->id])->toArray();
+      $response = $this->postJson(route('posts.store'),
+        [...$post_data, 'displays_ids' => null])->assertCreated();
 
-        $this->assertDatabaseCount('posts', 1);
+      $this->assertDatabaseCount('posts', 1);
     }
 
-    /**
-     * @test
-     * @dataProvider invalidPosts
-     */
-    public function cant_store_invalid_post($invalidData, $invalidFields)
-    {
-        $this->postJson(route('posts.store'), $invalidData)
-            ->assertJsonValidationErrors($invalidFields)
-            ->assertUnprocessable();
+  /**
+   * @test
+   */
+  public function when_media_is_image_expose_time_is_required()
+  {
+    $imageMedia = Media::factory()->create(['type' => 'image']);
+    $postData = Post::factory()->nonRecurrent()->make(['media_id' => $imageMedia->id, 'displays_ids' => []])->toArray();
+    $response = $this->postJson(route('posts.store'),
+      [...$postData, 'expose_time' => null])->assertUnprocessable()
+      ->assertJsonValidationErrorFor('expose_time');
+  }
 
-        $this->assertDatabaseCount('posts', 0);
-    }
+  /**
+   * @test
+   */
+  public function when_media_is_image_expose_time_must_be_greater_or_equal_to_1_second()
+  {
+    $imageMedia = Media::factory()->create(['type' => 'image']);
+    $postData = Post::factory()->make(['media_id' => $imageMedia->id])->toArray();
+    $response = $this->postJson(route('posts.store'),
+      [...$postData, 'expose_time' => 999])->assertUnprocessable()
+      ->assertJsonValidationErrorFor('expose_time');
+  }
 
-    public function invalidPosts(): array
-    {
-        $post_data = [
-            'description' => 'Descrição de post', 'start_date' => '2022-01-01',
-            'end_date'    => '2022-02-01',
-            'start_time'  => '08:30', 'end_time' => '10:00',
-            'expose_time' => 5000,
+  /**
+   * @test
+   */
+  public function when_media_is_video_expose_time_must_null()
+  {
+    $videoMedia = Media::factory()->create(['type' => 'video']);
+    $postData = Post::factory()->make(['media_id' => $videoMedia->id])->toArray();
+    $response = $this->postJson(route('posts.store'),
+      [...$postData, 'expose_time' => 1000])->assertUnprocessable()
+      ->assertJsonValidationErrorFor('expose_time');
+
+    $correctPostData = Post::factory()->nonRecurrent()->make([
+      'media_id' => $videoMedia->id, 'expose_time' => null, 'displays_ids' => []
+    ])->toArray();
+    $this->postJson(route('posts.store'),
+      $correctPostData)->assertCreated();
+  }
+
+  /**
+   * @test
+   * @dataProvider invalidPosts
+   */
+  public function cant_store_invalid_post($invalidData, $invalidFields)
+  {
+
+    $response = $this->postJson(route('posts.store'), $invalidData);
+
+    $response->assertJsonValidationErrors($invalidFields)
+      ->assertUnprocessable();
+
+    $this->assertDatabaseCount('posts', 0);
+  }
+
+  public function invalidPosts(): array
+  {
+    $post_data = [
+      'description' => 'Descrição de post', 'start_date' => '2022-01-01',
+      'end_date' => '2022-02-01',
+      'start_time' => '08:30', 'end_time' => '10:00',
         ];
         return [
             'description greater than 100 char'  => [
@@ -249,12 +294,6 @@ class PostValidationTest extends TestCase
             ],
             'media_id as string'                 => [
                 [...$post_data, 'media_id' => ''], ['media_id'],
-            ],
-            'expose_time as string'              => [
-                [...$post_data, 'expose_time' => ''], ['expose_time'],
-            ],
-            'expose_time less than 1000'         => [
-                [...$post_data, 'expose_time' => 999], ['expose_time'],
             ],
         ];
     }

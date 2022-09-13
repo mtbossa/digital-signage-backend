@@ -5,16 +5,17 @@ namespace App\Http\Controllers;
 use App\Actions\Display\StoreDisplayAction;
 use App\Actions\Display\UpdateDisplayAction;
 use App\Http\Requests\Display\StoreDisplayRequest;
+use App\Http\Requests\Display\UpdateDisplayRequest;
 use App\Models\Display;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 
 class DisplayController extends Controller
 {
 
-  public function index(): Collection
+  public function index(Request $request): LengthAwarePaginator
   {
-    return Display::all();
+    return Display::query()->paginate($request->size);
   }
 
   public function store(StoreDisplayRequest $request, StoreDisplayAction $action): Display
@@ -27,7 +28,7 @@ class DisplayController extends Controller
     return $display;
   }
 
-  public function update(Request $request, Display $display, UpdateDisplayAction $action): Display
+  public function update(UpdateDisplayRequest $request, Display $display, UpdateDisplayAction $action): Display
   {
     return $action->handle($request, $display);
   }

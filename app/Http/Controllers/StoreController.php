@@ -20,10 +20,7 @@ class StoreController extends Controller
                 'required', 'string', 'max:255', 'unique:stores'
             ]
         ]);
-        $store = Store::create($request->all());
-        $new_token = $store->createToken('store_access_token');
-        $store->token = $new_token;
-        return $store;
+      return Store::create(['name' => $request->name]);
     }
 
     public function show(Request $request, Store $store)
@@ -33,9 +30,14 @@ class StoreController extends Controller
 
     public function update(Request $request, Store $store): Store
     {
-        $store->update($request->all());
+      $request->validate([
+        'name' => [
+          'required', 'string', 'max:255', 'unique:stores'
+        ]
+      ]);
+      $store->update(['name' => $request->name]);
 
-        return $store;
+      return $store;
     }
 
     public function destroy(Store $store)

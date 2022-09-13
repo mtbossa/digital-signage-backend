@@ -26,6 +26,6 @@ Broadcast::channel('App.Models.Raspberry.{raspberry}',
     });
 
 Broadcast::channel('App.Models.Display.{display}',
-    function (Store $authStore, Display $display) {
-        return $display->store->id === $authStore->id;
+    function (Display $authDisplay, Display $display) {
+        return $display->id === $authDisplay->id;
     });
