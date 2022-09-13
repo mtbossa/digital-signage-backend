@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Post;
 
 use App\Models\Display;
+use App\Rules\ExposeTime;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -29,7 +30,7 @@ class StorePostRequest extends FormRequest
       'media_id' => ['required', 'integer'],
       'recurrence_id' => ['sometimes', 'prohibits:start_date,end_date'],
       'displays_ids' => ['present', 'nullable', 'array', Rule::in(Display::all()->pluck('id')->toArray())],
-      'expose_time' => ['numeric', 'min:1000']
+      'expose_time' => ['bail', 'nullable', 'numeric', 'min:1000', new ExposeTime]
     ];
   }
 }
