@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Store;
 
+use App\Models\Store;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
@@ -21,12 +22,21 @@ class StoreValidationTest extends TestCase
   }
 
   /** @test */
-  public function store_name_must_be_unique()
+  public function store_name_must_be_unique_when_creating()
   {
     $this->store = $this->_createStore();
     $store = $this->_makeStore(['name' => $this->store->name]);
     $this->postJson(route('stores.store'),
       $store->toArray())->assertUnprocessable()->assertJsonValidationErrorFor('name');
+  }
+
+  /** @test */
+  public function store_name_must_be_unique_when_updating()
+  {
+    $this->store = $this->_createStore();
+    $updatableStore = Store::factory()->create();
+    $this->patchJson(route('stores.update', $updatableStore->id),
+      ['name' => $this->store->name])->assertUnprocessable()->assertJsonValidationErrorFor('name');
   }
 
   /**
@@ -40,6 +50,18 @@ class StoreValidationTest extends TestCase
       ->assertUnprocessable();
 
     $this->assertDatabaseCount('stores', 0);
+  }
+
+  /**
+   * @test
+   * @dataProvider invalidStores
+   */
+  public function cant_update_invalid_store($invalidData, $invalidFields)
+  {
+    $store = Store::factory()->create();
+    $this->patchJson(route('stores.update', $store->id), [...$store->toArray(), ...$invalidData])
+      ->assertJsonValidationErrors($invalidFields)
+      ->assertUnprocessable();
   }
 
   public function invalidStores(): array

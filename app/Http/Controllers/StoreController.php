@@ -30,9 +30,14 @@ class StoreController extends Controller
 
     public function update(Request $request, Store $store): Store
     {
-        $store->update($request->all());
+      $request->validate([
+        'name' => [
+          'required', 'string', 'max:255', 'unique:stores'
+        ]
+      ]);
+      $store->update(['name' => $request->name]);
 
-        return $store;
+      return $store;
     }
 
     public function destroy(Store $store)
