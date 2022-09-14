@@ -48,6 +48,7 @@ docker compose up
 EOF
 )
 echo "$app_startup_script" > ${INSTALLATIONFOLDER}/intus-startup.sh
+sudo chmod +x ${INSTALLATIONFOLDER}/intus-startup.sh
 run_app=@bash ${INSTALLATIONFOLDER}/intus-startup.sh
 echo $run_app >> /etc/xdg/lxsession/LXDE-pi/autostart
 
