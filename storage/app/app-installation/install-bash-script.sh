@@ -69,3 +69,5 @@ sudo usermod -aG docker ${USER}
 echo ""
 echo "Installation complete.  You must reboot the system"
 echo ""
+
+exit (0)
