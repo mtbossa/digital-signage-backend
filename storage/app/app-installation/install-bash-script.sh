@@ -70,4 +70,4 @@ echo ""
 echo "Installation complete.  You must reboot the system"
 echo ""
 
-exit (0)
+exit 0
