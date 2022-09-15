@@ -73,22 +73,18 @@ echo "
 Checking docker installation
 "
 
-if command -v docker &> /dev/null
+if ! command -v docker &> /dev/null
 then
-    echo ""
-    echo "Docker already installed, installation complete!"
-    echo ""
-
-    exit 0
+    echo "
+    Docker not installed, installing Docker.
+    "
+    
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sh get-docker.sh &> /dev/null
+    sudo usermod -aG docker ${USER}
 fi
-
-echo "
-Docker not installed, installing Docker.
-"
-
-curl -fsSL https://get.docker.com -o get-docker.sh
-sh get-docker.sh
-sudo usermod -aG docker ${USER}
+  
+docker pull mtbossa/raspberry-prod:staging
 
 echo ""
 echo "Installation complete.  You must reboot the system"
