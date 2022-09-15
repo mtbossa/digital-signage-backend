@@ -17,9 +17,9 @@ mkdir -p ${MEDIASFOLDER} ${DATAFOLDER} ${LOGSFOLDER}
 
 env_string=$(cat << EOF
 NODE_ENV=production
-API_URL='http://192.168.0.108:80'
-DISPLAY_ID=##PLACE##
-DISPLAY_API_TOKEN=##PLACE##
+API_URL=**PLACE_API_URL**
+DISPLAY_ID=**PLACE_DISPLAY**
+DISPLAY_API_TOKEN=**PLACE_DISPLAY**
 REPO_USER=mtbossa
 REPO_PASS=Vaw2Pmm1234
 WATCHTOWER_DEBUG=false
@@ -35,7 +35,7 @@ echo ""
 echo "Downloading docker-compose file"
 echo ""
 
-curl -H GET http://192.168.0.108:80/api/docker/installer/download -o ${INSTALLATIONFOLDER}/docker-compose.yml
+curl -H GET **PLACE_API_URL**/api/docker/installer/download -o ${INSTALLATIONFOLDER}/docker-compose.yml
 
 echo ""
 echo "Creating docker startup bash script and making it run automatically"

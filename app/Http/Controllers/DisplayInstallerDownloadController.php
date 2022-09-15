@@ -23,9 +23,11 @@ class DisplayInstallerDownloadController extends Controller
       }
 
       $installScript = Storage::get("app-installation/install-bash-script.sh");
-      $replaced = Str::replaceArray('##PLACE##', [$display->id, $request->bearerToken()], $installScript);
+      $displayReplaced = Str::replaceArray('**PLACE_DISPLAY**', [$display->id, $request->bearerToken()],
+        $installScript);
+      $completeReplaced = Str::replace('**PLACE_API_URL**', config("app.url"), $displayReplaced);
 
-      return response($replaced, 200)
+      return response($completeReplaced, 200)
         ->header('Content-Type', 'text/plain');
     }
 
