@@ -10,6 +10,12 @@ class DockerInstallerDownloadController extends Controller
 {
   public function __invoke(Request $request): StreamedResponse
   {
-    return Storage::download("app-installation/docker-compose-production.yml");
+    $appEnv = config("app.env"); # development, staging or production
+
+    if ($appEnv !== "production" && $appEnv !== "staging") {
+      $appEnv = "development";
+    }
+
+    return Storage::download("app-installation/docker-compose-$appEnv.yml");
   }
 }

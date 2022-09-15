@@ -52,5 +52,39 @@ class DisplayInstallerDownloadTest extends TestCase
     $this->assertStringContainsString("{$apiUrl}/api/docker/installer/download", $responseContent);
   }
 
+  /** @test */
+  public function ensure_docker_production_download_is_correct()
+  {
+    config(['app.env' => 'production']);
+    $display = Display::factory()->create();
 
+    $response = $this->get("api/docker/installer/download",
+      ["Authorization" => "Bearer $display->plainTextToken"])->assertDownload("docker-compose-production.yml");
+  }
+
+  /** @test */
+  public function ensure_docker_staging_download_is_correct()
+  {
+    config(['app.env' => 'staging']);
+    $display = Display::factory()->create();
+
+    $response = $this->get("api/docker/installer/download",
+      ["Authorization" => "Bearer $display->plainTextToken"])->assertDownload("docker-compose-staging.yml");
+  }
+
+  /** @test */
+  public function ensure_docker_development_download_is_correct()
+  {
+    config(['app.env' => 'development']);
+    $display = Display::factory()->create();
+
+    $response = $this->get("api/docker/installer/download",
+      ["Authorization" => "Bearer $display->plainTextToken"])->assertDownload("docker-compose-development.yml");
+
+    config(['app.env' => 'local']);
+    $display = Display::factory()->create();
+
+    $response = $this->get("api/docker/installer/download",
+      ["Authorization" => "Bearer $display->plainTextToken"])->assertDownload("docker-compose-development.yml");
+  }
 }
