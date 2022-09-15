@@ -22,12 +22,20 @@ class DisplayInstallerDownloadController extends Controller
         return response()->json(['message' => 'Not Found!'], 404);
       }
 
-      $installScript = Storage::get("app-installation/install-bash-script.sh");
-      $displayReplaced = Str::replaceArray('**PLACE_DISPLAY**', [$display->id, $request->bearerToken()],
-        $installScript);
-      $completeReplaced = Str::replace('**PLACE_API_URL**', config("app.url"), $displayReplaced);
+      $findAndReplace = [
+        "**API_URL**" => config("app.url"),
+        "**DISPLAY_ID**" => $display->id,
+        "**DISPLAY_API_TOKEN**" => $request->bearerToken(),
+        "**PUSHER_APP_KEY**" => config("app.pusher_app_key"),
+        "**PUSHER_APP_CLUSTER**" => config("app.pusher_app_cluster"),
+      ];
 
-      return response($completeReplaced, 200)
+      $installScript = Storage::get("app-installation/install-bash-script.sh");
+      foreach ($findAndReplace as $find => $replace) {
+        $installScript = Str::replace($find, $replace, $installScript);
+      }
+
+      return response($installScript, 200)
         ->header('Content-Type', 'text/plain');
     }
 

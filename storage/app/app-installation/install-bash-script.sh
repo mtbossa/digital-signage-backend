@@ -17,9 +17,11 @@ mkdir -p ${MEDIASFOLDER} ${DATAFOLDER} ${LOGSFOLDER}
 
 env_string=$(cat << EOF
 NODE_ENV=production
-API_URL=**PLACE_API_URL**
-DISPLAY_ID=**PLACE_DISPLAY**
-DISPLAY_API_TOKEN=**PLACE_DISPLAY**
+API_URL=**API_URL**
+DISPLAY_ID=**DISPLAY_ID**
+DISPLAY_API_TOKEN=**DISPLAY_API_TOKEN**
+PUSHER_APP_KEY=**PUSHER_APP_KEY**
+PUSHER_APP_CLUSTER=**PUSHER_APP_CLUSTER**
 REPO_USER=mtbossa
 REPO_PASS=Vaw2Pmm1234
 WATCHTOWER_DEBUG=false
@@ -35,7 +37,7 @@ echo "
 Downloading docker-compose file
 "
 
-curl -H GET **PLACE_API_URL**/api/docker/installer/download -o ${INSTALLATIONFOLDER}/docker-compose.yml
+curl -H GET **API_URL**/api/docker/installer/download -o ${INSTALLATIONFOLDER}/docker-compose.yml
 
 echo "
 Creating docker startup bash script and making it run automatically

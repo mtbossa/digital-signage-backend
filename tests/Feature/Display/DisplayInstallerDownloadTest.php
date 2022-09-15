@@ -41,6 +41,8 @@ class DisplayInstallerDownloadTest extends TestCase
   {
     $display = Display::factory()->create();
     $apiUrl = config("app.url");
+    $pusherAppKey = config("app.pusher_app_key");
+    $pusherAppCluster = config("app.pusher_app_cluster");
 
     $response = $this->getJson(route('displays.installer.download', $display->id),
       ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
@@ -49,6 +51,8 @@ class DisplayInstallerDownloadTest extends TestCase
     $this->assertStringContainsString("DISPLAY_ID={$display->id}", $responseContent);
     $this->assertStringContainsString("DISPLAY_API_TOKEN={$display->plainTextToken}", $responseContent);
     $this->assertStringContainsString("API_URL={$apiUrl}", $responseContent);
+    $this->assertStringContainsString("PUSHER_APP_KEY={$pusherAppKey}", $responseContent);
+    $this->assertStringContainsString("PUSHER_APP_CLUSTER={$pusherAppCluster}", $responseContent);
     $this->assertStringContainsString("{$apiUrl}/api/docker/installer/download", $responseContent);
   }
 

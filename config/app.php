@@ -201,6 +201,8 @@ return [
   |--------------------------------------------------------------------------
   |
   */
-  'app_front_url' => env('APP_FRONT_URL')
+  'app_front_url' => env('APP_FRONT_URL'),
+  'pusher_app_key' => env('PUSHER_APP_KEY'),
+  'pusher_app_cluster' => env('PUSHER_APP_CLUSTER'),
 
 ];
