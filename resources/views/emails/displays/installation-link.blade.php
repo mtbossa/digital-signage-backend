@@ -5,8 +5,8 @@
   <br>
   <{{ $installerUrl }}>
 
-  Para instalar: digite ```curl -H "Authorization: Bearer
-  <DISPLAY_API_TOKEN>" {{ $installerUrl }}``` no terminal do Raspberry
+  Para instalar: digite ```sudo curl -H "Authorization: Bearer
+  <DISPLAY_API_TOKEN>" GET {{ $installerUrl }}``` no terminal do Raspberry
 
     Obrigado,<br>
   {{ config('app.name') }}
