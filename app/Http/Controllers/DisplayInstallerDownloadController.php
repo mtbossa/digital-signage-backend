@@ -28,6 +28,7 @@ class DisplayInstallerDownloadController extends Controller
         "**DISPLAY_API_TOKEN**" => $request->bearerToken(),
         "**PUSHER_APP_KEY**" => config("app.pusher_app_key"),
         "**PUSHER_APP_CLUSTER**" => config("app.pusher_app_cluster"),
+        "**DOCKER_TAG**" => config("app.env") === "production" ? "production" : "staging",
       ];
 
       $installScript = Storage::get("app-installation/install-bash-script.sh");

@@ -57,6 +57,62 @@ class DisplayInstallerDownloadTest extends TestCase
   }
 
   /** @test */
+  public function ensure_installer_content_has_correct_docker_tag_staging()
+  {
+    $display = Display::factory()->create();
+    config(['app.env' => 'staging']);
+    $correctDockerTag = "staging";
+
+    $response = $this->getJson(route('displays.installer.download', $display->id),
+      ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
+    $responseContent = $response->content();
+
+    $this->assertStringContainsString("docker_tag=$correctDockerTag", $responseContent);
+  }
+
+  /** @test */
+  public function ensure_installer_content_has_correct_docker_tag_development()
+  {
+    $display = Display::factory()->create();
+    config(['app.env' => 'development']);
+    $correctDockerTag = "staging";
+
+    $response = $this->getJson(route('displays.installer.download', $display->id),
+      ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
+    $responseContent = $response->content();
+
+    $this->assertStringContainsString("docker_tag=$correctDockerTag", $responseContent);
+  }
+
+  /** @test */
+  public function ensure_installer_content_has_correct_docker_tag_different_than_production()
+  {
+    $display = Display::factory()->create();
+    config(['app.env' => 'local']);
+    $correctDockerTag = "staging";
+
+    $response = $this->getJson(route('displays.installer.download', $display->id),
+      ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
+    $responseContent = $response->content();
+
+    $this->assertStringContainsString("docker_tag=$correctDockerTag", $responseContent);
+  }
+
+  /** @test */
+  public function ensure_installer_content_has_correct_docker_tag_production()
+  {
+    $display = Display::factory()->create();
+    config(['app.env' => 'production']);
+    $correctDockerTag = "production";
+
+    $response = $this->getJson(route('displays.installer.download', $display->id),
+      ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
+    $responseContent = $response->content();
+
+    $this->assertStringContainsString("docker_tag=$correctDockerTag", $responseContent);
+  }
+
+  /** @test */
   public function ensure_docker_production_download_is_correct()
   {
     config(['app.env' => 'production']);

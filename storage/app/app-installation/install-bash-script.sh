@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 
+separator="-------------------------------"
+
 echo "
+$separator
 Intus Display App installer
+$separator
 "
 
 echo "
+$separator
 Creating .env file and folders
+$separator
 "
 
 INSTALLATIONFOLDER="$HOME/intus"
@@ -34,13 +40,17 @@ EOF
 echo "$env_string" > ${INSTALLATIONFOLDER}/.env # variable inside "" so new lines are preserved
 
 echo "
+$separator
 Downloading docker-compose file
+$separator
 "
 
 curl -H GET **API_URL**/api/docker/installer/download -o ${INSTALLATIONFOLDER}/docker-compose.yml
 
 echo "
+$separator
 Creating docker startup bash script and making it run automatically
+$separator
 "
 
 app_startup_script=$(cat << EOF
@@ -60,7 +70,9 @@ run_app="@bash ${INSTALLATIONFOLDER}/intus-startup.sh"
 echo "$run_app" | sudo tee -a /etc/xdg/lxsession/LXDE-pi/autostart
 
 echo "
+$separator
 Installing unclutter
+$separator
 "
 
 sudo apt-get install unclutter
@@ -70,21 +82,32 @@ echo "$hide_mouse" | sudo tee -a /etc/xdg/lxsession/LXDE-pi/autostart
 
 # Checks if Docker is installed, and if not, installs it
 echo "
+$separator
 Checking docker installation
+$separator
 "
 
 if ! command -v docker &> /dev/null
 then
     echo "
+    $separator
     Docker not installed, installing Docker.
+    $separator
     "
     
     curl -fsSL https://get.docker.com -o get-docker.sh
     sh get-docker.sh &> /dev/null
     sudo usermod -aG docker ${USER}
 fi
-  
-docker pull mtbossa/raspberry-prod:staging
+
+# Downloads Docker App image
+echo "
+$separator
+Downloading Docker App image
+$separator
+"
+docker_tag=**DOCKER_TAG**  
+docker pull mtbossa/raspberry-prod:$docker_tag
 
 echo ""
 echo "Installation complete.  You must reboot the system"
