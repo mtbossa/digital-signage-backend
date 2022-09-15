@@ -17,9 +17,9 @@ mkdir -p ${MEDIASFOLDER} ${DATAFOLDER} ${LOGSFOLDER}
 
 env_string=$(cat << EOF
 NODE_ENV=production
-API_URL='http://192.168.0.108:80'
-DISPLAY_ID=##PLACE##
-DISPLAY_API_TOKEN=##PLACE##
+API_URL=**PLACE_API_URL**
+DISPLAY_ID=**PLACE_DISPLAY**
+DISPLAY_API_TOKEN=**PLACE_DISPLAY**
 REPO_USER=mtbossa
 REPO_PASS=Vaw2Pmm1234
 WATCHTOWER_DEBUG=false
@@ -35,7 +35,7 @@ echo ""
 echo "Downloading docker-compose file"
 echo ""
 
-curl -H GET http://192.168.0.108:80/api/docker/installer/download -o ${INSTALLATIONFOLDER}/docker-compose.yml
+curl -H GET **PLACE_API_URL**/api/docker/installer/download -o ${INSTALLATIONFOLDER}/docker-compose.yml
 
 echo ""
 echo "Creating docker startup bash script and making it run automatically"
@@ -47,16 +47,31 @@ cd $HOME/intus
 docker compose up
 EOF
 )
+  
 echo "$app_startup_script" > ${INSTALLATIONFOLDER}/intus-startup.sh
-run_app=@bash ${INSTALLATIONFOLDER}/intus-startup.sh
+sudo chmod +x ${INSTALLATIONFOLDER}/intus-startup.sh
+run_app="@bash ${INSTALLATIONFOLDER}/intus-startup.sh"
 echo $run_app >> /etc/xdg/lxsession/LXDE-pi/autostart
 
 echo ""
 echo "Making Raspberry automatically open browser on startup"
 echo ""
 
-startup=@chromium-browser --kiosk localhost:45691
-echo $startup >> /etc/xdg/lxsession/LXDE-pi/autostart
+startup="@chromium-browser --kiosk localhost:45691"
+echo "$startup" >> /etc/xdg/lxsession/LXDE-pi/autostart
+
+# Checks if Docker is installed, and if not, installs it
+echo ""
+echo "Checking docker installation"
+echo ""
+if command -v docker &> /dev/null
+then
+    echo ""
+    echo "Docker already installed, installation complete!"
+    echo ""
+
+    exit 0
+fi
 
 echo ""
 echo "Downloading Docker"
@@ -69,3 +84,5 @@ sudo usermod -aG docker ${USER}
 echo ""
 echo "Installation complete.  You must reboot the system"
 echo ""
+
+exit 0

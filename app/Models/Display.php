@@ -37,7 +37,7 @@ class Display extends Model
 
   public function generateInstallationUrl()
   {
-    $apiUrl = env('APP_URL');
+    $apiUrl = config('app.url');
     return url("{$apiUrl}/api/displays/{$this->id}/installer/download");
   }
 }

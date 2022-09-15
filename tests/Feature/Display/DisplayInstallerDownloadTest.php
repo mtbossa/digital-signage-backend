@@ -40,6 +40,7 @@ class DisplayInstallerDownloadTest extends TestCase
   public function ensure_installer_content_has_api_key_and_display_id()
   {
     $display = Display::factory()->create();
+    $apiUrl = config("app.url");
 
     $response = $this->getJson(route('displays.installer.download', $display->id),
       ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
@@ -47,6 +48,8 @@ class DisplayInstallerDownloadTest extends TestCase
 
     $this->assertStringContainsString("DISPLAY_ID={$display->id}", $responseContent);
     $this->assertStringContainsString("DISPLAY_API_TOKEN={$display->plainTextToken}", $responseContent);
+    $this->assertStringContainsString("API_URL={$apiUrl}", $responseContent);
+    $this->assertStringContainsString("{$apiUrl}/api/docker/installer/download", $responseContent);
   }
 
 
