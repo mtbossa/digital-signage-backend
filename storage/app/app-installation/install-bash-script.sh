@@ -47,17 +47,31 @@ cd $HOME/intus
 docker compose up
 EOF
 )
+  
 echo "$app_startup_script" > ${INSTALLATIONFOLDER}/intus-startup.sh
 sudo chmod +x ${INSTALLATIONFOLDER}/intus-startup.sh
-run_app=@bash ${INSTALLATIONFOLDER}/intus-startup.sh
+run_app="@bash ${INSTALLATIONFOLDER}/intus-startup.sh"
 echo $run_app >> /etc/xdg/lxsession/LXDE-pi/autostart
 
 echo ""
 echo "Making Raspberry automatically open browser on startup"
 echo ""
 
-startup=@chromium-browser --kiosk localhost:45691
-echo $startup >> /etc/xdg/lxsession/LXDE-pi/autostart
+startup="@chromium-browser --kiosk localhost:45691"
+echo "$startup" >> /etc/xdg/lxsession/LXDE-pi/autostart
+
+# Checks if Docker is installed, and if not, installs it
+echo ""
+echo "Checking docker installation"
+echo ""
+if command -v docker &> /dev/null
+then
+    echo ""
+    echo "Docker already installed, installation complete!"
+    echo ""
+
+    exit 0
+fi
 
 echo ""
 echo "Downloading Docker"
