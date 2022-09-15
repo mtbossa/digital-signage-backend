@@ -45,8 +45,12 @@ Creating docker startup bash script and making it run automatically
 
 app_startup_script=$(cat << EOF
 #!/usr/bin/env bash
+xset s noblank
+xset -dpms
+xset -s off
 cd $HOME/intus
-docker compose up
+docker compose up -d
+chromium-browser --kiosk http://localhost:45691
 EOF
 )
   
@@ -54,13 +58,6 @@ echo "$app_startup_script" > ${INSTALLATIONFOLDER}/intus-startup.sh
 sudo chmod +x ${INSTALLATIONFOLDER}/intus-startup.sh
 run_app="@bash ${INSTALLATIONFOLDER}/intus-startup.sh"
 echo "$run_app" | sudo tee -a /etc/xdg/lxsession/LXDE-pi/autostart
-
-echo "
-Making Raspberry automatically open browser on startup
-"
-
-startup="@chromium-browser --kiosk http://localhost:45691"
-echo "$startup" | sudo tee -a /etc/xdg/lxsession/LXDE-pi/autostart
 
 echo "
 Installing unclutter
