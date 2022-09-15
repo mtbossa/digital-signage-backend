@@ -57,7 +57,7 @@ echo "
 Making Raspberry automatically open browser on startup
 "
 
-startup="@chromium-browser --kiosk localhost:45691"
+startup="@chromium-browser --kiosk http://localhost:45691"
 echo "$startup" | sudo tee -a /etc/xdg/lxsession/LXDE-pi/autostart
 
 # Checks if Docker is installed, and if not, installs it
