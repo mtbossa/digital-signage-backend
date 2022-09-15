@@ -60,6 +60,15 @@ Making Raspberry automatically open browser on startup
 startup="@chromium-browser --kiosk http://localhost:45691"
 echo "$startup" | sudo tee -a /etc/xdg/lxsession/LXDE-pi/autostart
 
+echo "
+Installing unclutter
+"
+
+sudo apt-get install unclutter
+
+hide_mouse="@unclutter -idle 0"
+echo "$hide_mouse" | sudo tee -a /etc/xdg/lxsession/LXDE-pi/autostart
+
 # Checks if Docker is installed, and if not, installs it
 echo "
 Checking docker installation
