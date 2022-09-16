@@ -46,6 +46,8 @@ class PostDeleted extends Notification implements ShouldQueue
     $postAmountThatDependsOnDeletedPostMedia = $this->display->posts()->where(function (
       Builder $query
     ) {
+      $query->select(["id as post_id", "media_id"]);
+      $query->where("post_id", "<>", $this->post_id);
       $query->where('media_id', $this->media_id);
     })->count("posts.id");
 
