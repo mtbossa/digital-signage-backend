@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Str;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory
@@ -19,7 +19,6 @@ class MediaFactory extends Factory
       'mp4', 'avi'
     ]
   ];
-  private string $default_path = 'intus/caxias';
 
   /**
    * Define the model's default state.
@@ -46,7 +45,7 @@ class MediaFactory extends Factory
       'type' => $type,
       'extension' => $extension,
       'filename' => $filename,
-      'path' => "{$this->default_path}/$type/{$hashed_filename}.{$extension}",
+      'path' => "$type/{$hashed_filename}.{$extension}",
       'size_kb' => $this->faker->numberBetween($min, $max),
     ];
   }

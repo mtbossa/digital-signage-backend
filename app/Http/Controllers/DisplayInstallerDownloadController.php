@@ -31,7 +31,7 @@ class DisplayInstallerDownloadController extends Controller
         "**DOCKER_TAG**" => config("app.env") === "production" ? "production" : "staging",
       ];
 
-      $installScript = Storage::get("app-installation/install-bash-script.sh");
+      $installScript = Storage::disk("local")->get("app-installation/install-bash-script.sh");
       foreach ($findAndReplace as $find => $replace) {
         $installScript = Str::replace($find, $replace, $installScript);
       }

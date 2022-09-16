@@ -21,8 +21,8 @@ class MediaTest extends TestCase
 
     $this->_authUser();
     $this->defaultLocation = [
-      'image' => 'intus/caxias/image',
-      'video' => 'intus/caxias/video'
+      'image' => 'image',
+      'video' => 'video'
     ];
 
     $this->media = $this->_createMedia();
@@ -39,7 +39,7 @@ class MediaTest extends TestCase
     $hash_name = $file->hashName();
     $response = $this->postJson(route('medias.store'), ['description' => $description, 'file' => $file]);
 
-    Storage::disk('local')->assertExists($this->defaultLocation['image'].'/'.$response['filename']);
+    Storage::disk('s3')->assertExists($this->defaultLocation['image'].'/'.$response['filename']);
     $this->assertDatabaseHas('medias', ['id' => $response['id'], 'filename' => $hash_name]);
   }
 
@@ -55,7 +55,7 @@ class MediaTest extends TestCase
 
     $response_data = $response->json();
 
-    Storage::disk('local')->assertExists($this->defaultLocation['image'].'/'.$response_data['filename']);
+    Storage::disk('s3')->assertExists($this->defaultLocation['image'].'/'.$response_data['filename']);
 
     $this->assertDatabaseHas('medias', $response_data);
 
@@ -76,7 +76,7 @@ class MediaTest extends TestCase
 
     $response_data = $response->json();
 
-    Storage::disk('local')->assertExists($this->defaultLocation['video'].'/'.$response_data['filename']);
+    Storage::disk('s3')->assertExists($this->defaultLocation['video'].'/'.$response_data['filename']);
 
     $this->assertDatabaseHas('medias', $response_data);
 

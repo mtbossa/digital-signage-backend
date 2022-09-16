@@ -16,6 +16,6 @@ class DockerInstallerDownloadController extends Controller
       $appEnv = "development";
     }
 
-    return Storage::download("app-installation/docker-compose-$appEnv.yml");
+    return Storage::disk("local")->download("app-installation/docker-compose-$appEnv.yml");
   }
 }
