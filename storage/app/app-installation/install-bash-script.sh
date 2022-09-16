@@ -96,9 +96,10 @@ then
     "
     docker_access_token=**DOCKER_ACCESS_TOKEN**
     
+    sudo groupadd docker
+    sudo usermod -aG docker ${USER}
     curl -fsSL https://get.docker.com -o get-docker.sh
     sh get-docker.sh &> /dev/null
-    sudo usermod -aG docker ${USER}
     
     echo "$docker_access_token" | docker login -u mtbossa --password-stdin
 fi
