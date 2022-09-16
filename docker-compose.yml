@@ -49,6 +49,19 @@ services:
             - '${FORWARD_MAILHOG_DASHBOARD_PORT:-8025}:8025'
         networks:
             - sail
+    minio:
+        image: 'minio/minio:latest'
+        ports:
+            - '9002:9000'
+            - '9004:9004'
+        volumes:
+            - ./storage/minio:/data
+        environment:
+            MINIO_ACCESS_KEY: "minio"
+            MINIO_SECRET_KEY: "minio123"
+        command: server --address 0.0.0.0:9000 /data --console-address ":9004"
+        networks:
+            - sail
 networks:
     sail:
         driver: bridge
