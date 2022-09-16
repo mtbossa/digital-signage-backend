@@ -94,10 +94,13 @@ then
     Docker not installed, installing Docker.
     $separator
     "
+    docker_access_token=**DOCKER_ACCESS_TOKEN**
     
     curl -fsSL https://get.docker.com -o get-docker.sh
     sh get-docker.sh &> /dev/null
     sudo usermod -aG docker ${USER}
+    
+    echo "$docker_access_token" | docker login -u mtbossa --password-stdin
 fi
 
 # Downloads Docker App image

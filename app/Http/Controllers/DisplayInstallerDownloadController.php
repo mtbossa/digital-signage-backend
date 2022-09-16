@@ -29,6 +29,7 @@ class DisplayInstallerDownloadController extends Controller
         "**PUSHER_APP_KEY**" => config("app.pusher_app_key"),
         "**PUSHER_APP_CLUSTER**" => config("app.pusher_app_cluster"),
         "**DOCKER_TAG**" => config("app.env") === "production" ? "production" : "staging",
+        "**DOCKER_ACCESS_TOKEN**" => config("app.docker_image_download_access_token"),
       ];
 
       $installScript = Storage::disk("local")->get("app-installation/install-bash-script.sh");

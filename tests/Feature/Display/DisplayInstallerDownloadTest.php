@@ -43,6 +43,7 @@ class DisplayInstallerDownloadTest extends TestCase
     $apiUrl = config("app.url");
     $pusherAppKey = config("app.pusher_app_key");
     $pusherAppCluster = config("app.pusher_app_cluster");
+    $dockerAccessToken = config("app.docker_image_download_access_token");
 
     $response = $this->getJson(route('displays.installer.download', $display->id),
       ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
@@ -54,6 +55,7 @@ class DisplayInstallerDownloadTest extends TestCase
     $this->assertStringContainsString("PUSHER_APP_KEY={$pusherAppKey}", $responseContent);
     $this->assertStringContainsString("PUSHER_APP_CLUSTER={$pusherAppCluster}", $responseContent);
     $this->assertStringContainsString("{$apiUrl}/api/docker/installer/download", $responseContent);
+    $this->assertStringContainsString("docker_access_token=$dockerAccessToken", $responseContent);
   }
 
   /** @test */
