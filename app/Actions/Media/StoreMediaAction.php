@@ -48,6 +48,6 @@ class StoreMediaAction
   private function _storeFile(array $file_info): string
   {
     $type = $file_info['type'];
-    return Storage::putFileAs($type, $this->file, $file_info['filename']);
+    return Storage::putFileAs("medias/$type", $this->file, $file_info['filename']);
   }
 }

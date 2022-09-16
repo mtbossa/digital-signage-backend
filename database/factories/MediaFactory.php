@@ -45,7 +45,7 @@ class MediaFactory extends Factory
       'type' => $type,
       'extension' => $extension,
       'filename' => $filename,
-      'path' => "$type/{$hashed_filename}.{$extension}",
+      'path' => "medias/$type/{$hashed_filename}.{$extension}",
       'size_kb' => $this->faker->numberBetween($min, $max),
     ];
   }
