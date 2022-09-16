@@ -1,13 +1,14 @@
 @component('mail::message')
-  # Link para download do instalador
+  # Link para instalação
 
   Esse é o link para download do instalador da aplicação:
   <br>
   <{{ $installerUrl }}>
 
-  Para instalar: digite ```sudo curl -H "Authorization: Bearer
-  <DISPLAY_API_TOKEN>" GET {{ $installerUrl }}``` no terminal do Raspberry
+  Para instalar: digite <br>
+  **`sudo curl -H "Authorization: Bearer
+  <DISPLAY_API_TOKEN>" {{ $installerUrl }} | bash`** <br>
+    no terminal do Raspberry
 
-    Obrigado,<br>
   {{ config('app.name') }}
 @endcomponent
