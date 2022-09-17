@@ -96,7 +96,8 @@ class InvitationTest extends TestCase
   {
     $this->_createWithTokenInvitation(['inviter' => $this->user->id, 'is_admin' => false]);
 
-    $this->getJson(route('invitations.index'))->assertOk()->assertJsonCount(2)->assertJsonFragment($this->invitation->toArray());
+    $this->getJson(route('invitations.index'))->assertOk()->assertJsonCount(2,
+      'data')->assertJsonFragment($this->invitation->toArray());
   }
 
   /** @test */

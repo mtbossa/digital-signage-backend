@@ -8,16 +8,16 @@ use App\Http\Requests\Invitation\StoreInvitationRequest;
 use App\Models\Invitation;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class InvitationController extends Controller
 {
 
-  public function index(): Collection
+  public function index(Request $request): LengthAwarePaginator
   {
-    return Invitation::all();
+    return Invitation::query()->paginate($request->size);
   }
 
   public function store(StoreInvitationRequest $request, StoreInvitationAction $action): Invitation
