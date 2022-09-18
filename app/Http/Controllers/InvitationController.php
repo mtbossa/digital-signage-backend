@@ -44,7 +44,9 @@ class InvitationController extends Controller
       ->whereNull('registered_at')
       ->firstOrFail();
     $user = $action->create([
-      ...$request->all(), 'email' => $invitation->email, 'store_id' => $invitation->store_id,
+      "name" => $request->name, "password" => $request->password,
+      "password_confirmation" => $request->password_confirmation, 'email' => $invitation->email,
+      'store_id' => $invitation->store_id,
       'is_admin' => $invitation->is_admin
     ]);
     $invitation->registered_at = Carbon::now()->format('Y-m-d H:i:s');
