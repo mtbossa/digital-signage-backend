@@ -3,10 +3,13 @@
 namespace Tests\Feature\User\Invitation;
 
 use App\Mail\UserInvitation;
+use App\Models\Invitation;
 use App\Models\Store;
 use Carbon\Carbon;
+use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\Feature\User\Invitation\Traits\InvitationTestsTrait;
@@ -106,6 +109,30 @@ class InvitationTest extends TestCase
     $response = $this->deleteJson(route('invitations.destroy', $this->invitation->id));
     $this->assertDatabaseMissing('invitations', ['id' => $this->invitation->id]);
     $response->assertOk();
+  }
+
+  /** @test */
+  public function ensure_delete_expired_invitations_is_running_every_five_minutes()
+  {
+    Event::fake();
+    $this->travelTo(now()->startOfDay());
+    $this->travelTo(now()->addMinutes(5));
+    $this->artisan('schedule:run');
+
+    Event::assertDispatched(ScheduledTaskFinished::class);
+  }
+
+  /** @test */
+  public function ensure_delete_expired_invitations_is_deleting_all_invitations_created_on_the_day_before()
+  {
+    $this->travelTo(now()->startOfDay());
+    $shouldDeleteInvitation = Invitation::factory()->withToken()->create(["inviter" => $this->user->id]);
+    $this->travelTo(now()->addDay()->addMinutes(5));
+    $notDeletedInvitation = Invitation::factory()->withToken()->create(["inviter" => $this->user->id]);
+    $this->artisan('schedule:run');
+
+    $this->assertDatabaseMissing("invitations", ["id" => $shouldDeleteInvitation->id]);
+    $this->assertDatabaseHas("invitations", ["id" => $notDeletedInvitation->id]);
   }
 
 }
