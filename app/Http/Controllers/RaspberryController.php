@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Raspberry\StoreRaspberryRequest;
+use App\Http\Requests\Raspberry\UpdateRaspberryRequest;
 use App\Models\Display;
 use App\Models\Raspberry;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Request;
 
 class RaspberryController extends Controller
 {
@@ -18,7 +18,7 @@ class RaspberryController extends Controller
 
   public function store(StoreRaspberryRequest $request): Raspberry
   {
-    $raspberry = Raspberry::create($request->except(['display_id']));
+    $raspberry = Raspberry::create($request->safe()->except(['display_id']));
     if ($request->display_id) {
       $display = Display::findOrFail($request->display_id);
       $raspberry->display()->associate($display)->save();
@@ -32,9 +32,9 @@ class RaspberryController extends Controller
     return $raspberry;
   }
 
-  public function update(Request $request, Raspberry $raspberry): Raspberry
+  public function update(UpdateRaspberryRequest $request, Raspberry $raspberry): Raspberry
   {
-    $raspberry->update($request->all());
+    $raspberry->update($request->validated());
 
     if ($request->display_id) {
       $display = Display::findOrFail($request->display_id);
