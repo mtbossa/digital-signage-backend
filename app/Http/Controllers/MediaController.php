@@ -7,7 +7,6 @@ use App\Http\Requests\Media\UpdateMediaRequest;
 use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Storage;
 
 class MediaController extends Controller
 {
@@ -38,7 +37,6 @@ class MediaController extends Controller
 
   public function destroy(Media $media)
   {
-    Storage::delete($media->path);
     return $media->delete();
   }
 }
