@@ -72,6 +72,8 @@ class PostController extends Controller
 
   public function destroy(Post $post)
   {
+    $post->load("displays");
+
     foreach ($post->displays as $display) {
       $notification = new PostDeleted($display, $post->id, $post->media->id);
 
