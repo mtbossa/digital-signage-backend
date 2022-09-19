@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Recurrence\StoreRecurrenceRequest;
 use App\Http\Requests\Recurrence\UpdateRecurrenceRequest;
 use App\Models\Recurrence;
+use App\Notifications\DisplayPost\PostDeleted;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class RecurrenceController extends Controller
 {
@@ -30,8 +32,25 @@ class RecurrenceController extends Controller
     return $recurrence;
   }
 
-  public function destroy(Recurrence $recurrence): bool
+  public function destroy(Recurrence $recurrence)
   {
-    return $recurrence->delete();
+    $recurrence->load("posts.displays");
+
+    DB::transaction(function () use ($recurrence) {
+      $posts = $recurrence->posts;
+
+      foreach ($posts as $post) {
+        foreach ($post->displays as $display) {
+          $notification = new PostDeleted($display, $post->id, $post->media->id);
+
+          $display->notify($notification);
+        }
+      }
+
+      $recurrence->delete();
+    });
+
+
+    return response("", 200);
   }
 }
