@@ -25,6 +25,8 @@ services:
             - sail
         depends_on:
             - pgsql
+            - mailhog
+            - minio
     pgsql:
         image: 'postgres:13'
         ports:
