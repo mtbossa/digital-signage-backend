@@ -39,6 +39,10 @@ class InvitationController extends Controller
 
   public function update(Request $request, string $token, CreateNewUser $action): User
   {
+    if (Auth::user()) {
+      abort(404);
+    }
+    
     $invitation = Invitation::query()
       ->where('token', $token)
       ->whereNull('registered_at')
