@@ -19,6 +19,6 @@ class Invitation extends Model
   public function generateFrontendInvitationUrl()
   {
     $front_url = config('app.app_front_url');
-    return url("{$front_url}/invitations/{$this->token}/accept");
+    return url("{$front_url}/convites/{$this->token}/aceitar");
   }
 }
