@@ -17,7 +17,6 @@ class Recurrence extends Model
             'isoweekday',
             'day',
             'month',
-            'year',
         ];
 
     public static function getOnlyNotNullRecurrenceValues(Recurrence $recurrence
