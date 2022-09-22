@@ -10,6 +10,7 @@ use App\Http\Controllers\MediaDownloadController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostDisplayOptions;
 use App\Http\Controllers\PostMediaOptions;
+use App\Http\Controllers\PostRecurrenceOptions;
 use App\Http\Controllers\RaspberryController;
 use App\Http\Controllers\RecurrenceController;
 use App\Http\Controllers\StoreController;
@@ -62,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
   Route::get('posts/medias/options', PostMediaOptions::class)->name("post.media.options");
   Route::get('posts/displays/options', PostDisplayOptions::class)->name("post.display.options");
+  Route::get('posts/recurrences/options', PostRecurrenceOptions::class)->name("post.recurrence.options");
 
   Route::apiResource('invitations', InvitationController::class,
     ['except' => ['update', 'show']]);
