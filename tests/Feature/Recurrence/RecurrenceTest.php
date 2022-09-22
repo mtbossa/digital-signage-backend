@@ -73,6 +73,7 @@ class RecurrenceTest extends TestCase
   {
     $this->_createRecurrence();
 
-    $this->getJson(route('recurrences.index'))->assertOk()->assertJsonCount(2)->assertJsonFragment($this->recurrence->toArray());
+    $this->getJson(route('recurrences.index'))->assertOk()->assertJsonCount(2,
+      "data")->assertJsonFragment($this->recurrence->toArray());
   }
 }
