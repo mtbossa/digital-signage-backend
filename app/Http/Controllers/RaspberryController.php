@@ -6,14 +6,15 @@ use App\Http\Requests\Raspberry\StoreRaspberryRequest;
 use App\Http\Requests\Raspberry\UpdateRaspberryRequest;
 use App\Models\Display;
 use App\Models\Raspberry;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class RaspberryController extends Controller
 {
 
-  public function index(): Collection
+  public function index(Request $request): LengthAwarePaginator
   {
-    return Raspberry::all();
+    return Raspberry::query()->paginate($request->size);
   }
 
   public function store(StoreRaspberryRequest $request): Raspberry
