@@ -24,10 +24,21 @@
 
 ### Install script
 
-`sudo curl -H "Authorization: Bearer <DISPLAY_API_TOKEN>" GET http://192.168.0.108:80/api/displays/<DISPLAY_ID>/installer/download | bash`
+`curl -H "Authorization: Bearer <DISPLAY_API_TOKEN>" <API_URL>/api/displays/<DISPLAY_ID>/installer/download | sudo bash`
+
+---
+
+### Post Max Size - Upload Max Size
+
+* Must set `post_max_size = 150M` and `upload_max_filesize = 150M`
+* Development:
+  * If we don't [publish sail files](https://laravel.com/docs/9.x/sail#sail-customization), we'll need to change the
+    php.ini
+    configuration file inside `vendor/laravel/sail/runtimes/RUNTIME_VERSION/php.ini`
 
 ---
 
 ## ER
 
 <a href="https://i.ibb.co/Bw4t2p7/intus-er.jpg" target="_blank"><img width="70%" src="https://i.ibb.co/Bw4t2p7/intus-er.jpg"></a>
+
