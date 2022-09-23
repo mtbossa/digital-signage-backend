@@ -34,7 +34,8 @@
 * Development:
   * If we don't [publish sail files](https://laravel.com/docs/9.x/sail#sail-customization), we'll need to change the
     php.ini
-    configuration file inside `vendor/laravel/sail/runtimes/RUNTIME_VERSION/php.ini`
+    configuration file inside `vendor/laravel/sail/runtimes/RUNTIME_VERSION/php.ini` everytime we build the sail
+    container `sail build --no-cache`.
 
 ---
 
