@@ -15,10 +15,9 @@ class StoreRecurrenceRequest extends FormRequest
   {
     return [
       'description' => ['required', 'string', 'max:50'],
-      'isoweekday' => ['nullable', 'numeric', 'between:1,7', 'required_without_all:day,month,year'],
-      'day' => ['nullable', 'numeric', 'between:1,31', 'required_without_all:isoweekday,month,year'],
-      'month' => ['nullable', 'numeric', 'between:1,12', 'required_without_all:isoweekday,day,year'],
-      'year' => ['nullable', 'numeric', 'between:2000,2500', 'required_without_all:isoweekday,day,month'],
+      'isoweekday' => ['nullable', 'numeric', 'between:1,7'],
+      'day' => ['nullable', 'numeric', 'between:1,31'],
+      'month' => ['nullable', 'numeric', 'between:1,12'],
     ];
   }
 }

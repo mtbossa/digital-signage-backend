@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Events\DisplayPost\DisplayPostCreated;
 use App\Events\DisplayPost\DisplayPostDeleted;
 use App\Listeners\DisplayPost\BroadcastToDisplay;
+use App\Models\Media;
+use App\Observers\MediaObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -28,6 +30,15 @@ class EventServiceProvider extends ServiceProvider
         BroadcastToDisplay::class,
       ],
     ];
+
+  /**
+   * The model observers for your application.
+   *
+   * @var array
+   */
+  protected $observers = [
+    Media::class => [MediaObserver::class],
+  ];
 
   /**
    * Register any events for your application.

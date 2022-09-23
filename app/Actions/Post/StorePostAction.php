@@ -3,21 +3,21 @@
 namespace App\Actions\Post;
 
 use App\Events\DisplayPost\DisplayPostCreated;
+use App\Http\Requests\Post\StorePostRequest;
 use App\Jobs\ExpirePost;
 use App\Models\Display;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\Recurrence;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 
 class StorePostAction
 {
   public function handle(
-    Request $request,
+    StorePostRequest $request,
   ): Post {
     $media = Media::findOrFail($request->media_id);
-    $post = $media->posts()->create($request->except(['media_id']));
+    $post = $media->posts()->create($request->safe()->except(['media_id']));
 
     if ($request->has('recurrence_id')) {
       $recurrence = Recurrence::findOrFail($request->recurrence_id);

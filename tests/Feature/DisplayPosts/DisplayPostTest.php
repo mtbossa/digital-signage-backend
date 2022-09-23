@@ -137,7 +137,6 @@ class DisplayPostTest extends TestCase
                     'isoweekday' => $post->recurrence->isoweekday,
                     'day'        => $post->recurrence->day,
                     'month'      => $post->recurrence->month,
-                    'year'       => $post->recurrence->year
                 ];
             }
 

@@ -65,7 +65,7 @@ class RaspberryRelationshipsTest extends TestCase
     $last_display = Display::all()->last();
 
     $response = $this->putJson(route('raspberries.update', $this->raspberry->id),
-      ['display_id' => $last_display->id]);
+      [...$this->raspberry->toArray(), 'display_id' => $last_display->id]);
 
     $this->assertDatabaseHas('raspberries', ['id' => $this->raspberry->id, 'display_id' => $last_display->id]);
 
@@ -78,7 +78,8 @@ class RaspberryRelationshipsTest extends TestCase
     Display::factory()->create();
     $this->raspberry = $this->_createRaspberry(['display_id' => Display::first()->id]);
 
-    $response = $this->putJson(route('raspberries.update', $this->raspberry->id), ['display_id' => null]);
+    $response = $this->putJson(route('raspberries.update', $this->raspberry->id),
+      [...$this->raspberry->toArray(), 'display_id' => null]);
 
     $this->assertDatabaseHas('raspberries', ['id' => $this->raspberry->id, 'display_id' => null]);
 

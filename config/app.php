@@ -205,5 +205,6 @@ return [
   'pusher_app_key' => env('PUSHER_APP_KEY'),
   'pusher_app_cluster' => env('PUSHER_APP_CLUSTER'),
   'docker_image_download_access_token' => env('DOCKER_IMAGE_DOWNLOAD_ACCESS_TOKEN'),
+  'docker_image' => env('DOCKER_IMAGE'),
 
 ];

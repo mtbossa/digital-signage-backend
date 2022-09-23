@@ -25,6 +25,8 @@ services:
             - sail
         depends_on:
             - pgsql
+            - mailhog
+            - minio
     pgsql:
         image: 'postgres:13'
         ports:
@@ -57,8 +59,8 @@ services:
         volumes:
             - ./storage/minio:/data
         environment:
-            MINIO_ACCESS_KEY: "minio"
-            MINIO_SECRET_KEY: "minio123"
+            MINIO_ROOT_USER: "minio"
+            MINIO_ROOT_PASSWORD: "minio123"
         command: server --address 0.0.0.0:9000 /data --console-address ":9004"
         networks:
             - sail

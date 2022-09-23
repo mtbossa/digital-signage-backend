@@ -121,6 +121,18 @@ class MediaTest extends TestCase
   }
 
   /** @test */
+  public function media_file_must_be_deleted_when_media_is_deleted()
+  {
+    Storage::fake();
+    Storage::putFileAs($this->defaultLocation[$this->media->type], UploadedFile::fake()->image($this->media->filename),
+      $this->media->filename);
+    Storage::assertExists($this->media->path);
+    $this->deleteJson(route('medias.destroy', $this->media->id))->assertOk();
+
+    Storage::assertMissing($this->media->path);
+  }
+
+  /** @test */
   public function fetch_single_media()
   {
     $this->getJson(route('medias.show',

@@ -41,7 +41,6 @@ class RecurrenceValidationTest extends TestCase
       'description greater than 50 char' => [[...$recurrence_data, 'description' => Str::random(51)], ['description']],
       'description as null' => [[...$recurrence_data, 'description' => null], ['description']],
       'description as empty string' => [[...$recurrence_data, 'description' => ''], ['description']],
-      'all dates null' => [[...$recurrence_data, 'isoweekday' => null, 'day' => null, 'month' => null, 'year' => null], ['isoweekday', 'day', 'month', 'year']],
       'isoweekday less than 1' => [[...$recurrence_data, 'isoweekday' => 0], ['isoweekday']],
       'isoweekday greather than 7' => [[...$recurrence_data, 'isoweekday' => 8], ['isoweekday']],
       'isoweekday as string' => [[...$recurrence_data, 'isoweekday' => 'a'], ['isoweekday']],
@@ -51,9 +50,6 @@ class RecurrenceValidationTest extends TestCase
       'month as less than 1' => [[...$recurrence_data, 'month' => 0], ['month']],
       'month greather than 12' => [[...$recurrence_data, 'month' => 13], ['month']],
       'month as string' => [[...$recurrence_data, 'month' => 'a'], ['month']],
-      'year less than 2000' => [[...$recurrence_data, 'year' => 1999], ['year']],
-      'year greater than 2500' => [[...$recurrence_data, 'year' => 2501], ['year']],
-      'year as string' => [[...$recurrence_data, 'year' => 'a'], ['year']],
     ];
   }
 

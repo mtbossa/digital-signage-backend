@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Actions\Media\StoreMediaAction;
 use App\Http\Requests\Media\UpdateMediaRequest;
 use App\Models\Media;
+use App\Notifications\DisplayPost\PostDeleted;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class MediaController extends Controller
 {
@@ -35,13 +37,25 @@ class MediaController extends Controller
     return $media;
   }
 
-  /**
-   * Remove the specified resource from storage.
-   *
-   * @return bool
-   */
   public function destroy(Media $media)
   {
-    return $media->delete();
+    $media->load("posts.displays");
+
+    DB::transaction(function () use ($media) {
+      $posts = $media->posts;
+
+      foreach ($posts as $post) {
+        foreach ($post->displays as $display) {
+          $notification = new PostDeleted($display, $post->id, $post->media->id);
+
+          $display->notify($notification);
+        }
+      }
+
+      $media->delete();
+    });
+
+
+    return response("", 200);
   }
 }

@@ -22,14 +22,18 @@ class DisplayInstallerDownloadController extends Controller
         return response()->json(['message' => 'Not Found!'], 404);
       }
 
+      $dockerTag = config("app.env") === "production" ? "production" : "staging";
+      $dockerImage = config("app.docker_image");
+      $dockerCompleteImage = "$dockerImage:$dockerTag";
+
       $findAndReplace = [
         "**API_URL**" => config("app.url"),
         "**DISPLAY_ID**" => $display->id,
         "**DISPLAY_API_TOKEN**" => $request->bearerToken(),
         "**PUSHER_APP_KEY**" => config("app.pusher_app_key"),
         "**PUSHER_APP_CLUSTER**" => config("app.pusher_app_cluster"),
-        "**DOCKER_TAG**" => config("app.env") === "production" ? "production" : "staging",
         "**DOCKER_ACCESS_TOKEN**" => config("app.docker_image_download_access_token"),
+        "**DOCKER_COMPLETE_IMAGE**" => $dockerCompleteImage,
       ];
 
       $installScript = Storage::disk("local")->get("app-installation/install-bash-script.sh");

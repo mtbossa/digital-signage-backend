@@ -59,6 +59,7 @@ xset s noblank
 xset -dpms
 xset -s off
 cd $HOME/intus
+docker pull **DOCKER_COMPLETE_IMAGE**
 docker compose up -d
 chromium-browser --kiosk http://localhost:45691
 EOF
@@ -96,9 +97,10 @@ then
     "
     docker_access_token=**DOCKER_ACCESS_TOKEN**
     
+    sudo groupadd docker
+    sudo usermod -aG docker ${USER}
     curl -fsSL https://get.docker.com -o get-docker.sh
     sh get-docker.sh &> /dev/null
-    sudo usermod -aG docker ${USER}
     
     echo "$docker_access_token" | docker login -u mtbossa --password-stdin
 fi
@@ -109,11 +111,14 @@ $separator
 Downloading Docker App image
 $separator
 "
-docker_tag=**DOCKER_TAG**  
-docker pull mtbossa/raspberry-prod:$docker_tag
+
+docker pull **DOCKER_COMPLETE_IMAGE**
 
 echo ""
-echo "Installation complete.  You must reboot the system"
+echo "Installation complete.  Rebooting in 10 seconds"
 echo ""
+
+sleep 10
+sudo reboot now
 
 exit 0
