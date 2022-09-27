@@ -41,10 +41,7 @@ class DisplayInstallerDownloadTest extends TestCase
   {
     $display = Display::factory()->create();
     $apiUrl = config("app.url");
-    $pusherAppKey = config("app.pusher_app_key");
-    $pusherAppCluster = config("app.pusher_app_cluster");
-    $dockerAccessToken = config("app.docker_image_download_access_token");
-    $dockerImage = config("app.docker_image");
+    $githubRepoUrl = config("app.app_github_repo_url");
 
     $response = $this->getJson(route('displays.installer.download', $display->id),
       ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
@@ -52,74 +49,8 @@ class DisplayInstallerDownloadTest extends TestCase
 
     $this->assertStringContainsString("DISPLAY_ID={$display->id}", $responseContent);
     $this->assertStringContainsString("DISPLAY_API_TOKEN={$display->plainTextToken}", $responseContent);
-    $this->assertStringContainsString("{$apiUrl}/api/docker/installer/download", $responseContent);
-    $this->assertStringContainsString("docker_access_token=$dockerAccessToken", $responseContent);
-  }
-
-  /** @test */
-  public function ensure_installer_content_has_correct_docker_tag_staging()
-  {
-    $display = Display::factory()->create();
-    $dockerImage = config("app.docker_image");
-    config(['app.env' => 'staging']);
-    $correctDockerTag = "staging";
-
-    $response = $this->getJson(route('displays.installer.download', $display->id),
-      ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
-    $responseContent = $response->content();
-
-    $this->assertStringContainsString("docker pull $dockerImage:$correctDockerTag", $responseContent);
-  }
-
-  /** @test */
-  public function ensure_installer_content_has_correct_DOCKER_TAG_development()
-  {
-    $display = Display::factory()->create();
-    $dockerImage = config("app.docker_image");
-
-    config(['app.env' => 'development']);
-    $correctDockerTag = "staging";
-
-    $response = $this->getJson(route('displays.installer.download', $display->id),
-      ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
-    $responseContent = $response->content();
-
-    $this->assertStringContainsString("docker pull $dockerImage:$correctDockerTag", $responseContent);
-
-  }
-
-  /** @test */
-  public function ensure_installer_content_has_correct_DOCKER_TAG_different_than_production()
-  {
-    $display = Display::factory()->create();
-    $dockerImage = config("app.docker_image");
-
-    config(['app.env' => 'local']);
-    $correctDockerTag = "staging";
-
-    $response = $this->getJson(route('displays.installer.download', $display->id),
-      ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
-    $responseContent = $response->content();
-
-    $this->assertStringContainsString("docker pull $dockerImage:$correctDockerTag", $responseContent);
-
-  }
-
-  /** @test */
-  public function ensure_installer_content_has_correct_DOCKER_TAG_production()
-  {
-    $display = Display::factory()->create();
-    $dockerImage = config("app.docker_image");
-
-    config(['app.env' => 'production']);
-    $correctDockerTag = "latest";
-
-    $response = $this->getJson(route('displays.installer.download', $display->id),
-      ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
-    $responseContent = $response->content();
-
-    $this->assertStringContainsString("docker pull $dockerImage:$correctDockerTag", $responseContent);
-
+    $this->assertStringContainsString("DISPLAY_API_TOKEN={$display->plainTextToken}", $responseContent);
+    $this->assertStringContainsString("APP_GITHUB_REPO_URL={$githubRepoUrl}", $responseContent);
   }
 
   /** @test */

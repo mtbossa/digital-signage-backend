@@ -204,7 +204,6 @@ return [
   'app_front_url' => env('APP_FRONT_URL'),
   'pusher_app_key' => env('PUSHER_APP_KEY'),
   'pusher_app_cluster' => env('PUSHER_APP_CLUSTER'),
-  'docker_image_download_access_token' => env('DOCKER_IMAGE_DOWNLOAD_ACCESS_TOKEN'),
-  'docker_image' => env('DOCKER_IMAGE'),
+  'app_github_repo_url' => env('APP_GITHUB_REPO_URL'),
 
 ];

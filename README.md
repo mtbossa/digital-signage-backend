@@ -24,7 +24,7 @@
 
 ### Install script
 
-`curl -H "Authorization: Bearer <DISPLAY_API_TOKEN>" <API_URL>/api/displays/<DISPLAY_ID>/installer/download | sudo bash`
+`sudo curl -H "Authorization: Bearer <DISPLAY_API_TOKEN>" <API_URL>/api/displays/<DISPLAY_ID>/installer/download | bash`
 
 ---
 
