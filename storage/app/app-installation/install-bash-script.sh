@@ -24,9 +24,15 @@ echo "
 app_startup_script=$(cat << EOF
 #!/usr/bin/env bash
 cd ${INSTALLATION_FOLDER}/intus
+
 git pull origin ${NODE_ENV}
-NODE_ENV=${NODE_ENV} DISPLAY_ID=${DISPLAY_ID} DISPLAY_API_TOKEN="${DISPLAY_API_TOKEN}" ./intus-raspberry &
-chromium-browser --kiosk http://localhost:45691
+
+if [ $? -eq 0 ]
+then
+  NODE_ENV=${NODE_ENV} DISPLAY_ID=${DISPLAY_ID} DISPLAY_API_TOKEN="${DISPLAY_API_TOKEN}" ./intus-raspberry > debug.log 2>&1 &
+else
+  NODE_ENV=${NODE_ENV} DISPLAY_ID=${DISPLAY_ID} DISPLAY_API_TOKEN="${DISPLAY_API_TOKEN}" ./intus-raspberry > debug.log 2>&1 &
+fi
 EOF
 )
   
@@ -40,12 +46,10 @@ echo "
 run_app="@bash ${INSTALLATION_FOLDER}/intus-startup.sh"
 echo "$run_app" | sudo tee -a /etc/xdg/lxsession/LXDE-pi/autostart
 
-#start_browser="@bash chromium-browser --kiosk http://localhost:45691"
-#echo "$start_browser" | sudo tee -a /etc/xdg/lxsession/LXDE-pi/autostart
-
 echo "
 - Adding unclutter config to autostart
 "
+# Makes mouse hidden by default
 sudo apt install unclutter -y
 hide_mouse="@unclutter -idle 0"
 echo "$hide_mouse" | sudo tee -a /etc/xdg/lxsession/LXDE-pi/autostart
@@ -58,7 +62,7 @@ echo "
 sudo sed -i 's/#xserver-command=X/xserver-command=X -s 0 -dpms/' /etc/lightdm/lightdm.conf
 
 echo "
-- Installation complete.  Rebooting in 10 seconds
+- Installation complete.  Rebooting in 10 seconds...
 "
 
 sleep 10
