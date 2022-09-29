@@ -1,7 +1,13 @@
 ### Setting Laravel Sanctum:
+
 * Must set .env variables to the frontend domain with port, for example, for local Angular applications:
   * `SANCTUM_STATEFUL_DOMAINS=localhost:4200`
   * `SESSION_DOMAIN=localhost`
+
+In production, eg.:
+
+* `SANCTUM_STATEFUL_DOMAINS=*.revendahost.inf.br`
+* `SESSION_DOMAIN=.revendahost.inf.br`
 
 ---
 
@@ -24,7 +30,7 @@
 
 ### Install script
 
-`curl -H "Authorization: Bearer <DISPLAY_API_TOKEN>" <API_URL>/api/displays/<DISPLAY_ID>/installer/download | sudo bash`
+`sudo curl -H "Authorization: Bearer <DISPLAY_API_TOKEN>" <API_URL>/api/displays/<DISPLAY_ID>/installer/download | bash`
 
 ---
 

@@ -23,17 +23,13 @@ class DisplayInstallerDownloadController extends Controller
       }
 
       $nodeEnv = config("app.env") === "production" ? "production" : "staging";
-      $dockerTag = config("app.env") === "production" ? "latest" : "staging";
-      $dockerImage = config("app.docker_image");
-      $dockerCompleteImage = "$dockerImage:$dockerTag";
 
       $findAndReplace = [
         "**API_URL**" => config("app.url"),
         "**NODE_ENV**" => $nodeEnv,
         "**DISPLAY_ID**" => $display->id,
         "**DISPLAY_API_TOKEN**" => $request->bearerToken(),
-        "**DOCKER_ACCESS_TOKEN**" => config("app.docker_image_download_access_token"),
-        "**DOCKER_COMPLETE_IMAGE**" => $dockerCompleteImage,
+        "**APP_GITHUB_REPO_URL**" => config("app.app_github_repo_url"),
       ];
 
       $installScript = Storage::disk("local")->get("app-installation/install-bash-script.sh");
