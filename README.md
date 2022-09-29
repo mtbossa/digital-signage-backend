@@ -1,7 +1,13 @@
 ### Setting Laravel Sanctum:
+
 * Must set .env variables to the frontend domain with port, for example, for local Angular applications:
   * `SANCTUM_STATEFUL_DOMAINS=localhost:4200`
   * `SESSION_DOMAIN=localhost`
+
+In production, eg.:
+
+* `SANCTUM_STATEFUL_DOMAINS=*.revendahost.inf.br`
+* `SESSION_DOMAIN=.revendahost.inf.br`
 
 ---
 
