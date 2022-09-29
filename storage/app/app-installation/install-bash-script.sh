@@ -26,7 +26,7 @@ app_startup_script=$(cat << EOF
 #!/usr/bin/env bash
 cd ${INSTALLATION_FOLDER}/intus
 
-git pull origin ${NODE_ENV}
+git stash && git pull origin ${NODE_ENV} && sudo chmod +x ./intus-raspberry
 
 if [ $? -eq 0 ]
 then
