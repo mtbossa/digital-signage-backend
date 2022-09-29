@@ -43,8 +43,14 @@ echo "
 - Making startup script run on start
 "
 
-run_app="@bash ${INSTALLATION_FOLDER}/intus-startup.sh"
-echo "$run_app" | sudo tee -a /etc/xdg/lxsession/LXDE-pi/autostart
+run_app=$(cat << EOF
+[Desktop Entry]
+Name=Intus Application
+Exec=/usr/bin/bash $INSTALLATION_FOLDER/intus-startup.sh
+EOF
+)
+sudo touch /etc/xdg/autostart/intus.desktop
+echo "$run_app" | sudo tee -a /etc/xdg/autostart/intus.desktop
 
 echo "
 - Adding unclutter config to autostart
@@ -53,7 +59,6 @@ echo "
 sudo apt install unclutter -y
 hide_mouse="@unclutter -idle 0"
 echo "$hide_mouse" | sudo tee -a /etc/xdg/lxsession/LXDE-pi/autostart
-
 
 echo "
 - Making Raspberry not sleep by uncommenting setting \"xserver-command=X -s 0 -dpms\" inside /etc/lightdm/lightdm.conf
