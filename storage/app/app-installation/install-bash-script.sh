@@ -28,8 +28,6 @@ cd ${INSTALLATION_FOLDER}/intus
 
 git pull origin ${NODE_ENV}
 
-sudo chmod +x intus-raspberry
-
 if [ $? -eq 0 ]
 then
   NODE_ENV=${NODE_ENV} DISPLAY_ID=${DISPLAY_ID} DISPLAY_API_TOKEN="${DISPLAY_API_TOKEN}" ./intus-raspberry > debug.log 2>&1 &
