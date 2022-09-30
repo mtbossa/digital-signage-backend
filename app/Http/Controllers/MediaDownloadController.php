@@ -17,6 +17,7 @@ class MediaDownloadController extends Controller
    */
   public function __invoke(Request $request, string $filename)
   {
+    ini_set('max_execution_time', 180);
     $media = Media::query()->where('filename', $filename)->firstOrFail();
     $contents = Storage::get($media->path);
     $size = Storage::size($media->path);
