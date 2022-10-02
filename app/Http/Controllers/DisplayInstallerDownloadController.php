@@ -22,17 +22,23 @@ class DisplayInstallerDownloadController extends Controller
         return response()->json(['message' => 'Not Found!'], 404);
       }
 
-      $nodeEnv = config("app.env") === "production" ? "production" : "staging";
+      $correctAppEnv = $this->getCorrectAppEnv();
 
       $findAndReplace = [
-        "**API_URL**" => config("app.url"),
-        "**NODE_ENV**" => $nodeEnv,
+        "**NODE_ENV**" => $correctAppEnv,
         "**DISPLAY_ID**" => $display->id,
         "**DISPLAY_API_TOKEN**" => $request->bearerToken(),
         "**APP_GITHUB_REPO_URL**" => config("app.app_github_repo_url"),
       ];
 
-      $installScript = Storage::disk("local")->get("app-installation/install-bash-script.sh");
+      if ($correctAppEnv === "development") {
+        // Appended necessary variables for development
+        $findAndReplace["**API_URL**"] = config("app.url");
+        $findAndReplace["**PUSHER_CLUSTER**"] = config("broadcasting.connections.pusher.options.cluster");
+        $findAndReplace["**PUSHER_APP_KEY**"] = config("broadcasting.connections.pusher.key");
+      }
+
+      $installScript = Storage::disk("local")->get("app-installation/install-app-script-$correctAppEnv.sh");
       foreach ($findAndReplace as $find => $replace) {
         $installScript = Str::replace($find, $replace, $installScript);
       }
@@ -42,5 +48,20 @@ class DisplayInstallerDownloadController extends Controller
     }
 
     return response()->json(['message' => 'Not Found!'], 404);
+  }
+
+  private function getCorrectAppEnv(): string
+  {
+    $appEnv = config("app.env");
+
+    if ($appEnv === "production") {
+      return "production";
+    } else {
+      if ($appEnv === "staging") {
+        return "staging";
+      } else {
+        return "development";
+      }
+    }
   }
 }

@@ -1,7 +1,7 @@
 *
 !app-installation/install-bash-script.sh
-!app-installation/docker-compose-production.yml
-!app-installation/docker-compose-development.yml.yml
-!app-installation/docker-compose-staging.yml.yml.yml
+!app-installation/install-app-script-production.sh
+!app-installation/install-app-script-development.sh
+!app-installation/install-app-script-staging.sh
 !public/
 !.gitignore
