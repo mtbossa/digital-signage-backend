@@ -32,7 +32,7 @@ class DisplayInstallerDownloadController extends Controller
         "**APP_GITHUB_REPO_URL**" => config("app.app_github_repo_url"),
       ];
 
-      $installScript = Storage::disk("local")->get("app-installation/install-bash-script.sh");
+      $installScript = Storage::disk("local")->get("app-installation/install-app-script.sh");
       foreach ($findAndReplace as $find => $replace) {
         $installScript = Str::replace($find, $replace, $installScript);
       }
