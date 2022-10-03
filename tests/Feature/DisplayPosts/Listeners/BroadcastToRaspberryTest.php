@@ -7,6 +7,7 @@ use App\Events\DisplayPost\DisplayPostCreated;
 use App\Events\DisplayPost\DisplayPostDeleted;
 use App\Models\Display;
 use App\Models\Post;
+use App\Models\Raspberry;
 use App\Notifications\DisplayPost\PostCreated;
 use App\Notifications\DisplayPost\PostDeleted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,7 +16,7 @@ use Tests\Feature\Post\Traits\PostTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
 
-class BroadcastToDisplayTest extends TestCase
+class BroadcastToRaspberryTest extends TestCase
 {
   use RefreshDatabase, PostTestsTrait, AuthUserTrait;
 
@@ -32,7 +33,7 @@ class BroadcastToDisplayTest extends TestCase
   /**
    * @test
    */
-  public function when_event_is_DisplayPostCreated_should_notify_display_with_PostCreated_notification()
+  public function when_event_is_DisplayPostCreated_should_notify_raspberry_with_PostCreated_notification()
   {
     Notification::fake([PostCreated::class]);
 
@@ -42,12 +43,13 @@ class BroadcastToDisplayTest extends TestCase
     foreach (
       $displaysWithThisPost as $display
     ) {
+      $raspberry = Raspberry::factory()->create(["display_id" => $display->id]);
       $this->post->displays()->attach($display->id);
 
       event(new DisplayPostCreated($display, $this->post));
 
       Notification::assertSentTo(
-        $display,
+        $raspberry,
         PostCreated::class
       );
     }
@@ -56,7 +58,7 @@ class BroadcastToDisplayTest extends TestCase
   /**
    * @test
    */
-  public function when_event_is_DisplayPostDeleted_should_notify_display_with_PostDeleted_notification()
+  public function when_event_is_DisplayPostDeleted_should_notify_raspberry_with_PostDeleted_notification()
   {
     Notification::fake([PostDeleted::class]);
 
@@ -72,9 +74,10 @@ class BroadcastToDisplayTest extends TestCase
     $this->post->displays()->sync($newDisplaysPostIds);
 
     foreach ($displaysWithThisPost as $removedDisplay) {
+      $raspberry = Raspberry::factory()->create(["display_id" => $removedDisplay->id]);
       event(new DisplayPostDeleted($removedDisplay, $this->post));
       Notification::assertSentTo(
-        $removedDisplay,
+        $raspberry,
         PostDeleted::class
       );
     }

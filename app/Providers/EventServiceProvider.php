@@ -4,14 +4,14 @@ namespace App\Providers;
 
 use App\Events\DisplayPost\DisplayPostCreated;
 use App\Events\DisplayPost\DisplayPostDeleted;
-use App\Listeners\DisplayPost\BroadcastToDisplay;
+use App\Listeners\DisplayPost\BroadcastToRaspberry;
 use App\Models\Media;
 use App\Observers\MediaObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
-class EventServiceProvider extends ServiceProvider
+class   EventServiceProvider extends ServiceProvider
 {
   /**
    * The event listener mappings for the application.
@@ -24,10 +24,10 @@ class EventServiceProvider extends ServiceProvider
         SendEmailVerificationNotification::class,
       ],
       DisplayPostCreated::class => [
-        BroadcastToDisplay::class,
+        BroadcastToRaspberry::class,
       ],
       DisplayPostDeleted::class => [
-        BroadcastToDisplay::class,
+        BroadcastToRaspberry::class,
       ],
     ];
 
