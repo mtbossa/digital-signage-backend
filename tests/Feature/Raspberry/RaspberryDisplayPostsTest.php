@@ -42,14 +42,6 @@ class RaspberryDisplayPostsTest extends TestCase
   }
 
   /** @test */
-  public function ensure_404_when_display_trying_to_access_route()
-  {
-    $display = Display::factory()->create();
-    $this->getJson(route('raspberry.display.posts'),
-      ["Authorization" => "Bearer $display->plainTextToken"])->assertNotFound();
-  }
-
-  /** @test */
   public function ensure_404_when_raspberry_is_not_connected_to_any_display()
   {
     $this->getJson(route('raspberry.display.posts'),

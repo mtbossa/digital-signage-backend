@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Raspberry;
 
-use App\Models\Display;
 use App\Models\Raspberry;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -25,13 +24,6 @@ class RaspberryInstallerDownloadTest extends TestCase
   public function ensure_404_when_user_trying_to_access_installer_link()
   {
     Sanctum::actingAs(User::factory()->create());
-    $this->getJson(route('raspberry.installer.download'))->assertNotFound();
-  }
-
-  /** @test */
-  public function ensure_404_when_display_trying_to_access_installer_link()
-  {
-    Sanctum::actingAs(Display::factory()->create());
     $this->getJson(route('raspberry.installer.download'))->assertNotFound();
   }
 
