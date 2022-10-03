@@ -28,16 +28,13 @@ echo "
 app_startup_script=$(
 cat <<EOF
 #!/usr/bin/env bash
+{
 cd ${INSTALLATION_FOLDER}/intus
+git stash && git pull origin ${NODE_ENV} 
+sudo chmod +x ./intus-raspberry
+NODE_ENV=${NODE_ENV} DISPLAY_ID=${DISPLAY_ID} DISPLAY_API_TOKEN="${DISPLAY_API_TOKEN}" API_URL="${API_URL}" PUSHER_CLUSTER="${PUSHER_CLUSTER}" PUSHER_APP_KEY="${PUSHER_APP_KEY}" ./intus-raspberry &  
+} > ${INSTALLATION_FOLDER} > startup.log
 
-git stash && git pull origin ${NODE_ENV}
-
-if [ $? -eq 0 ]
-then
-  NODE_ENV=${NODE_ENV} DISPLAY_ID=${DISPLAY_ID} DISPLAY_API_TOKEN="${DISPLAY_API_TOKEN}" API_URL="${API_URL}" PUSHER_CLUSTER="${PUSHER_CLUSTER}" PUSHER_APP_KEY="${PUSHER_APP_KEY}" ./intus-raspberry &
-else
-  NODE_ENV=${NODE_ENV} DISPLAY_ID=${DISPLAY_ID} DISPLAY_API_TOKEN="${DISPLAY_API_TOKEN}" API_URL="${API_URL}" PUSHER_CLUSTER="${PUSHER_CLUSTER}" PUSHER_APP_KEY="${PUSHER_APP_KEY}" ./intus-raspberry &
-fi
 EOF
 )
 echo "$app_startup_script" >"${INSTALLATION_FOLDER}"/intus-startup.sh
