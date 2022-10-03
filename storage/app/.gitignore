@@ -1,5 +1,4 @@
 *
-!app-installation/install-bash-script.sh
 !app-installation/install-app-script-production.sh
 !app-installation/install-app-script-development.sh
 !app-installation/install-app-script-staging.sh
