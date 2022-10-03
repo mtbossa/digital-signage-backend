@@ -63,6 +63,6 @@ class RaspberryTest extends TestCase
     $second_raspberry = $this->_createRaspberry();
 
     $this->getJson(route('raspberries.index'))->assertOk()->assertJsonCount(2,
-      'data')->assertJsonFragment($this->raspberry->toArray());
+      'data')->assertJsonFragment(['id' => $this->raspberry->id]);
   }
 }

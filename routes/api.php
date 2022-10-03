@@ -11,6 +11,7 @@ use App\Http\Controllers\PostDisplayOptions;
 use App\Http\Controllers\PostMediaOptions;
 use App\Http\Controllers\PostRecurrenceOptions;
 use App\Http\Controllers\RaspberryController;
+use App\Http\Controllers\RaspberryDisplayPostsController;
 use App\Http\Controllers\RecurrenceController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\StoreDisplaysController;
@@ -40,7 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     return new LoggedUserResource($request->user());
   });
 
-
+  Route::get("raspberry/display/posts", RaspberryDisplayPostsController::class)->name('raspberry.display.posts');
   Route::apiResource('displays.posts', DisplayPostController::class)
     ->only('index');
   Route::get('media/{filename}/download', MediaDownloadController::class)
