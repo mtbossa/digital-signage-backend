@@ -16,7 +16,6 @@ echo "
 
 cd "$INSTALLATION_FOLDER"
 git clone --depth 1 -b "${NODE_ENV}" "${APP_GITHUB_REPO_URL}" intus
-sudo chmod +x intus-raspberry
 
 echo "
 - Creating startup script
@@ -26,7 +25,8 @@ app_startup_script=$(cat << EOF
 #!/usr/bin/env bash
 {
 cd ${INSTALLATION_FOLDER}/intus
-git stash && git pull origin ${NODE_ENV} 
+git stash
+git pull origin ${NODE_ENV}
 sudo chmod +x ./intus-raspberry
 NODE_ENV=${NODE_ENV} DISPLAY_ID=${DISPLAY_ID} DISPLAY_API_TOKEN="${DISPLAY_API_TOKEN}" API_URL="${API_URL}" PUSHER_CLUSTER="${PUSHER_CLUSTER}" PUSHER_APP_KEY="${PUSHER_APP_KEY}" ./intus-raspberry &  
 } > ${INSTALLATION_FOLDER}/startup.log
