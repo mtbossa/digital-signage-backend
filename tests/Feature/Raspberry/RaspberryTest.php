@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\Raspberry;
 
+use App\Mail\InstallationLink;
+use App\Models\Raspberry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\Feature\Raspberry\Traits\RaspberryTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
@@ -64,5 +67,29 @@ class RaspberryTest extends TestCase
 
     $this->getJson(route('raspberries.index'))->assertOk()->assertJsonCount(2,
       'data')->assertJsonFragment(['id' => $this->raspberry->id]);
+  }
+
+  /** @test */
+  public function after_raspberry_created_should_send_email_with_installation_link_to_raspberry_creator()
+  {
+    Mail::fake();
+
+    $raspberry_data = Raspberry::factory()->make()->toArray();
+    $response = $this->postJson(route('raspberries.store'), $raspberry_data);
+    $response->assertCreated();
+
+    Mail::assertQueued(InstallationLink::class);
+  }
+
+  /** @test */
+  public function installer_email_should_have_correct_installer_download_url()
+  {
+    $raspberry = Raspberry::factory()->create();
+
+    $mailable = new InstallationLink($raspberry);
+    $apiUrl = env('APP_URL');
+    $correctUrl = url("{$apiUrl}/api/raspberry/installer/download");
+
+    $mailable->assertSeeInHtml($correctUrl);
   }
 }

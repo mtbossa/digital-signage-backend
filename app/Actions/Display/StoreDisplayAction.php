@@ -3,11 +3,9 @@
 namespace App\Actions\Display;
 
 use App\Http\Requests\Display\StoreDisplayRequest;
-use App\Mail\InstallationLink;
 use App\Models\Display;
 use App\Models\Raspberry;
 use App\Models\Store;
-use Illuminate\Support\Facades\Mail;
 
 class StoreDisplayAction
 {
@@ -27,8 +25,6 @@ class StoreDisplayAction
 
       $new_token = $display->createToken('display_access_token');
       $display->token = $new_token;
-
-      Mail::to($request->user())->queue(new InstallationLink($display));
 
       return $display;
     }

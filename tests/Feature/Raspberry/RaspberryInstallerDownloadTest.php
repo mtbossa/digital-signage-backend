@@ -1,19 +1,20 @@
 <?php
 
-namespace Tests\Feature\Display;
+namespace Tests\Feature\Raspberry;
 
 use App\Models\Display;
+use App\Models\Raspberry;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Laravel\Sanctum\Sanctum;
-use Tests\Feature\Display\Traits\DisplayTestsTrait;
+use Tests\Feature\Raspberry\Traits\RaspberryTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
 
-class DisplayInstallerDownloadTest extends TestCase
+class RaspberryInstallerDownloadTest extends TestCase
 {
-  use RefreshDatabase, DisplayTestsTrait, AuthUserTrait;
+  use RefreshDatabase, RaspberryTestsTrait, AuthUserTrait;
 
   public function setUp(): void
   {
@@ -24,45 +25,40 @@ class DisplayInstallerDownloadTest extends TestCase
   public function ensure_404_when_user_trying_to_access_installer_link()
   {
     Sanctum::actingAs(User::factory()->create());
-    $this->getJson(route('displays.installer.download', Display::factory()->create()->id))->assertNotFound();
+    $this->getJson(route('raspberry.installer.download'))->assertNotFound();
   }
 
   /** @test */
-  public function ensure_one_display_cannot_download_others_display_installer()
+  public function ensure_404_when_display_trying_to_access_installer_link()
   {
-    $correctDisplay = Display::factory()->create();
-    $wrongDisplay = Display::factory()->create();
-    $plainTextToken = $wrongDisplay->plainTextToken;
-    $this->getJson(route('displays.installer.download', $correctDisplay->id),
-      ["Authorization" => "Bearer $plainTextToken"])->assertNotFound();
+    Sanctum::actingAs(Display::factory()->create());
+    $this->getJson(route('raspberry.installer.download'))->assertNotFound();
   }
 
   /** @test */
-  public function ensure_installer_content_has_api_key_and_display_id()
+  public function ensure_installer_content_has_correct_needed_content()
   {
-    $display = Display::factory()->create();
-    $apiUrl = config("app.url");
+    $raspberry = Raspberry::factory()->create();
     $githubRepoUrl = config("app.app_github_repo_url");
 
-    $response = $this->getJson(route('displays.installer.download', $display->id),
-      ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
+    $response = $this->getJson(route('raspberry.installer.download'),
+      ["Authorization" => "Bearer $raspberry->plainTextToken"])->assertOk();
     $responseContent = $response->content();
 
-    $this->assertStringContainsString("DISPLAY_ID={$display->id}", $responseContent);
-    $this->assertStringContainsString("DISPLAY_API_TOKEN=\"{$display->plainTextToken}\"", $responseContent);
+    $this->assertStringContainsString("RASPBERRY_API_TOKEN=\"{$raspberry->plainTextToken}\"", $responseContent);
     $this->assertStringContainsString("APP_GITHUB_REPO_URL={$githubRepoUrl}", $responseContent);
   }
 
   /** @test */
   public function when_development_script_should_have_api_url_pusher_key_and_cluster()
   {
-    $display = Display::factory()->create();
+    $raspberry = Raspberry::factory()->create();
     $apiUrl = config("app.url");
     $cluster = config("broadcasting.connections.pusher.options.cluster");
     $pusherKey = config("broadcasting.connections.pusher.key");
 
-    $response = $this->getJson(route('displays.installer.download', $display->id),
-      ["Authorization" => "Bearer $display->plainTextToken"])->assertOk();
+    $response = $this->getJson(route('raspberry.installer.download', $raspberry->id),
+      ["Authorization" => "Bearer $raspberry->plainTextToken"])->assertOk();
     $responseContent = $response->content();
 
     $this->assertStringContainsString("API_URL=$apiUrl", $responseContent);
@@ -73,18 +69,18 @@ class DisplayInstallerDownloadTest extends TestCase
   /** @test */
   public function should_download_development_script_when_app_env_is_diff_from_prod_or_staging()
   {
-    $display = Display::factory()->create();
+    $raspberry = Raspberry::factory()->create();
     Config::set("app.env", "development");
 
-    $response = $this->getJson(route('displays.installer.download', $display->id),
-      ["Authorization" => "Bearer $display->plainTextToken"]);
+    $response = $this->getJson(route('raspberry.installer.download', $raspberry->id),
+      ["Authorization" => "Bearer $raspberry->plainTextToken"]);
     $responseContent = $response->content();
     $this->assertStringContainsString("NODE_ENV=development", $responseContent);
 
     Config::set("app.env", "local");
 
-    $response = $this->getJson(route('displays.installer.download', $display->id),
-      ["Authorization" => "Bearer $display->plainTextToken"]);
+    $response = $this->getJson(route('raspberry.installer.download', $raspberry->id),
+      ["Authorization" => "Bearer $raspberry->plainTextToken"]);
     $responseContent = $response->content();
     $this->assertStringContainsString("NODE_ENV=development", $responseContent);
   }
@@ -92,11 +88,11 @@ class DisplayInstallerDownloadTest extends TestCase
   /** @test */
   public function should_download_staging_script_when_app_env_is_staging()
   {
-    $display = Display::factory()->create();
+    $raspberry = Raspberry::factory()->create();
     Config::set("app.env", "staging");
 
-    $response = $this->getJson(route('displays.installer.download', $display->id),
-      ["Authorization" => "Bearer $display->plainTextToken"]);
+    $response = $this->getJson(route('raspberry.installer.download', $raspberry->id),
+      ["Authorization" => "Bearer $raspberry->plainTextToken"]);
     $responseContent = $response->content();
     $this->assertStringContainsString("NODE_ENV=staging", $responseContent);
   }
@@ -104,11 +100,11 @@ class DisplayInstallerDownloadTest extends TestCase
   /** @test */
   public function should_download_production_script_when_app_env_is_diff_from_prod_or_production()
   {
-    $display = Display::factory()->create();
+    $raspberry = Raspberry::factory()->create();
     Config::set("app.env", "production");
 
-    $response = $this->getJson(route('displays.installer.download', $display->id),
-      ["Authorization" => "Bearer $display->plainTextToken"]);
+    $response = $this->getJson(route('raspberry.installer.download', $raspberry->id),
+      ["Authorization" => "Bearer $raspberry->plainTextToken"]);
     $responseContent = $response->content();
     $this->assertStringContainsString("NODE_ENV=production", $responseContent);
   }
