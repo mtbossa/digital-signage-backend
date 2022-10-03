@@ -37,6 +37,7 @@ class RaspberryInstallerDownloadTest extends TestCase
       ["Authorization" => "Bearer $raspberry->plainTextToken"])->assertOk();
     $responseContent = $response->content();
 
+    $this->assertStringContainsString("RASPBERRY_ID={$raspberry->id}", $responseContent);
     $this->assertStringContainsString("RASPBERRY_API_TOKEN=\"{$raspberry->plainTextToken}\"", $responseContent);
     $this->assertStringContainsString("APP_GITHUB_REPO_URL={$githubRepoUrl}", $responseContent);
   }

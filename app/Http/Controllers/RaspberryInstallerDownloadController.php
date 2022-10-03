@@ -18,7 +18,7 @@ class RaspberryInstallerDownloadController extends Controller
   {
     $authenticated = Auth::user();
     $isRaspberry = $authenticated instanceof Raspberry;
-    
+
     if (!$isRaspberry) {
       return response()->json(['message' => 'Not Found!'], 404);
     }
@@ -27,7 +27,7 @@ class RaspberryInstallerDownloadController extends Controller
 
     $findAndReplace = [
       "**NODE_ENV**" => $correctAppEnv, "**RASPBERRY_API_TOKEN**" => $request->bearerToken(),
-      "**APP_GITHUB_REPO_URL**" => config("app.app_github_repo_url"),
+      "**RASPBERRY_ID**" => $authenticated->id, "**APP_GITHUB_REPO_URL**" => config("app.app_github_repo_url"),
     ];
 
     if ($correctAppEnv === "development") {

@@ -170,7 +170,7 @@ class RaspberryDisplayPostsTest extends TestCase
   public function ensure_only_posts_from_auth_raspberry_are_returned()
   {
     $this->raspberry->display()->associate($this->display)->save();
-    $new_media = Media::factory()->create();
+    $new_media = Media::factory()->create(["id" => 99999]);
     $posts = Post::factory(2)->create(['media_id' => $new_media->id]);
 
     foreach ($posts as $post) {
