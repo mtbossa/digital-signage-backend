@@ -6,6 +6,7 @@ use App\Events\DisplayPost\DisplayPostCreated;
 use App\Events\DisplayPost\DisplayPostDeleted;
 use App\Models\Display;
 use App\Models\Post;
+use App\Models\Raspberry;
 use App\Notifications\DisplayPost\PostDeleted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
@@ -160,16 +161,21 @@ class PostTest extends TestCase
   }
   
   /** @test */
-  public function when_post_is_deleted_should_dispatch_post_deleted_notification_for_each_displays()
+  public function when_post_is_deleted_should_dispatch_post_deleted_notification_for_each_raspberry()
   {
     Notification::fake(PostDeleted::class);
-    $this->withoutExceptionHandling();
 
     $displays = Display::factory(2)->create();
+    foreach ($displays as $display) {
+      $raspberry = Raspberry::factory()->create((["display_id" => $display->id]));
+    }
     $displaysIds = $displays->pluck('id')->toArray();
     $this->post->displays()->sync($displaysIds);
     $this->deleteJson(route('posts.destroy', $this->post->id))->assertOk();
 
-    Notification::assertSentTo($displays[0], PostDeleted::class);
+    foreach ($displays as $display) {
+      Notification::assertSentTo($raspberry, PostDeleted::class);
+    }
+
   }
 }
