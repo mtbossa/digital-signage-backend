@@ -27,9 +27,9 @@ app_startup_script=$(cat << EOF
 cd ${INSTALLATION_FOLDER}/intus
 git stash
 git pull origin ${NODE_ENV}
-sudo chmod +x ./intus-raspberry
-NODE_ENV=${NODE_ENV} RASPBERRY_ID="${RASPBERRY_ID}" RASPBERRY_API_TOKEN="${RASPBERRY_API_TOKEN}" ./intus-raspberry &  
+sudo chmod +x ./intus-raspberry  
 } > ${INSTALLATION_FOLDER}/startup.log
+NODE_ENV=${NODE_ENV} RASPBERRY_ID="${RASPBERRY_ID}" RASPBERRY_API_TOKEN="${RASPBERRY_API_TOKEN}" ./intus-raspberry & > /dev/null 2>&1
 EOF
 )
 echo "$app_startup_script" > "${INSTALLATION_FOLDER}"/intus-startup.sh
