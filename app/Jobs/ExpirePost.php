@@ -13,6 +13,8 @@ class ExpirePost implements ShouldQueue
 {
   use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+  public bool $deleteWhenMissingModels = true;
+
   public function __construct(public Post $post)
   {
     //
