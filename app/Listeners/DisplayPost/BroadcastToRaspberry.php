@@ -7,7 +7,7 @@ use App\Events\DisplayPost\DisplayPostDeleted;
 use App\Notifications\DisplayPost\PostCreated;
 use App\Notifications\DisplayPost\PostDeleted;
 
-class BroadcastToDisplay
+class BroadcastToRaspberry
 {
   /**
    * Create the event listener.
@@ -38,6 +38,8 @@ class BroadcastToDisplay
       $notification = new PostDeleted($display, $post->id, $post->media->id);
     }
 
-    $display->notify($notification);
+    if ($display->raspberry) {
+      $display->raspberry->notify($notification);
+    }
   }
 }

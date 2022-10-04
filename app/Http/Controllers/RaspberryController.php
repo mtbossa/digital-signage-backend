@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Raspberry\StoreRaspberryRequest;
 use App\Http\Requests\Raspberry\UpdateRaspberryRequest;
+use App\Mail\InstallationLink;
 use App\Models\Display;
 use App\Models\Raspberry;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Mail;
 
 class RaspberryController extends Controller
 {
@@ -24,6 +26,11 @@ class RaspberryController extends Controller
       $display = Display::findOrFail($request->display_id);
       $raspberry->display()->associate($display)->save();
     }
+
+    $new_token = $raspberry->createToken('raspberry_access_token');
+    $raspberry->token = $new_token;
+
+    Mail::to($request->user())->queue(new InstallationLink($raspberry));
 
     return $raspberry;
   }

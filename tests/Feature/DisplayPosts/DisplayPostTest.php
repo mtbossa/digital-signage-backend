@@ -269,7 +269,7 @@ class DisplayPostTest extends TestCase
 
     $response = $this->getJson(route('displays.posts.index',
       ['display' => $this->display->id, 'expired' => true, 'fromApp' => true]))->assertOk();
-    $response->assertExactJson($complete_json);
+    $response->assertJson($complete_json);
   }
 
 }

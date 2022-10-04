@@ -8,22 +8,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class Display extends Model
 {
-    use HasFactory, Notifiable, HasApiTokens;
+  use HasFactory, Notifiable;
 
-    protected $fillable
-        = [
-            'name', 'size', 'width', 'height', 'touch', 'observation',
-            'store_id'
-        ];
+  protected $fillable
+    = [
+      'name', 'size', 'width', 'height', 'touch', 'observation',
+      'store_id'
+    ];
 
-    public function raspberry(): HasOne
-    {
-        return $this->hasOne(Raspberry::class);
-    }
+  public function raspberry(): HasOne
+  {
+    return $this->hasOne(Raspberry::class);
+  }
 
   public function posts(): BelongsToMany
   {
@@ -33,11 +32,5 @@ class Display extends Model
   public function store(): BelongsTo
   {
     return $this->belongsTo(Store::class);
-  }
-
-  public function generateInstallationUrl()
-  {
-    $apiUrl = config('app.url');
-    return url("{$apiUrl}/api/displays/{$this->id}/installer/download");
   }
 }

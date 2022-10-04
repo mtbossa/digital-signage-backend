@@ -2,10 +2,8 @@
 
 namespace Tests\Feature\Display;
 
-use App\Mail\InstallationLink;
 use App\Models\Display;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Mail;
 use Tests\Feature\Display\Traits\DisplayTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
@@ -70,30 +68,5 @@ class DisplayTest extends TestCase
 
     $this->getJson(route('displays.index'))->assertOk()->assertJsonCount(2,
       'data')->assertJsonFragment(['id' => $display->id]);
-  }
-
-  /** @test */
-  public function after_display_created_should_send_email_with_installation_link_to_display_creator()
-  {
-    Mail::fake();
-
-    $display_data = Display::factory()->make()->toArray();
-    $response = $this->postJson(route('displays.store'), $display_data);
-    $response->assertCreated();
-
-    Mail::assertQueued(InstallationLink::class);
-  }
-
-  /** @test */
-  public function installer_email_should_have_correct_installer_download_url()
-  {
-    $this->withoutExceptionHandling();
-    $display = Display::factory()->create();
-
-    $mailable = new InstallationLink($display);
-    $apiUrl = env('APP_URL');
-    $correctUrl = url("{$apiUrl}/api/displays/{$display->id}/installer/download");
-
-    $mailable->assertSeeInHtml($correctUrl);
   }
 }

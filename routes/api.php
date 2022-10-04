@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\DisplayController;
-use App\Http\Controllers\DisplayInstallerDownloadController;
 use App\Http\Controllers\DisplayPostController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MediaController;
@@ -11,6 +10,8 @@ use App\Http\Controllers\PostDisplayOptions;
 use App\Http\Controllers\PostMediaOptions;
 use App\Http\Controllers\PostRecurrenceOptions;
 use App\Http\Controllers\RaspberryController;
+use App\Http\Controllers\RaspberryDisplayPostsController;
+use App\Http\Controllers\RaspberryInstallerDownloadController;
 use App\Http\Controllers\RecurrenceController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\StoreDisplaysController;
@@ -40,13 +41,13 @@ Route::middleware('auth:sanctum')->group(function () {
     return new LoggedUserResource($request->user());
   });
 
-
+  Route::get("raspberry/display/posts", RaspberryDisplayPostsController::class)->name('raspberry.display.posts');
   Route::apiResource('displays.posts', DisplayPostController::class)
     ->only('index');
   Route::get('media/{filename}/download', MediaDownloadController::class)
     ->name('media.download');
-  Route::get('displays/{display}/installer/download', DisplayInstallerDownloadController::class)
-    ->name('displays.installer.download');
+  Route::get('raspberry/installer/download', RaspberryInstallerDownloadController::class)
+    ->name('raspberry.installer.download');
   Route::apiResource('stores.displays', StoreDisplaysController::class)
     ->only('index');
 

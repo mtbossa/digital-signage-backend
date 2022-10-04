@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Raspberry;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -10,12 +11,15 @@ use Illuminate\Support\Str;
  */
 class RaspberryFactory extends Factory
 {
-  /**
-   * Define the model's default state.
-   *
-   * @return array<string, mixed>
-   */
-  public function definition()
+  public function configure(): RaspberryFactory
+  {
+    return $this->afterCreating(function (Raspberry $raspberry) {
+      return $raspberry->plainTextToken
+        = $raspberry->createToken('raspberry_api_token')->plainTextToken;
+    });
+  }
+
+  public function definition(): array
   {
     return [
       'mac_address' => Str::lower($this->faker->macAddress()),
@@ -25,12 +29,12 @@ class RaspberryFactory extends Factory
     ];
   }
 
-  private function _generateSerialNumber()
+  private function _generateSerialNumber(): string
   {
     return "{$this->faker->randomNumber(9, true)}{$this->faker->randomNumber(4, true)}d";
   }
 
-  public function booted()
+  public function booted(): RaspberryFactory
   {
     return $this->state(function (array $attributes) {
       return [

@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Models\Display;
+use App\Models\Raspberry;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -18,10 +18,10 @@ class InstallationLink extends Mailable
    *
    * @return void
    */
-  public function __construct(private readonly Display $display)
+  public function __construct(private readonly Raspberry $raspberry)
   {
     $this->afterCommit();
-    $this->url = $this->display->generateInstallationUrl();
+    $this->url = $this->raspberry->generateInstallationUrl();
   }
 
   /**
@@ -31,7 +31,7 @@ class InstallationLink extends Mailable
    */
   public function build()
   {
-    return $this->markdown('emails.displays.installation-link')
+    return $this->markdown('emails.raspberries.installation-link')
       ->with([
         'installerUrl' => $this->url,
       ]);
