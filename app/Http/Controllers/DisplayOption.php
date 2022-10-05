@@ -11,9 +11,19 @@ class DisplayOption extends Controller
   public function __invoke(Request $request): Collection
   {
     $columns = ['id', 'name'];
+    $query = Display::query();
+
     if ($request->has('whereDoesntHaveRaspberry')) {
-      return Display::query()->whereDoesntHave("raspberry")->get($columns);
+      $query->whereDoesntHave("raspberry");
     }
-    return Display::all($columns);
+
+    if ($request->has('withIds')) {
+      $withIdsArray = json_decode($request->withIds);
+      if (count($withIdsArray) > 0) {
+        $query->orWhereIn("id", $withIdsArray);
+      }
+    }
+
+    return $query->get($columns);
   }
 }
