@@ -8,11 +8,11 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MediaDownloadController;
 use App\Http\Controllers\MediaOption;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\PostRecurrenceOptions;
 use App\Http\Controllers\RaspberryController;
 use App\Http\Controllers\RaspberryDisplayPostsController;
 use App\Http\Controllers\RaspberryInstallerDownloadController;
 use App\Http\Controllers\RecurrenceController;
+use App\Http\Controllers\RecurrenceOption;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\StoreDisplaysController;
 use App\Http\Controllers\UserController;
@@ -53,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
   Route::get('medias/options', MediaOption::class)->name("medias.options");
   Route::get('displays/options', DisplayOption::class)->name("displays.options");
+  Route::get('recurrences/options', RecurrenceOption::class)->name("recurrences.options");
 
   Route::apiResources([
     'users' => UserController::class,
@@ -63,8 +64,6 @@ Route::middleware('auth:sanctum')->group(function () {
     'recurrences' => RecurrenceController::class,
     'stores' => StoreController::class,
   ]);
-
-  Route::get('posts/recurrences/options', PostRecurrenceOptions::class)->name("post.recurrence.options");
 
   Route::apiResource('invitations', InvitationController::class,
     ['except' => ['update', 'show']]);

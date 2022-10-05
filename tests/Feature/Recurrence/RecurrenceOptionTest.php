@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Post;
+namespace Recurrence;
 
 use App\Models\Recurrence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -9,7 +9,7 @@ use Tests\Feature\Media\Traits\MediaTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
 
-class PostRecurrenceOptionsTest extends TestCase
+class RecurrenceOptionTest extends TestCase
 {
   use RefreshDatabase, MediaTestsTrait, WithFaker, AuthUserTrait;
 
@@ -26,7 +26,7 @@ class PostRecurrenceOptionsTest extends TestCase
     $amount = 10;
     Recurrence::factory($amount)->create();
 
-    $this->getJson(route('post.recurrence.options'))->assertOk()->assertJsonCount($amount);
+    $this->getJson(route('recurrences.options'))->assertOk()->assertJsonCount($amount);
   }
 
   /** @test */
@@ -38,6 +38,6 @@ class PostRecurrenceOptionsTest extends TestCase
       return ['id' => $recurrence->id, 'description' => $recurrence->description];
     });
 
-    $this->getJson(route('post.recurrence.options'))->assertExactJson($correctStructure->toArray());
+    $this->getJson(route('recurrences.options'))->assertExactJson($correctStructure->toArray());
   }
 }
