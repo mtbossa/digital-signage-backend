@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Post;
+namespace Display;
 
 use App\Models\Display;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -9,7 +9,7 @@ use Tests\Feature\Media\Traits\MediaTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
 
-class PostDisplayOptionsTest extends TestCase
+class DisplayOptionTest extends TestCase
 {
   use RefreshDatabase, MediaTestsTrait, WithFaker, AuthUserTrait;
 
