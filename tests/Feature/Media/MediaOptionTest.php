@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Post;
+namespace Media;
 
 use App\Models\Media;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -9,7 +9,7 @@ use Tests\Feature\Media\Traits\MediaTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
 
-class PostMediaOptionsTest extends TestCase
+class MediaOptionTest extends TestCase
 {
   use RefreshDatabase, MediaTestsTrait, WithFaker, AuthUserTrait;
 
@@ -26,7 +26,7 @@ class PostMediaOptionsTest extends TestCase
     $amount = 10;
     Media::factory($amount)->create();
 
-    $this->getJson(route('post.media.options'))->assertOk()->assertJsonCount($amount);
+    $this->getJson(route('medias.options'))->assertOk()->assertJsonCount($amount);
   }
 
   /** @test */
@@ -38,6 +38,6 @@ class PostMediaOptionsTest extends TestCase
       return ['id' => $media->id, 'description' => $media->description, 'path' => $media->path, 'type' => $media->type];
     });
 
-    $this->getJson(route('post.media.options'))->assertExactJson($correctStructure->toArray());
+    $this->getJson(route('medias.options'))->assertExactJson($correctStructure->toArray());
   }
 }
