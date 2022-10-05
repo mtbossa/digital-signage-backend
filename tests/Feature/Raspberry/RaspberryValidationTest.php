@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Raspberry;
 
+use App\Models\Display;
 use App\Models\Raspberry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -19,6 +20,19 @@ class RaspberryValidationTest extends TestCase
     parent::setUp();
 
     $this->_authUser();
+  }
+
+  /**
+   * @test
+   */
+  public function cant_store_raspberry_with_display_id_that_already_exists()
+  {
+    $display = Display::factory()->create();
+    $raspberry = Raspberry::factory()->create(["display_id" => $display->id]);
+
+    $raspberry_data = Raspberry::factory()->make(["display_id" => $display->id])->toArray();
+    $response = $this->postJson(route('raspberries.store'), $raspberry_data)
+      ->assertUnprocessable()->assertJsonValidationErrorFor('display_id');
   }
 
   /**

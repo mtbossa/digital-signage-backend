@@ -21,11 +21,7 @@ class RaspberryController extends Controller
 
   public function store(StoreRaspberryRequest $request): Raspberry
   {
-    $raspberry = Raspberry::create($request->safe()->except(['display_id']));
-    if ($request->display_id) {
-      $display = Display::findOrFail($request->display_id);
-      $raspberry->display()->associate($display)->save();
-    }
+    $raspberry = Raspberry::create($request->validated());
 
     $new_token = $raspberry->createToken('raspberry_access_token');
     $raspberry->token = $new_token;

@@ -47,9 +47,9 @@ class RaspberryRelationshipsTest extends TestCase
   public function create_raspberry_with_display()
   {
     $display = Display::factory()->create();
-    $raspberry_data = $this->_makeRaspberry()->toArray();
+    $raspberry_data = $this->_makeRaspberry(['display_id' => $display->id])->toArray();
 
-    $response = $this->postJson(route('raspberries.store', ['display_id' => $display->id]), $raspberry_data);
+    $response = $this->postJson(route('raspberries.store'), $raspberry_data);
 
     $this->assertDatabaseHas('raspberries', ['id' => $response['id'], 'display_id' => $display->id]);
 

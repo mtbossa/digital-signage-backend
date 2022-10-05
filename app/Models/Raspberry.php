@@ -17,7 +17,7 @@ class Raspberry extends Authenticatable
   protected $fillable
     = [
       'mac_address', 'short_name', 'serial_number', 'last_boot',
-      'observation'
+      'observation', 'display_id'
     ];
 
   public function display(): BelongsTo
