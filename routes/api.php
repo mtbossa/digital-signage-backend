@@ -1,13 +1,13 @@
 <?php
 
 use App\Http\Controllers\DisplayController;
+use App\Http\Controllers\DisplayOption;
 use App\Http\Controllers\DisplayPostController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MediaDownloadController;
 use App\Http\Controllers\MediaOption;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\PostDisplayOptions;
 use App\Http\Controllers\PostRecurrenceOptions;
 use App\Http\Controllers\RaspberryController;
 use App\Http\Controllers\RaspberryDisplayPostsController;
@@ -52,7 +52,8 @@ Route::middleware('auth:sanctum')->group(function () {
     ->only('index');
 
   Route::get('medias/options', MediaOption::class)->name("medias.options");
-  
+  Route::get('displays/options', DisplayOption::class)->name("displays.options");
+
   Route::apiResources([
     'users' => UserController::class,
     'displays' => DisplayController::class,
@@ -63,7 +64,6 @@ Route::middleware('auth:sanctum')->group(function () {
     'stores' => StoreController::class,
   ]);
 
-  Route::get('posts/displays/options', PostDisplayOptions::class)->name("post.display.options");
   Route::get('posts/recurrences/options', PostRecurrenceOptions::class)->name("post.recurrence.options");
 
   Route::apiResource('invitations', InvitationController::class,

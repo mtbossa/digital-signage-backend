@@ -26,7 +26,7 @@ class PostDisplayOptionsTest extends TestCase
     $amount = 10;
     Display::factory($amount)->create();
 
-    $this->getJson(route('post.display.options'))->assertOk()->assertJsonCount($amount);
+    $this->getJson(route('displays.options'))->assertOk()->assertJsonCount($amount);
   }
 
   /** @test */
@@ -38,6 +38,6 @@ class PostDisplayOptionsTest extends TestCase
       return ['id' => $display->id, 'name' => $display->name];
     });
 
-    $this->getJson(route('post.display.options'))->assertExactJson($correctStructure->toArray());
+    $this->getJson(route('displays.options'))->assertExactJson($correctStructure->toArray());
   }
 }
