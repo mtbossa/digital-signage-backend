@@ -15,7 +15,7 @@ return new class extends Migration {
     Schema::create('raspberries', function (Blueprint $table) {
       $table->id();
       $table->string('short_name', 30);
-      $table->macAddress('mac_address');
+      $table->macAddress('mac_address')->unique();
       $table->string('serial_number', 50);
       $table->dateTime('last_boot')->nullable();
       $table->text('observation')->nullable();

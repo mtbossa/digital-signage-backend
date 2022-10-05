@@ -37,6 +37,20 @@ class RaspberryValidationTest extends TestCase
 
   /**
    * @test
+   */
+  public function mac_address_must_be_unique()
+  {
+    $macAddress = $this->faker->macAddress();
+    Raspberry::factory()->create(["mac_address" => $macAddress]);
+
+    $raspberryData = Raspberry::factory()->make(["mac_address" => $macAddress])->toArray();
+
+    $response = $this->postJson(route('raspberries.store'), $raspberryData)
+      ->assertUnprocessable()->assertJsonValidationErrorFor('mac_address');
+  }
+
+  /**
+   * @test
    * @dataProvider invalidRaspberries
    */
   public function cant_store_invalid_raspberry($invalidData, $invalidFields)
