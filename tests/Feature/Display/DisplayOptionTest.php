@@ -3,6 +3,7 @@
 namespace Display;
 
 use App\Models\Display;
+use App\Models\Raspberry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\Feature\Media\Traits\MediaTestsTrait;
@@ -39,5 +40,20 @@ class DisplayOptionTest extends TestCase
     });
 
     $this->getJson(route('displays.options'))->assertExactJson($correctStructure->toArray());
+  }
+
+  /** @test */
+  public function when_request_has_whereDoesntHaveRaspberry_should_return_only_displays_without_raspberries()
+  {
+    $displayWithRaspberry = Display::factory()->create();
+    Raspberry::factory()->create(['display_id' => $displayWithRaspberry->id]);
+
+    $displaysWithoutRaspberry = Display::factory(2)->create();
+    $correctStructure = $displaysWithoutRaspberry->map(function (Display $display) {
+      return ['id' => $display->id, 'name' => $display->name];
+    });
+
+    $this->getJson(route('displays.options',
+      ["whereDoesntHaveRaspberry" => true]))->assertExactJson($correctStructure->toArray());
   }
 }

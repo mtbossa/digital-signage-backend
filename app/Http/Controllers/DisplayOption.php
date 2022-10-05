@@ -10,6 +10,10 @@ class DisplayOption extends Controller
 {
   public function __invoke(Request $request): Collection
   {
-    return Display::all(['id', 'name']);
+    $columns = ['id', 'name'];
+    if ($request->has('whereDoesntHaveRaspberry')) {
+      return Display::query()->whereDoesntHave("raspberry")->get($columns);
+    }
+    return Display::all($columns);
   }
 }
