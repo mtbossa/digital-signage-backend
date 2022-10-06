@@ -7,6 +7,7 @@ use App\Http\Requests\Raspberry\UpdateRaspberryRequest;
 use App\Mail\InstallationLink;
 use App\Models\Display;
 use App\Models\Raspberry;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Mail;
@@ -16,7 +17,12 @@ class RaspberryController extends Controller
 
   public function index(Request $request): LengthAwarePaginator
   {
-    return Raspberry::query()->paginate($request->size);
+    $query = Raspberry::query();
+    
+    $search = $request->query("search");
+    $query->when($search, fn (Builder $query) => $query->where("short_name", "like", "%{$search}%"));
+    
+    return $query->paginate($request->size);
   }
 
   public function store(StoreRaspberryRequest $request): Raspberry

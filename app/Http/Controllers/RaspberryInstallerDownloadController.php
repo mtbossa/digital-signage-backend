@@ -24,6 +24,11 @@ class RaspberryInstallerDownloadController extends Controller
     }
 
     $correctAppEnv = $this->getCorrectAppEnv();
+    
+    $customStartupScript = Storage::disk("local")->get("app-installation/startup-script-$correctAppEnv.sh");
+    $installScript = Storage::disk("local")->get("app-installation/default-install-script.sh");
+
+    $installScript = Str::replace("**STARTUP_SCRIPT**", $customStartupScript, $installScript);
 
     $findAndReplace = [
       "**NODE_ENV**" => $correctAppEnv, "**RASPBERRY_API_TOKEN**" => $request->bearerToken(),
@@ -36,8 +41,7 @@ class RaspberryInstallerDownloadController extends Controller
       $findAndReplace["**PUSHER_CLUSTER**"] = config("broadcasting.connections.pusher.options.cluster");
       $findAndReplace["**PUSHER_APP_KEY**"] = config("broadcasting.connections.pusher.key");
     }
-
-    $installScript = Storage::disk("local")->get("app-installation/install-app-script-$correctAppEnv.sh");
+    
     foreach ($findAndReplace as $find => $replace) {
       $installScript = Str::replace($find, $replace, $installScript);
     }
