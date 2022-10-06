@@ -2,6 +2,7 @@
  
 # Variable setup
 INSTALLATION_FOLDER="$HOME/.local/bin"
+LOGS_FOLDER="$HOME/.local/share/intus/logs"
 NODE_ENV=**NODE_ENV**
 RASPBERRY_ID=**RASPBERRY_ID**
 RASPBERRY_API_TOKEN="**RASPBERRY_API_TOKEN**"
@@ -20,6 +21,7 @@ echo ""
 echo "[ Intus Kiosk App ] Cloning and saving app from GitHub to ${INSTALLATION_FOLDER}/intus"
 echo ""
 
+mkdir -p "$LOGS_FOLDER"
 mkdir -p "$INSTALLATION_FOLDER" 
 # shellcheck disable=SC2164
 cd "$INSTALLATION_FOLDER"
