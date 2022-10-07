@@ -58,7 +58,6 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::apiResources([
     'users' => UserController::class,
     'displays' => DisplayController::class,
-    'raspberries' => RaspberryController::class,
     'posts' => PostController::class,
     'medias' => MediaController::class,
     'recurrences' => RecurrenceController::class,
@@ -68,8 +67,12 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::apiResource('invitations', InvitationController::class,
     ['except' => ['update', 'show']]);
 });
+
+Route::apiResources([
+  'raspberries' => RaspberryController::class,
+]);
 Route::get('invitations/{token}', [InvitationController::class, 'show'])
-    ->name('invitations.show');
+  ->name('invitations.show');
 Route::patch('invitations/{token}', [InvitationController::class, 'update'])
-    ->name('invitations.update');
+  ->name('invitations.update');
 

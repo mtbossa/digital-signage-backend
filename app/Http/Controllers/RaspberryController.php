@@ -8,6 +8,7 @@ use App\Mail\InstallationLink;
 use App\Models\Display;
 use App\Models\Raspberry;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Mail;
@@ -15,13 +16,20 @@ use Illuminate\Support\Facades\Mail;
 class RaspberryController extends Controller
 {
 
-  public function index(Request $request): LengthAwarePaginator
+  public function index(Request $request): LengthAwarePaginator|JsonResponse
   {
-    $query = Raspberry::query();
-    
     $search = $request->query("search");
-    $query->when($search, fn (Builder $query) => $query->where("short_name", "like", "%{$search}%"));
+    $searchColumn = $request->query("searchColumn");
+
+    if ($search && !$searchColumn) {
+      return response()->json([
+        'message' => "searchColumn parameter must be specified when search parameter is not empty."
+      ], 400);
+    }
     
+    $query = Raspberry::query();
+    $query->when($search, fn(Builder $query) => $query->where($request->query("searchColumn"), "ilike", "%{$search}%"));
+
     return $query->paginate($request->size);
   }
 

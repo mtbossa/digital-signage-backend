@@ -70,6 +70,33 @@ class RaspberryTest extends TestCase
   }
 
   /** @test */
+  public function when_search_params_is_set_but_searchColumn_not_should_throw_BadRequestException()
+  {
+    $search = "Test";
+
+    $this->getJson(route('raspberries.index', ["search" => $search]))->assertStatus(400)->assertJson([
+      "message" => "searchColumn parameter must be specified when search parameter is not empty."
+    ]);
+  }
+
+  /** @test */
+  public function search_should_find_by_short_name()
+  {
+    $findOne = Raspberry::factory()->create(["short_name" => "Raspberry 1"]);
+    $findTwo = Raspberry::factory()->create(["short_name" => "Raspberry 2"]);
+    $notFind = Raspberry::factory()->create(["short_name" => "Test"]);
+
+    $response = $this->getJson(route('raspberries.index', [
+      "search" => "Rasp", "searchColumn" => "short_name"
+    ]))->assertOk();
+
+    foreach ([$findOne, $findTwo] as $item) {
+      $response->assertJsonFragment(["id" => $item->id]);
+    }
+    $response->assertJsonMissing(["id" => $notFind->id]);
+  }
+
+  /** @test */
   public function after_raspberry_created_should_send_email_with_installation_link_to_raspberry_creator()
   {
     Mail::fake();
