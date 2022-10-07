@@ -97,6 +97,25 @@ class RaspberryTest extends TestCase
   }
 
   /** @test */
+  public function search_should_find_by_mac_address()
+  {
+    $find = Raspberry::factory()->create(["mac_address" => "04:BA:73:55:C8:F3"]);
+
+    $response = $this->getJson(route('raspberries.index', [
+      "search" => "04:BA:73:55:C8:F3", "searchColumn" => "mac_address"
+    ]))->assertOk();
+    $response->assertJsonFragment(["id" => $find->id]);
+
+    $notFind = Raspberry::factory()->create(["mac_address" => "01:CA:73:55:C8:F3"]);
+    $response = $this->getJson(route('raspberries.index', [
+      "search" => "04:BA", "searchColumn" => "mac_address"
+    ]))->assertOk();
+
+    $response->assertJsonFragment(["id" => $find->id]);
+    $response->assertJsonMissing(["id" => $notFind->id]);
+  }
+
+  /** @test */
   public function after_raspberry_created_should_send_email_with_installation_link_to_raspberry_creator()
   {
     Mail::fake();

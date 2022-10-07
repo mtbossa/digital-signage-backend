@@ -28,7 +28,7 @@ class RaspberryController extends Controller
     }
     
     $query = Raspberry::query();
-    $query->when($search, fn(Builder $query) => $query->where($request->query("searchColumn"), "ilike", "%{$search}%"));
+    $query->when($search, fn(Builder $query) => $query->where($searchColumn, "ilike", "%{$search}%"));
 
     return $query->paginate($request->size);
   }
