@@ -116,6 +116,25 @@ class RaspberryTest extends TestCase
   }
 
   /** @test */
+  public function search_should_find_by_serial_number()
+  {
+    $find = Raspberry::factory()->create(["serial_number" => "12345"]);
+
+    $response = $this->getJson(route('raspberries.index', [
+      "search" => "12345", "searchColumn" => "serial_number"
+    ]))->assertOk();
+    $response->assertJsonFragment(["id" => $find->id]);
+
+    $notFind = Raspberry::factory()->create(["serial_number" => "6789"]);
+    $response = $this->getJson(route('raspberries.index', [
+      "search" => "123", "searchColumn" => "serial_number"
+    ]))->assertOk();
+
+    $response->assertJsonFragment(["id" => $find->id]);
+    $response->assertJsonMissing(["id" => $notFind->id]);
+  }
+
+  /** @test */
   public function after_raspberry_created_should_send_email_with_installation_link_to_raspberry_creator()
   {
     Mail::fake();
