@@ -25,7 +25,7 @@ class PostFactory extends Factory
         return;
       }
       if ($media->type === "image") {
-        $post->expose_time = $this->faker->numberBetween(1000, 86400);
+        $post->expose_time = $this->faker->numberBetween(1000, 3600000);
       } else {
         $post->expose_time = null;
       }

@@ -178,12 +178,24 @@ class PostValidationTest extends TestCase
   /**
    * @test
    */
-  public function when_media_is_image_expose_time_must_be_greater_or_equal_to_1_second()
+  public function when_media_is_image_expose_time_must_be_greater_or_equal_to_1000_ms()
   {
     $imageMedia = Media::factory()->create(['type' => 'image']);
     $postData = Post::factory()->make(['media_id' => $imageMedia->id])->toArray();
     $response = $this->postJson(route('posts.store'),
       [...$postData, 'expose_time' => 999])->assertUnprocessable()
+      ->assertJsonValidationErrorFor('expose_time');
+  }
+
+  /**
+   * @test
+   */
+  public function when_media_is_image_expose_time_must_be_less_then_or_equal_to_3_600_000_ms()
+  {
+    $imageMedia = Media::factory()->create(['type' => 'image']);
+    $postData = Post::factory()->make(['media_id' => $imageMedia->id])->toArray();
+    $response = $this->postJson(route('posts.store'),
+      [...$postData, 'expose_time' => 3600001])->assertUnprocessable()
       ->assertJsonValidationErrorFor('expose_time');
   }
 
