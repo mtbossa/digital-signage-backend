@@ -16,6 +16,7 @@ use App\Http\Controllers\RecurrenceOption;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\StoreDisplaysController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\IsNotRaspberry;
 use App\Http\Resources\LoggedUserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -33,40 +34,43 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
 
-  Route::get('/server-status', function (Request $request) {
-    return response()->json(['status' => 'up']);
-  });
+  Route::middleware(IsNotRaspberry::class)->group(function () {
+    Route::get('/user', function (Request $request) {
+      return new LoggedUserResource($request->user());
+    });
 
-  Route::get('/user', function (Request $request) {
-    return new LoggedUserResource($request->user());
-  });
+    Route::apiResource('displays.posts', DisplayPostController::class)
+      ->only('index');
 
+    Route::apiResource('stores.displays', StoreDisplaysController::class)
+      ->only('index');
+
+    Route::get('medias/options', MediaOption::class)->name("medias.options");
+    Route::get('displays/options', DisplayOption::class)->name("displays.options");
+    Route::get('recurrences/options', RecurrenceOption::class)->name("recurrences.options");
+
+    Route::apiResources([
+      'users' => UserController::class,
+      'displays' => DisplayController::class,
+      'posts' => PostController::class,
+      'medias' => MediaController::class,
+      'raspberries' => RaspberryController::class,
+      'recurrences' => RecurrenceController::class,
+      'stores' => StoreController::class,
+    ]);
+
+    Route::apiResource('invitations', InvitationController::class,
+      ['except' => ['update', 'show']]);
+  });
   Route::get("raspberry/display/posts", RaspberryDisplayPostsController::class)->name('raspberry.display.posts');
-  Route::apiResource('displays.posts', DisplayPostController::class)
-    ->only('index');
   Route::get('media/{filename}/download', MediaDownloadController::class)
     ->name('media.download');
   Route::get('raspberry/installer/download', RaspberryInstallerDownloadController::class)
     ->name('raspberry.installer.download');
-  Route::apiResource('stores.displays', StoreDisplaysController::class)
-    ->only('index');
 
-  Route::get('medias/options', MediaOption::class)->name("medias.options");
-  Route::get('displays/options', DisplayOption::class)->name("displays.options");
-  Route::get('recurrences/options', RecurrenceOption::class)->name("recurrences.options");
-
-  Route::apiResources([
-    'users' => UserController::class,
-    'displays' => DisplayController::class,
-    'posts' => PostController::class,
-    'medias' => MediaController::class,
-    'raspberries' => RaspberryController::class,
-    'recurrences' => RecurrenceController::class,
-    'stores' => StoreController::class,
-  ]);
-
-  Route::apiResource('invitations', InvitationController::class,
-    ['except' => ['update', 'show']]);
+  Route::get('/server-status', function (Request $request) {
+    return response()->json(['status' => 'up']);
+  });
 });
 
 Route::get('invitations/{token}', [InvitationController::class, 'show'])
