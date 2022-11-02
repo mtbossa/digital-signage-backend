@@ -9,6 +9,7 @@ use App\Models\Display;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\Recurrence;
+use App\Services\PostSchedulerService;
 use Carbon\Carbon;
 
 class StorePostAction
@@ -24,7 +25,7 @@ class StorePostAction
       $post->recurrence()->associate($recurrence);
       $post->save();
     } else {
-      $this->schedulePostExpiredEvent($post);
+      PostSchedulerService::schedulePostExpiredEvent($post);
     }
 
     if (!is_null($request->displays_ids)) {
