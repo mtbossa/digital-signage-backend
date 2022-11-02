@@ -119,6 +119,10 @@ class PostTest extends TestCase
     $this->patchJson(route('posts.update', $post->id),
       [...$post->toArray(), 'displays_ids' => []])->assertOk();
     Event::assertDispatchedTimes(DisplayPostDeleted::class, $displaysAmount);
+    Event::assertDispatched(DisplayPostDeleted::class,
+      fn(DisplayPostDeleted $event) => in_array($event->display->id, $displays_ids)
+    );
+
   }
 
   /** @test */
@@ -142,6 +146,9 @@ class PostTest extends TestCase
     $this->patchJson(route('posts.update', $post->id),
       [...$post->toArray(), 'displays_ids' => $new_displays_ids])->assertOk();
     Event::assertDispatchedTimes(DisplayPostCreated::class, $newDisplaysAmount);
+    Event::assertDispatched(DisplayPostCreated::class,
+      fn(DisplayPostCreated $event) => in_array($event->display->id, $new_displays_ids)
+    );
   }
 
   /** @test */
@@ -171,9 +178,9 @@ class PostTest extends TestCase
       [...$post->toArray(), 'displays_ids' => [...$new_displays_ids, ...$remaningDisplaysIds]])->assertOk();
 
     Event::assertDispatchedTimes(DisplayPostUpdated::class, $remaningDisplaysAmount);
-    Event::assertDispatched(DisplayPostUpdated::class, function (DisplayPostUpdated $event) use ($remaningDisplaysIds) {
-      return in_array($event->display->id, $remaningDisplaysIds);
-    });
+    Event::assertDispatched(DisplayPostUpdated::class,
+      fn(DisplayPostUpdated $event) => in_array($event->display->id, $remaningDisplaysIds)
+    );
   }
 
   /** @test */
@@ -190,7 +197,7 @@ class PostTest extends TestCase
     $this->deleteJson(route('posts.destroy', $this->post->id))->assertOk();
 
     foreach ($displays as $display) {
-      Notification::assertSentTo($raspberry, PostDeleted::class);
+      Notification::assertSentTo($display->raspberry, PostDeleted::class);
     }
 
   }
