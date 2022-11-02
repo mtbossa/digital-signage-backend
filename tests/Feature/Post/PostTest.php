@@ -6,8 +6,10 @@ use App\Events\DisplayPost\DisplayPostCreated;
 use App\Events\DisplayPost\DisplayPostDeleted;
 use App\Events\DisplayPost\DisplayPostUpdated;
 use App\Models\Display;
+use App\Models\Media;
 use App\Models\Post;
 use App\Models\Raspberry;
+use App\Models\Recurrence;
 use App\Notifications\DisplayPost\PostDeleted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
@@ -84,6 +86,31 @@ class PostTest extends TestCase
 
     $this->getJson(route('posts.index'))->assertOk()->assertJsonCount(2,
       'data')->assertJsonFragment($this->post->toArray());
+  }
+
+  /** @test */
+  public function update_post()
+  {
+    $post = Post::factory()->nonRecurrent()->create(['media_id' => $this->media->id]);
+
+    $recurrence = Recurrence::factory()->create();
+    $newPostData = Post::factory()->make(['media_id' => $this->media->id]);
+
+    $this->patchJson(route('posts.update', ["post" => $post->id]),
+      [...$newPostData->toArray(), 'displays_ids' => [], 'recurrence_id' => $recurrence->id])->assertOk();
+  }
+
+  /** @test */
+  public function ensure_media_doesnt_change_on_update()
+  {
+    $post = Post::factory()->nonRecurrent()->create(['media_id' => $this->media->id]);
+
+    $newMedia = Media::factory()->create();
+    $newPostData = Post::factory()->nonRecurrent()->make(['media_id' => $newMedia->id]);
+
+    $this->patchJson(route('posts.update', ["post" => $post->id]),
+      [...$newPostData->toArray(), 'displays_ids' => []])->assertOk();
+    $this->assertDatabaseHas("posts", ['id' => $post->id, 'media_id' => $this->media->id]);
   }
 
   /** @test */
