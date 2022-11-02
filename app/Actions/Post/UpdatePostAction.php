@@ -28,6 +28,7 @@ class UpdatePostAction
 
       $post->start_date = null;
       $post->end_date = null;
+      $post->expired = false;
 
       $post->save();
     }

@@ -164,6 +164,21 @@ class PostTest extends TestCase
   }
 
   /** @test */
+  public function ensure_post_expired_is_set_to_false_when_updating_non_recurrent_to_recurrent()
+  {
+    $post = Post::factory()->nonRecurrent()->create(['media_id' => $this->media->id, 'expired' => true]);
+
+    $recurrence = Recurrence::factory()->create();
+    $newPostData = Post::factory()->make(['media_id' => $this->media->id]);
+
+    $this->patchJson(route('posts.update', ["post" => $post->id]),
+      [...$newPostData->toArray(), 'displays_ids' => [], 'recurrence_id' => $recurrence->id])->assertOk();
+
+    $this->assertDatabaseHas("posts",
+      ['id' => $post->id, 'expired' => false]);
+  }
+
+  /** @test */
   public function should_fire_display_post_created_event_after_creating_post_with_displays_ids_for_every_display_attached_to_post(
   )
   {
