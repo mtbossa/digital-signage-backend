@@ -83,6 +83,7 @@ class PostRelationshipsTest extends TestCase
   /** @test */
   public function ensure_not_passed_displays_are_detached_when_updating_post()
   {
+    $this->withoutExceptionHandling();
     $media = Media::factory()->create();
     $displays_ids = Display::factory(3)->create()->pluck('id')->toArray();
     $post = Post::factory()->nonRecurrent()

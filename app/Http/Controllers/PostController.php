@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Post\StorePostAction;
 use App\Events\DisplayPost\DisplayPostCreated;
 use App\Events\DisplayPost\DisplayPostDeleted;
+use App\Events\DisplayPost\DisplayPostUpdated;
 use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Models\Display;
@@ -13,6 +14,7 @@ use App\Notifications\DisplayPost\PostDeleted;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class PostController extends Controller
 {
@@ -50,8 +52,13 @@ class PostController extends Controller
   public function update(UpdatePostRequest $request, Post $post): Post
   {
     $post->update($request->validated());
+    $post->load("displays");
 
     if ($request->has('displays_ids')) {
+      $currentPostDisplaysIds = $post->displays->pluck("id")->toArray();
+      $unchangedDisplaysIds = Collection::make($request->displays_ids)->filter(fn($id) => in_array($id,
+        $currentPostDisplaysIds));
+
       $result = $post->displays()->sync($request->displays_ids);
 
       foreach ($result['detached'] as $removedDisplayId) {
@@ -64,7 +71,12 @@ class PostController extends Controller
         DisplayPostCreated::dispatch($display, $post);
       }
 
-      $post['displays'] = $post->displays->toArray();
+      foreach ($unchangedDisplaysIds as $unchangedDisplaysId) {
+        $display = Display::query()->find($unchangedDisplaysId);
+        DisplayPostUpdated::dispatch($display, $post);
+      }
+      
+      $post->refresh();
     }
 
     return $post;

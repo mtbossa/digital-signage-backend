@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Events\DisplayPost\DisplayPostCreated;
 use App\Events\DisplayPost\DisplayPostDeleted;
+use App\Events\DisplayPost\DisplayPostUpdated;
 use App\Listeners\DisplayPost\BroadcastToRaspberry;
 use App\Models\Media;
 use App\Observers\MediaObserver;
@@ -24,6 +25,9 @@ class   EventServiceProvider extends ServiceProvider
         SendEmailVerificationNotification::class,
       ],
       DisplayPostCreated::class => [
+        BroadcastToRaspberry::class,
+      ],
+      DisplayPostUpdated::class => [
         BroadcastToRaspberry::class,
       ],
       DisplayPostDeleted::class => [
