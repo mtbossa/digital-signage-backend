@@ -114,6 +114,38 @@ class PostTest extends TestCase
   }
 
   /** @test */
+  public function ensure_can_change_post_from_non_recurrent_to_recurrent()
+  {
+    $post = Post::factory()->nonRecurrent()->create(['media_id' => $this->media->id]);
+
+    $recurrence = Recurrence::factory()->create();
+    $newPostData = Post::factory()->make(['media_id' => $this->media->id]);
+
+    $this->patchJson(route('posts.update', ["post" => $post->id]),
+      [...$newPostData->toArray(), 'displays_ids' => [], 'recurrence_id' => $recurrence->id])->assertOk();
+
+    $this->assertDatabaseHas("posts",
+      ['id' => $post->id, 'recurrence_id' => $recurrence->id, 'start_date' => null, 'end_date' => null]);
+  }
+
+  /** @test */
+  public function ensure_can_change_post_from_recurrent_to_non_recurrent()
+  {
+    $recurrence = Recurrence::factory()->create();
+    $post = Post::factory()->create(['media_id' => $this->media->id, 'recurrence_id' => $recurrence->id]);
+
+    $newPostData = Post::factory()->nonRecurrent()->make(['media_id' => $this->media->id]);
+
+    $this->patchJson(route('posts.update', ["post" => $post->id]),
+      [...$newPostData->toArray(), 'displays_ids' => []])->assertOk();
+
+    $this->assertDatabaseHas("posts", [
+      'id' => $post->id, 'recurrence_id' => null, 'start_date' => $newPostData->start_date,
+      'end_date' => $newPostData->end_date
+    ]);
+  }
+
+  /** @test */
   public function should_fire_display_post_created_event_after_creating_post_with_displays_ids_for_every_display_attached_to_post(
   )
   {
