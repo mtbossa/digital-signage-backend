@@ -147,7 +147,7 @@ class PostTest extends TestCase
   }
 
   /** @test */
-  public function ensure_post_expired_event_is_scheduled_when_updating_non_recurrent_to_recurrent()
+  public function ensure_post_expired_event_is_scheduled_when_updating_recurrent_to_non_recurrent()
   {
     Bus::fake([ExpirePost::class]);
     $recurrence = Recurrence::factory()->create();
