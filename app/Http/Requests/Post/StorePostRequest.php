@@ -21,7 +21,7 @@ class StorePostRequest extends FormRequest
       'description' => ['required', 'string', 'max:100'],
       'start_date' => [
         'required_without:recurrence_id', 'required_with:end_date', 'nullable', 'date_format:Y-m-d', 'bail',
-        new StartDate
+        'after_or_equal:today'
       ],
       'end_date' => [
         'required_without:recurrence_id', 'required_with:start_date', 'nullable', 'date_format:Y-m-d',
