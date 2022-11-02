@@ -6,6 +6,7 @@ use App\Models\Display;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\Recurrence;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
@@ -34,6 +35,8 @@ class PostValidationTest extends TestCase
      */
     public function end_date_can_be_same_as_start_date()
     {
+      $now = Carbon::createFromFormat("Y-m-d", "2022-01-01");
+      $this->travelTo($now);
       $videoMedia = Media::factory()->create(['type' => 'video']);
       $post_data = Post::factory()->make([
         'start_date' => '2022-01-01', 'end_date' => '2022-01-01',
@@ -202,6 +205,46 @@ class PostValidationTest extends TestCase
   /**
    * @test
    */
+  public function ensure_cant_create_post_with_start_date_before_today()
+  {
+    $today = "2022-01-01 10:00:00";
+    $wrongStartDate = "2021-12-31";
+
+    $now = Carbon::createFromFormat("Y-m-d H:i:s", $today);
+    $this->travelTo($now);
+
+    $postData = Post::factory()->make([
+      'start_date' => $wrongStartDate, 'end_date' => $wrongStartDate, 'media_id' => $this->media->id,
+      'displays_ids' => []
+    ])->toArray();
+    $response = $this->postJson(route('posts.store'), $postData)->assertUnprocessable()
+      ->assertJsonValidationErrorFor('start_date');
+  }
+
+  /**
+   * @test
+   */
+  public function ensure_can_create_post_with_start_date_same_as_today()
+  {
+    $today = "2022-01-01 10:00:00";
+    $startDate = "2022-01-01";
+    $startTime = "10:01:00";
+    $endTime = "10:02:00";
+
+    $now = Carbon::createFromFormat("Y-m-d H:i:s", $today);
+    $this->travelTo($now);
+
+    $postData = Post::factory()->make([
+      'start_date' => $startDate, 'end_date' => $startDate, 'start_time' => $startTime, 'end_time' => $endTime,
+      'media_id' => $this->media->id, 'displays_ids' => []
+    ])->toArray();
+    $response = $this->postJson(route('posts.store'), $postData)->assertCreated();
+  }
+
+
+  /**
+   * @test
+   */
   public function when_media_is_video_expose_time_must_null()
   {
     $videoMedia = Media::factory()->create(['type' => 'video']);
@@ -223,7 +266,8 @@ class PostValidationTest extends TestCase
    */
   public function cant_store_invalid_post($invalidData, $invalidFields)
   {
-
+    $now = Carbon::createFromFormat("Y-m-d H:i:s", "2022-01-01 10:00:00");
+    $this->travelTo($now);
     $response = $this->postJson(route('posts.store'), $invalidData);
 
     $response->assertJsonValidationErrors($invalidFields)

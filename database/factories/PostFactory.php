@@ -75,8 +75,8 @@ class PostFactory extends Factory
   public function nonRecurrent()
   {
     $start_date
-      = Carbon::instance($this->faker->dateTimeBetween('-1 months',
-      '+1 months'));
+      = Carbon::now()->add("m", $this->faker->dateTimeBetween('+1 months',
+      '+6 months'));
     $end_date = (clone $start_date)->addDays($this->faker->numberBetween(0,
       90));
 

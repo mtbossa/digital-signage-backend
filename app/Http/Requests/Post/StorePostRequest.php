@@ -4,6 +4,7 @@ namespace App\Http\Requests\Post;
 
 use App\Models\Display;
 use App\Rules\ExposeTime;
+use App\Rules\StartDate;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -19,7 +20,8 @@ class StorePostRequest extends FormRequest
     return [
       'description' => ['required', 'string', 'max:100'],
       'start_date' => [
-        'required_without:recurrence_id', 'required_with:end_date', 'nullable', 'date_format:Y-m-d',
+        'required_without:recurrence_id', 'required_with:end_date', 'nullable', 'date_format:Y-m-d', 'bail',
+        new StartDate
       ],
       'end_date' => [
         'required_without:recurrence_id', 'required_with:start_date', 'nullable', 'date_format:Y-m-d',
