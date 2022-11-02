@@ -36,6 +36,8 @@ class UpdatePostAction
     if ($this->isUpdatingRecurrentToNonRecurrent($request, $post)) {
       $post->recurrence()->disassociate();
       $post->save();
+
+      $this->schedulePostExpiredEvent($post);
     }
 
     if ($request->has('displays_ids')) {

@@ -5,6 +5,7 @@ namespace Tests\Feature\Post;
 use App\Events\DisplayPost\DisplayPostCreated;
 use App\Events\DisplayPost\DisplayPostDeleted;
 use App\Events\DisplayPost\DisplayPostUpdated;
+use App\Jobs\ExpirePost;
 use App\Models\Display;
 use App\Models\Media;
 use App\Models\Post;
@@ -143,6 +144,23 @@ class PostTest extends TestCase
       'id' => $post->id, 'recurrence_id' => null, 'start_date' => $newPostData->start_date,
       'end_date' => $newPostData->end_date
     ]);
+  }
+
+  /** @test */
+  public function ensure_post_expired_event_is_scheduled_when_updataing_non_recurrent_to_recurrent()
+  {
+    Bus::fake([ExpirePost::class]);
+    $recurrence = Recurrence::factory()->create();
+    $post = Post::factory()->create(['media_id' => $this->media->id, 'recurrence_id' => $recurrence->id]);
+
+    $newPostData = Post::factory()->nonRecurrent()->make(['media_id' => $this->media->id]);
+
+    $this->patchJson(route('posts.update', ["post" => $post->id]),
+      [...$newPostData->toArray(), 'displays_ids' => []])->assertOk();
+    Bus::assertDispatchedTimes(ExpirePost::class, 1);
+    Bus::assertDispatched(ExpirePost::class, function (ExpirePost $job) use ($post) {
+      return $post->id === $job->post->id;
+    });
   }
 
   /** @test */
