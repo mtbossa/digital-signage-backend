@@ -261,6 +261,72 @@ class PostValidationTest extends TestCase
       $postData)->assertUnprocessable()->assertJsonValidationErrorFor("end_time");
   }
 
+  /**
+   * @test
+   */
+  public function ensure_cant_update_post_with_start_date_before_today()
+  {
+    $today = "2022-01-01 10:00:00";
+    $wrongStartDate = "2021-12-31";
+
+    $now = Carbon::createFromFormat("Y-m-d H:i:s", $today);
+    $this->travelTo($now);
+
+    $post = Post::factory()->create(['media_id' => $this->media->id]);
+
+    $postData = Post::factory()->make([
+      'start_date' => $wrongStartDate, 'end_date' => $wrongStartDate, 'media_id' => $this->media->id,
+      'displays_ids' => []
+    ])->toArray();
+    $response = $this->patchJson(route('posts.update', ["post" => $post->id]), $postData)->assertUnprocessable()
+      ->assertJsonValidationErrorFor('start_date');
+  }
+
+  /**
+   * @test
+   */
+  public function ensure_can_update_post_with_start_date_same_as_today()
+  {
+    $today = "2022-01-01 10:00:00";
+    $startDate = "2022-01-01";
+    $startTime = "10:01:00";
+    $endTime = "10:02:00";
+
+    $now = Carbon::createFromFormat("Y-m-d H:i:s", $today);
+    $this->travelTo($now);
+
+    $post = Post::factory()->create(['media_id' => $this->media->id]);
+
+    $postData = Post::factory()->make([
+      'start_date' => $startDate, 'end_date' => $startDate, 'start_time' => $startTime, 'end_time' => $endTime,
+      'media_id' => $this->media->id, 'displays_ids' => []
+    ])->toArray();
+    $response = $this->patchJson(route('posts.update', ["post" => $post->id]), $postData)->assertOk();
+  }
+
+  /**
+   * @test
+   */
+  public function when_end_date_is_today_end_time_must_be_after_now_time_while_updating()
+  {
+    $today = "2022-01-01 10:00:00";
+    $startDate = "2022-01-01";
+    $startTime = "09:00:00";
+    $endTime = "09:59:00";
+
+    $now = Carbon::createFromFormat("Y-m-d H:i:s", $today);
+    $this->travelTo($now);
+
+    $post = Post::factory()->nonRecurrent()->create(['media_id' => $this->media->id]);
+
+    $postData = Post::factory()->make([
+      'start_date' => $startDate, 'end_date' => $startDate, 'start_time' => $startTime, 'end_time' => $endTime,
+      'media_id' => $this->media->id, 'displays_ids' => []
+    ])->toArray();
+    $response = $this->patchJson(route('posts.update', ["post" => $post->id]),
+      $postData)->assertUnprocessable()->assertJsonValidationErrorFor("end_time");
+  }
+
 
   /**
    * @test
