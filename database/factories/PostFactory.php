@@ -60,8 +60,7 @@ class PostFactory extends Factory
       = (clone $base_time)->addHours($this->faker->numberBetween(0,
       8))->addMinutes($this->faker->numberBetween(0,
       59));
-    $end_time = (clone $start_time)->addHours($this->faker->numberBetween(0,
-      6))->addMinutes($this->faker->numberBetween('5',
+    $end_time = (clone now())->addMinutes($this->faker->numberBetween('5',
       59));
 
     return [

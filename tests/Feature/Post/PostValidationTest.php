@@ -90,16 +90,15 @@ class PostValidationTest extends TestCase
     public function start_date_and_end_date_are_required_if_recurrence_id_is_not_passed(
     )
     {
-        $recurrence = Recurrence::factory()->create();
-        $post_data = Post::factory()->make([
-            'start_date' => null, 'end_date' => null,
-            'media_id'   => $this->media->id
-        ])->toArray();
-        $response = $this->postJson(route('posts.store'),
-            $post_data)->assertUnprocessable()
-            ->assertJsonValidationErrors(['start_date', 'end_date']);
+      $post_data = Post::factory()->make([
+        'start_date' => null, 'end_date' => null,
+        'media_id' => $this->media->id
+      ])->toArray();
 
-        $this->assertDatabaseCount('posts', 0);
+      $this->postJson(route('posts.store'),
+        $post_data)->assertUnprocessable()->assertJsonValidationErrors(["start_date", "end_date"]);
+
+      $this->assertDatabaseCount('posts', 0);
     }
 
     /**
@@ -239,6 +238,27 @@ class PostValidationTest extends TestCase
       'media_id' => $this->media->id, 'displays_ids' => []
     ])->toArray();
     $response = $this->postJson(route('posts.store'), $postData)->assertCreated();
+  }
+
+  /**
+   * @test
+   */
+  public function when_end_date_is_today_end_time_must_be_after_now_time()
+  {
+    $today = "2022-01-01 10:00:00";
+    $startDate = "2022-01-01";
+    $startTime = "09:00:00";
+    $endTime = "09:59:00";
+
+    $now = Carbon::createFromFormat("Y-m-d H:i:s", $today);
+    $this->travelTo($now);
+
+    $postData = Post::factory()->make([
+      'start_date' => $startDate, 'end_date' => $startDate, 'start_time' => $startTime, 'end_time' => $endTime,
+      'media_id' => $this->media->id, 'displays_ids' => []
+    ])->toArray();
+    $response = $this->postJson(route('posts.store'),
+      $postData)->assertUnprocessable()->assertJsonValidationErrorFor("end_time");
   }
 
 
