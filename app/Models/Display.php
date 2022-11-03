@@ -15,7 +15,7 @@ class Display extends Model
 
   protected $fillable
     = [
-      'name', 'size', 'width', 'height', 'touch', 'observation',
+      'name', 'size', 'width', 'height', 'observation',
       'store_id'
     ];
 

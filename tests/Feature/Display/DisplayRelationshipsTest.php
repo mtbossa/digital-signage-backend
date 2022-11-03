@@ -121,12 +121,12 @@ class DisplayRelationshipsTest extends TestCase
     public function remove_displays_raspberry()
     {
       $display = $this->_createDisplay();
-      Raspberry::factory()->create(['display_id' => $display->id]);
+      $raspberry = Raspberry::factory()->create(['display_id' => $display->id]);
 
       $response = $this->putJson(route('displays.update', $display->id),
         [...$display->toArray(), 'raspberry_id' => null]);
 
-      $this->assertDatabaseHas('raspberries', ['display_id' => null]);
+      $this->assertDatabaseHas('raspberries', ['id' => $raspberry->id, 'display_id' => null]);
 
       $response->assertOk();
     }

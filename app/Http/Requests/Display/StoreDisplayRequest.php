@@ -28,7 +28,6 @@ class StoreDisplayRequest extends FormRequest
       'size' => 'required|numeric|min:1|max:1000',
       'width' => 'required|numeric|min:1|max:20000',
       'height' => 'required|numeric|min:1|max:20000',
-      'touch' => 'boolean',
       'observation' => 'nullable|string',
       'raspberry_id' => 'nullable|numeric'
     ];
