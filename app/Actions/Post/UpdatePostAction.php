@@ -18,7 +18,8 @@ class UpdatePostAction
     UpdatePostRequest $request,
     Post $post,
   ): Post {
-    $post->update($request->validated());
+    // Since the validation already verifies the end date/time, we know the post is not expired
+    $post->update([...$request->validated(), 'expired' => false]);
     $post->load("displays");
 
     if ($this->isUpdatingNonRecurrentToRecurrent($request, $post)) {

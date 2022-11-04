@@ -18,6 +18,7 @@ class Post extends Model
     'start_time',
     'end_time',
     'expose_time',
+    'expired'
   ];
 
   public function media(): BelongsTo
