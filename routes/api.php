@@ -49,6 +49,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('displays/options', DisplayOption::class)->name("displays.options");
     Route::get('recurrences/options', RecurrenceOption::class)->name("recurrences.options");
 
+    Route::patch('posts/{post}/description', [PostController::class, "description"])->name("posts.update.description");
+
     Route::apiResources([
       'users' => UserController::class,
       'displays' => DisplayController::class,

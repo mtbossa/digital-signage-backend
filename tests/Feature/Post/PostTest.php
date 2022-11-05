@@ -16,6 +16,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 use Tests\Feature\Post\Traits\PostTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
@@ -99,6 +100,63 @@ class PostTest extends TestCase
 
     $this->patchJson(route('posts.update', ["post" => $post->id]),
       [...$newPostData->toArray(), 'displays_ids' => [], 'recurrence_id' => $recurrence->id])->assertOk();
+  }
+
+  /** @test */
+  public function update_only_post_description()
+  {
+    $post = Post::factory()->nonRecurrent()->create(['media_id' => $this->media->id]);
+
+    $attributes = $post->getAttributes();
+
+    $newPostData = Post::factory()->make(['media_id' => $this->media->id]);
+
+    $response = $this->patchJson(route('posts.update.description', ["post" => $post->id]),
+      [...$newPostData->toArray(), 'displays_ids' => []])->assertOk();
+
+    $this->assertDatabaseHas("posts", [
+      "id" => $post->id, ...$attributes, "description" => $newPostData->description,
+      'updated_at' => $response['updated_at']
+    ]);
+  }
+
+  /** @test */
+  public function ensure_description_is_required_when_updating_only_description()
+  {
+    $post = Post::factory()->nonRecurrent()->create(['media_id' => $this->media->id]);
+
+    $newPostData = Post::factory()->make(['media_id' => $this->media->id]);
+
+    $response = $this->patchJson(route('posts.update.description', ["post" => $post->id]),
+      [
+        ...$newPostData->toArray(), 'description' => null, 'displays_ids' => []
+      ])->assertJsonValidationErrorFor("description");
+  }
+
+  /** @test */
+  public function ensure_description_is_string_when_updating_only_description()
+  {
+    $post = Post::factory()->nonRecurrent()->create(['media_id' => $this->media->id]);
+
+    $newPostData = Post::factory()->make(['media_id' => $this->media->id]);
+
+    $response = $this->patchJson(route('posts.update.description', ["post" => $post->id]),
+      [
+        ...$newPostData->toArray(), 'description' => 1, 'displays_ids' => []
+      ])->assertJsonValidationErrorFor("description");
+  }
+
+  /** @test */
+  public function ensure_description_max_is_100_when_updating_only_description()
+  {
+    $post = Post::factory()->nonRecurrent()->create(['media_id' => $this->media->id]);
+
+    $newPostData = Post::factory()->make(['media_id' => $this->media->id]);
+
+    $response = $this->patchJson(route('posts.update.description', ["post" => $post->id]),
+      [
+        ...$newPostData->toArray(), 'description' => Str::random(101), 'displays_ids' => []
+      ])->assertJsonValidationErrorFor("description");
   }
 
   /** @test */

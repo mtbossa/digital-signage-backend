@@ -75,4 +75,15 @@ class PostController extends Controller
     }
     return $post->delete();
   }
+
+  public function description(Request $request, Post $post): Post
+  {
+    $validated = $request->validate([
+      'description' => [
+        'required', 'string', 'max:100'
+      ]
+    ]);
+    $post->update($validated);
+    return $post;
+  }
 }
