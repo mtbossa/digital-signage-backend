@@ -65,6 +65,12 @@ class MediaTest extends TestCase
   }
 
   /** @test */
+  public function when_trying_to_download_media_file_should_return_404_if_media_not_found_by_filename()
+  {
+    $this->getJson(route('media.download', 'randomfilename.jpg'))->assertNotFound();
+  }
+
+  /** @test */
   public function create_video_media_and_store_file_under_videos_folder_and_ensure_it_can_be_downloaded()
   {
     Storage::fake('local');
