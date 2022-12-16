@@ -11,6 +11,7 @@ use App\Models\Post;
 use App\Models\Recurrence;
 use App\Services\PostSchedulerService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class StorePostAction
 {
@@ -35,6 +36,9 @@ class StorePostAction
       foreach ($displays_ids as $display_id) {
         $display = Display::query()->find($display_id);
         DisplayPostCreated::dispatch($display, $post);
+        
+        $currentCache = Cache::get('DisplayUpdates.PostCreated' . $display_id, []);
+        Cache::put('DisplayUpdates.PostCreated' . $display_id, [...$currentCache, $post->id]);
       }
 
       $post->load('displays');
