@@ -27,4 +27,16 @@ class DisplayUpdatesCacheService {
 
     return $cached;  
   }
+
+  public function clearCache(DisplayUpdatesCacheKeysEnum $key, int $display_id) {
+    $currentCache = $this->getCurrentCache($key, $display_id);
+    $forgotten = false;
+
+    switch ($key):
+      case DisplayUpdatesCacheKeysEnum::PostCreated:
+        $forgotten = Cache::forget('DisplayUpdates.PostCreated' . $display_id);
+    endswitch;
+
+    return $forgotten;
+  }
 }

@@ -15,11 +15,14 @@ class DisplayUpdatesController extends Controller
     public function __invoke(Request $request, Display $display, DisplayUpdatesCacheService $display_updates_cache_service): JsonResponse
     {
         $updates = [];
+        $display_id = $display->id;
         
-        $createdPostsIds = $display_updates_cache_service->getCurrentCache(DisplayUpdatesCacheKeysEnum::PostCreated, $display->id);        
+        $createdPostsIds = $display_updates_cache_service->getCurrentCache(DisplayUpdatesCacheKeysEnum::PostCreated, $display_id);        
         if (count($createdPostsIds) > 0) {
           $createdPosts = Post::query()->findMany($createdPostsIds);
           $updates['PostCreated'] = RaspberryPostsResource::collection($createdPosts)->resolve();
+          
+          $display_updates_cache_service->clearCache(DisplayUpdatesCacheKeysEnum::PostCreated, $display_id);
         }
         
         return response()->json($updates, 200);
