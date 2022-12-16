@@ -5,17 +5,18 @@ namespace App\Http\Controllers;
 use App\Http\Resources\RaspberryPostsResource;
 use App\Models\Display;
 use App\Models\Post;
+use App\Services\DisplayUpdatesCache\DisplayUpdatesCacheKeysEnum;
+use App\Services\DisplayUpdatesCache\DisplayUpdatesCacheService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 class DisplayUpdatesController extends Controller
 {
-    public function __invoke(Request $request, Display $display): JsonResponse
+    public function __invoke(Request $request, Display $display, DisplayUpdatesCacheService $display_updates_cache_service): JsonResponse
     {
         $updates = [];
         
-        $createdPostsIds = Cache::get('DisplayUpdates.PostCreated'.$display->id, []);        
+        $createdPostsIds = $display_updates_cache_service->getCurrentCache(DisplayUpdatesCacheKeysEnum::PostCreated, $display->id);        
         if (count($createdPostsIds) > 0) {
           $createdPosts = Post::query()->findMany($createdPostsIds);
           $updates['PostCreated'] = RaspberryPostsResource::collection($createdPosts)->resolve();

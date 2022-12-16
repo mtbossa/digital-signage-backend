@@ -4,17 +4,20 @@ namespace App\Actions\Post;
 
 use App\Events\DisplayPost\DisplayPostCreated;
 use App\Http\Requests\Post\StorePostRequest;
-use App\Jobs\ExpirePost;
 use App\Models\Display;
 use App\Models\Media;
 use App\Models\Post;
 use App\Models\Recurrence;
+use App\Services\DisplayUpdatesCache\DisplayUpdatesCacheKeysEnum;
+use App\Services\DisplayUpdatesCache\DisplayUpdatesCacheService;
 use App\Services\PostSchedulerService;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
 
 class StorePostAction
 {
+  public function __construct(private readonly DisplayUpdatesCacheService $display_updates_cache_service)
+  {
+  }
+
   public function handle(
     StorePostRequest $request,
   ): Post {
@@ -37,8 +40,7 @@ class StorePostAction
         $display = Display::query()->find($display_id);
         DisplayPostCreated::dispatch($display, $post);
         
-        $currentCache = Cache::get('DisplayUpdates.PostCreated' . $display_id, []);
-        Cache::put('DisplayUpdates.PostCreated' . $display_id, [...$currentCache, $post->id]);
+        $this->display_updates_cache_service->setCurrentCache(DisplayUpdatesCacheKeysEnum::PostCreated, $display_id, $post->id);
       }
 
       $post->load('displays');
