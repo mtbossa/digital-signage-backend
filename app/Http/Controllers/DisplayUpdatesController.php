@@ -17,12 +17,12 @@ class DisplayUpdatesController extends Controller
         $updates = [];
         $display_id = $display->id;
         
-        $createdPostsIds = $display_updates_cache_service->getCurrentCache(DisplayUpdatesCacheKeysEnum::PostCreated, $display_id);        
+        $createdPostsIds = $display_updates_cache_service->getCurrentCache(DisplayUpdatesCacheKeysEnum::DisplayUpdatesPostCreated, $display_id);        
         if (count($createdPostsIds) > 0) {
           $createdPosts = Post::query()->findMany($createdPostsIds);
           $updates['PostCreated'] = RaspberryPostsResource::collection($createdPosts)->resolve();
           
-          $display_updates_cache_service->clearCache(DisplayUpdatesCacheKeysEnum::PostCreated, $display_id);
+          $display_updates_cache_service->clearCache(DisplayUpdatesCacheKeysEnum::DisplayUpdatesPostCreated, $display_id);
         }
         
         return response()->json($updates, 200);

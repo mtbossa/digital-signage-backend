@@ -12,6 +12,8 @@ use App\Models\Post;
 use App\Models\Raspberry;
 use App\Models\Recurrence;
 use App\Notifications\DisplayPost\PostDeleted;
+use App\Services\DisplayUpdatesCache\DisplayUpdatesCacheKeysEnum;
+use App\Services\DisplayUpdatesCache\DisplayUpdatesCacheService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Cache;
@@ -369,13 +371,14 @@ class PostTest extends TestCase
   /** @test */
   public function when_post_is_created_with_displays_should_cache_post_create_cache_for_each_display_with_post_id()
   {
+    $cacheService = new DisplayUpdatesCacheService();
     $displaysIds = Display::factory(2)->create()->pluck('id');
     $post = Post::factory()->nonRecurrent()->make(['media_id' => $this->media->id]);
     
     $response = $this->postJson(route('posts.store'), [...$post->toArray(), 'displays_ids' => $displaysIds->toArray()])->assertCreated();
 
     foreach ($displaysIds as $displayId) {
-      $cache = Cache::get('DisplayUpdates.PostCreated'.$displayId);
+      $cache = $cacheService->getCurrentCache(DisplayUpdatesCacheKeysEnum::DisplayUpdatesPostCreated, $displayId);
       $this->assertEquals($cache, [$response->json('id')]);
     }
   }
@@ -383,6 +386,7 @@ class PostTest extends TestCase
   /** @test */
   public function when_post_is_created_with_displays_should_cache_post_create_cache_for_each_display_with_post_id_and_append_with_other_posts_that_are_already_in_cache()
   {
+    $cacheService = new DisplayUpdatesCacheService();
     $displaysIds = Display::factory(2)->create()->pluck('id');
     
     $post1 = Post::factory()->nonRecurrent()->make(['media_id' => $this->media->id]);
@@ -392,7 +396,7 @@ class PostTest extends TestCase
     $response2 = $this->postJson(route('posts.store'), [...$post2->toArray(), 'displays_ids' => $displaysIds->toArray()])->assertCreated();
 
     foreach ($displaysIds as $displayId) {
-      $cache = Cache::get('DisplayUpdates.PostCreated'.$displayId);
+      $cache = $cacheService->getCurrentCache(DisplayUpdatesCacheKeysEnum::DisplayUpdatesPostCreated, $displayId);
       $this->assertEquals($cache, [$response1->json('id'), $response2->json('id')]);
     }
   }

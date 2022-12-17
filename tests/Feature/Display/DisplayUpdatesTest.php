@@ -46,7 +46,7 @@ class DisplayUpdatesTest extends TestCase
     foreach ($posts as $post) {
       $post->displays()->attach($this->display->id);
 
-      $cacheService->setCurrentCache(DisplayUpdatesCacheKeysEnum::PostCreated, $this->display->id, $post->id);
+      $cacheService->setCurrentCache(DisplayUpdatesCacheKeysEnum::DisplayUpdatesPostCreated, $this->display->id, $post->id);
     }
     
     $response = $this->getJson(route('displays.updates', $this->display->id));
@@ -64,7 +64,7 @@ class DisplayUpdatesTest extends TestCase
     // First Post     
     $post1 = Post::factory()->create(['media_id' => $this->media->id]);
     $post1->displays()->attach($this->display->id);
-    $cacheService->setCurrentCache(DisplayUpdatesCacheKeysEnum::PostCreated, $this->display->id, $post1->id);
+    $cacheService->setCurrentCache(DisplayUpdatesCacheKeysEnum::DisplayUpdatesPostCreated, $this->display->id, $post1->id);
     
     // Client requests the updates and we return the created one
     $response = $this->getJson(route('displays.updates', $this->display->id));
@@ -75,7 +75,7 @@ class DisplayUpdatesTest extends TestCase
     foreach ($posts as $post) {
       $post->displays()->attach($this->display->id);
 
-      $cacheService->setCurrentCache(DisplayUpdatesCacheKeysEnum::PostCreated, $this->display->id, $post->id);
+      $cacheService->setCurrentCache(DisplayUpdatesCacheKeysEnum::DisplayUpdatesPostCreated, $this->display->id, $post->id);
     }
 
     // Must have only the two new ones, not the first one

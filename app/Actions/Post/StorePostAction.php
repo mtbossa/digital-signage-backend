@@ -40,7 +40,7 @@ class StorePostAction
         $display = Display::query()->find($display_id);
         DisplayPostCreated::dispatch($display, $post);
         
-        $this->display_updates_cache_service->setCurrentCache(DisplayUpdatesCacheKeysEnum::PostCreated, $display_id, $post->id);
+        $this->display_updates_cache_service->setCurrentCache(DisplayUpdatesCacheKeysEnum::DisplayUpdatesPostCreated, $display_id, $post->id);
       }
 
       $post->load('displays');

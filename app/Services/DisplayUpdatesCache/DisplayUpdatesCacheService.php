@@ -9,8 +9,8 @@ class DisplayUpdatesCacheService {
     $currentCache = [];
     
     switch ($key):
-      case DisplayUpdatesCacheKeysEnum::PostCreated:
-        $currentCache = Cache::get('DisplayUpdates.PostCreated' . $display_id, []);
+      case DisplayUpdatesCacheKeysEnum::DisplayUpdatesPostCreated:
+        $currentCache = Cache::get($this->makeKeyName($key, $display_id), []);
     endswitch;
     
     return $currentCache;
@@ -21,8 +21,8 @@ class DisplayUpdatesCacheService {
     $cached = false;
 
     switch ($key):
-      case DisplayUpdatesCacheKeysEnum::PostCreated:
-        $cached = Cache::put('DisplayUpdates.PostCreated' . $display_id, [...$currentCache, $value]);
+      case DisplayUpdatesCacheKeysEnum::DisplayUpdatesPostCreated:
+        $cached = Cache::put($this->makeKeyName($key, $display_id), [...$currentCache, $value]);
     endswitch;
 
     return $cached;  
@@ -33,10 +33,15 @@ class DisplayUpdatesCacheService {
     $forgotten = false;
 
     switch ($key):
-      case DisplayUpdatesCacheKeysEnum::PostCreated:
-        $forgotten = Cache::forget('DisplayUpdates.PostCreated' . $display_id);
+      case DisplayUpdatesCacheKeysEnum::DisplayUpdatesPostCreated:
+        $forgotten = Cache::forget($this->makeKeyName($key, $display_id));
     endswitch;
 
     return $forgotten;
+  }
+  
+  private function makeKeyName(DisplayUpdatesCacheKeysEnum $key, int $display_id): string
+  {
+    return $key->name . $display_id; 
   }
 }
