@@ -23,6 +23,7 @@
     "brianium/paratest": "^6.4",
     "fakerphp/faker": "^1.9.1",
     "laravel/sail": "^1.0.1",
+    "laravel/telescope": "^4.10",
     "mockery/mockery": "^1.4.4",
     "nunomaduro/collision": "^6.1",
     "phpunit/phpunit": "^9.5.10",
@@ -57,7 +58,7 @@
   },
   "extra": {
     "laravel": {
-      "dont-discover": []
+      "dont-discover": ["laravel/telescope"]
     }
   },
   "config": {
