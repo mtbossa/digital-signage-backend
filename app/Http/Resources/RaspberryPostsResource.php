@@ -38,7 +38,6 @@ class RaspberryPostsResource extends JsonResource
                     'isoweekday' => $this->recurrence?->isoweekday,
                     'day'        => $this->recurrence?->day,
                     'month'      => $this->recurrence?->month,
-                    'year'       => $this->recurrence?->year
                 ],
             ]),
         ];
