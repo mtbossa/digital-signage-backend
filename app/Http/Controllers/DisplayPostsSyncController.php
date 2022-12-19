@@ -28,7 +28,7 @@ class DisplayPostsSyncController extends Controller
         $query->with(['recurrence' => fn(BelongsTo $query) => $query->select(['id', 'isoweekday', 'day', 'month'])]);
       }
     ])
-      ->select(['id', 'type', 'filename', 'path'])
+      ->select(['id', 'type', 'filename'])
       ->findMany($uniqueMediasIds);
     
     
