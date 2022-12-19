@@ -3,6 +3,7 @@
 use App\Http\Controllers\DisplayController;
 use App\Http\Controllers\DisplayOption;
 use App\Http\Controllers\DisplayPostController;
+use App\Http\Controllers\DisplayPostsSyncController;
 use App\Http\Controllers\DisplayUpdatesController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MediaController;
@@ -68,6 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('invitations', InvitationController::class,
       ['except' => ['update', 'show']]);
   });
+  Route::get('display/{display}/posts/sync', DisplayPostsSyncController::class);
   Route::get("raspberry/display/posts", RaspberryDisplayPostsController::class)->name('raspberry.display.posts');
   Route::get('media/{filename}/download', MediaDownloadController::class)
     ->name('media.download');
