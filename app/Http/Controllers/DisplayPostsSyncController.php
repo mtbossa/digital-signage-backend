@@ -32,6 +32,6 @@ class DisplayPostsSyncController extends Controller
       ->findMany($uniqueMediasIds);
     
     
-    return response()->json($neededMedias);
+    return response()->json(['data' => $neededMedias]);
   }
 }
