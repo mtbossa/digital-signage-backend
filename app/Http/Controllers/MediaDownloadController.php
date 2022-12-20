@@ -16,8 +16,6 @@ class MediaDownloadController extends Controller
     if (request()->has("temp_url")) {
       return Storage::temporaryUrl($media->path, now()->addMinutes(10));
     }
-    $contents = Storage::get($media->path);
-    $size = Storage::size($media->path);
     return Storage::download($media->path);
   }
 }
