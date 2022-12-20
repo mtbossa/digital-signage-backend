@@ -31,7 +31,7 @@ class MediaTest extends TestCase
   /** @test */
   public function ensure_filename_is_store_as_hash()
   {
-    Storage::fake('local');
+    Storage::fake('s3');
 
     $description = 'Imagem de teste';
 
@@ -44,9 +44,9 @@ class MediaTest extends TestCase
   }
 
   /** @test */
-  public function create_image_media_and_store_file_under_images_folder_and_ensure_it_can_be_downloaded()
+  public function ensure_temporay_url_is_returned_when_temporary_url_parameter_is_send()
   {
-    Storage::fake('local');
+    Storage::fake('s3');
 
     $description = 'Imagem de teste';
 
@@ -73,7 +73,7 @@ class MediaTest extends TestCase
   /** @test */
   public function create_video_media_and_store_file_under_videos_folder_and_ensure_it_can_be_downloaded()
   {
-    Storage::fake('local');
+    Storage::fake('s3');
 
     $description = 'Video de teste';
 
