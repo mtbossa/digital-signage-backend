@@ -54,7 +54,7 @@ services:
     minio:
         image: 'minio/minio:latest'
         ports:
-            - '9002:9000'
+            - '9000:9000'
             - '9004:9004'
         volumes:
             - ./storage/minio:/data
