@@ -9,16 +9,13 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MediaDownloadController extends Controller
 {
-  /**
-   * Handle the incoming request.
-   *
-   * @param  Request  $request
-   * @return StreamedResponse
-   */
-  public function __invoke(Request $request, string $filename)
+
+  public function __invoke(Request $request, string $filename): StreamedResponse|string
   {
-    ini_set('max_execution_time', 180);
     $media = Media::query()->where('filename', $filename)->firstOrFail();
+    if (request()->has("temp_url")) {
+      return Storage::temporaryUrl($media->path, now()->addMinutes(10));
+    }
     $contents = Storage::get($media->path);
     $size = Storage::size($media->path);
     return Storage::download($media->path);

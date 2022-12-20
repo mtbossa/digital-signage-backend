@@ -73,16 +73,30 @@ class MediaTest extends TestCase
 
     $file = UploadedFile::fake()->image('image_test.jpg');
     $response = $this->postJson(route('medias.store'), ['description' => $description, 'file' => $file]);
+    
+    $test = Storage::temporaryUrl($response->json('path'), now()->addMinutes(10));
 
-    $response_data = $response->json();
+    $response2 = $this->getJson(route('media.download', ['filename' => $response->json('filename'), 'temp_url' => true]))->assertOk();
+    $this->assertIsString($response2->content());
+  }
 
-    Storage::disk('s3')->assertExists($this->defaultLocation['image'].'/'.$response_data['filename']);
+  /** @test */
+  public function ensure_temporay_url_is_available_for_10_minutes()
+  {
+    // So we stop time
+    $this->travelTo(now()->addMinute());
 
-    $this->assertDatabaseHas('medias', $response_data);
+    Storage::fake('s3');
 
-    $response->assertCreated()->assertJson($response_data);
+    $description = 'Imagem de teste';
 
-    $this->getJson(route('media.download', $response_data['filename']))->assertDownload($response_data['filename']);
+    $file = UploadedFile::fake()->image('image_test.jpg');
+    $response = $this->postJson(route('medias.store'), ['description' => $description, 'file' => $file]);
+
+    $correctUrl = Storage::temporaryUrl($response->json('path'), now()->addMinutes(10));
+
+    $response2 = $this->getJson(route('media.download', ['filename' => $response->json('filename'), 'temp_url' => true]))->assertOk();
+    $this->assertEquals($correctUrl, $response2->content());
   }
 
   /** @test */
