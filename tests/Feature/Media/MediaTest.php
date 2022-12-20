@@ -44,6 +44,27 @@ class MediaTest extends TestCase
   }
 
   /** @test */
+  public function create_image_media_and_store_file_under_images_folder_and_ensure_it_can_be_downloaded()
+  {
+    Storage::fake('s3');
+
+    $description = 'Imagem de teste';
+
+    $file = UploadedFile::fake()->image('image_test.jpg');
+    $response = $this->postJson(route('medias.store'), ['description' => $description, 'file' => $file]);
+
+    $response_data = $response->json();
+
+    Storage::disk('s3')->assertExists($this->defaultLocation['image'].'/'.$response_data['filename']);
+
+    $this->assertDatabaseHas('medias', $response_data);
+
+    $response->assertCreated()->assertJson($response_data);
+
+    $this->getJson(route('media.download', $response_data['filename']))->assertDownload($response_data['filename']);
+  }
+
+  /** @test */
   public function ensure_temporay_url_is_returned_when_temporary_url_parameter_is_send()
   {
     Storage::fake('s3');
