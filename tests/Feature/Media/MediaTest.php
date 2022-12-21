@@ -65,7 +65,7 @@ class MediaTest extends TestCase
   }
 
   /** @test */
-  public function ensure_temporay_url_is_returned_when_temporary_url_parameter_is_send()
+  public function ensure_temporary_url_is_returned_when_temporary_url_parameter_is_send()
   {
     Storage::fake('s3');
 
@@ -77,11 +77,11 @@ class MediaTest extends TestCase
     $test = Storage::temporaryUrl($response->json('path'), now()->addMinutes(10));
 
     $response2 = $this->getJson(route('media.download', ['filename' => $response->json('filename'), 'temp_url' => true]))->assertOk();
-    $this->assertIsString($response2->content());
+    $this->assertIsString($response2->json('temp_url'));
   }
 
   /** @test */
-  public function ensure_temporay_url_is_available_for_10_minutes()
+  public function ensure_temporary_url_is_available_for_10_minutes()
   {
     // So we stop time
     $this->travelTo(now()->addMinute());
@@ -96,7 +96,7 @@ class MediaTest extends TestCase
     $correctUrl = Storage::temporaryUrl($response->json('path'), now()->addMinutes(10));
 
     $response2 = $this->getJson(route('media.download', ['filename' => $response->json('filename'), 'temp_url' => true]))->assertOk();
-    $this->assertEquals($correctUrl, $response2->content());
+    $this->assertEquals($correctUrl, $response2->json('temp_url'));
   }
 
   /** @test */
