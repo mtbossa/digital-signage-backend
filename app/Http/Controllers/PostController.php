@@ -48,15 +48,6 @@ class PostController extends Controller
     return $post;
   }
 
-  private function schedulePostExpiredEvent(Post $post)
-  {
-    $end_date = $post->end_date;
-    $end_time = $post->end_time;
-    $end = Carbon::createFromFormat('Y-m-d H:i:s', "$end_date $end_time");
-    $delay = $end->diffInSeconds(now());
-    ExpirePost::dispatch($post)->delay($delay);
-  }
-
   public function update(UpdatePostRequest $request, Post $post, UpdatePostAction $action): Post
   {
     return $action->handle($request, $post);
