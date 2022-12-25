@@ -33,7 +33,7 @@ class RaspberryPostsResource extends JsonResource
                 ],
             ]),
             $this->mergeWhen($this->whenLoaded('recurrence')
-                && $this->whenNotNull($this->recurrence), [
+                && (bool) $this->recurrence_id, [
                 'recurrence' => [
                     'isoweekday' => $this->recurrence?->isoweekday,
                     'day'        => $this->recurrence?->day,
