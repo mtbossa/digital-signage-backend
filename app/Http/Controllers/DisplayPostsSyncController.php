@@ -21,8 +21,8 @@ class DisplayPostsSyncController extends Controller
       return response()->json(["error" => "You must pass current locally stores posts_ids"],
         Response::HTTP_BAD_REQUEST);
     }
-
-    $locallyStoredPostsIds = $request->posts_ids;
+    
+    $locallyStoredPostsIds = array_map('intval', $request->posts_ids);
 
     $display->load([
       'posts' => function (BelongsToMany $query) {
@@ -71,7 +71,7 @@ class DisplayPostsSyncController extends Controller
       'data' => [
         "available" => $neededMedias, 
         "deletable_posts_ids" => $deletablePostsIds,
-        "deletable_medias_ids" => $deletablePostsIds
+        "deletable_medias_ids" => $deletable_medias_ids
       ]
     ]);
   }
