@@ -32,7 +32,7 @@ class DisplayPostsSyncController extends Controller
 
     $notExpiredPosts = $display->posts;
     $uniqueMediasIds = $notExpiredPosts->pluck('media_id')->unique();
-    $neededMedias = Media::query()->with([
+    $needed_medias = Media::query()->with([
       'posts' => function (HasMany $query) use ($notExpiredPosts) {
         $query->whereIn('id', $notExpiredPosts->pluck('id')->toArray());
         $query->select([
@@ -44,14 +44,14 @@ class DisplayPostsSyncController extends Controller
       ->select(['id', 'type', 'filename'])
       ->findMany($uniqueMediasIds);
 
-    $deletablePostsIds = Collection::make($locallyStoredPostsIds)->filter(function (string $locallyStoredPostId) use (
+    $deletable_posts_ids = Collection::make($locallyStoredPostsIds)->filter(function (string $locallyStoredPostId) use (
       $notExpiredPosts
     ) {
       return !$notExpiredPosts->contains(fn(Post $notExpiredPost
       ) => (int) $locallyStoredPostId === $notExpiredPost->id);
     });
 
-    $deletablePosts = Post::query()->findMany($deletablePostsIds, ['id', 'media_id']);
+    $deletablePosts = Post::query()->findMany($deletable_posts_ids, ['id', 'media_id']);
     $stillNeededMediasIds = Post::query()->select(['media_id', DB::raw("count(*)")])
       ->whereNotIn("id", $deletablePosts->pluck("id"))
       ->whereIn("media_id", $deletablePosts->pluck("media_id")->unique('media_id'))
@@ -68,8 +68,8 @@ class DisplayPostsSyncController extends Controller
       );
 
     return response()->json([
-      "available" => $neededMedias, 
-      "deletable_posts_ids" => $deletablePostsIds,
+      "available" => $needed_medias, 
+      "deletable_posts_ids" => $deletable_posts_ids,
       "deletable_medias_ids" => $deletable_medias_ids
     ]);
   }
