@@ -68,11 +68,9 @@ class DisplayPostsSyncController extends Controller
       );
 
     return response()->json([
-      'data' => [
-        "available" => $neededMedias, 
-        "deletable_posts_ids" => $deletablePostsIds,
-        "deletable_medias_ids" => $deletable_medias_ids
-      ]
+      "available" => $neededMedias, 
+      "deletable_posts_ids" => $deletablePostsIds,
+      "deletable_medias_ids" => $deletable_medias_ids
     ]);
   }
 }
