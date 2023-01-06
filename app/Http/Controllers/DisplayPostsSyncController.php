@@ -22,7 +22,13 @@ class DisplayPostsSyncController extends Controller
         Response::HTTP_BAD_REQUEST);
     }
     
-    $locallyStoredPostsIds = array_map('intval', $request->posts_ids);
+    $posts_ids = $request->posts_ids;
+    $locallyStoredPostsIds = [];
+    if (! is_null($posts_ids[0])) {
+      // When there aren't any posts stored, the request will come as ?posts_ids=[]
+      // which will be transform in an array [null]
+      $locallyStoredPostsIds = array_map('intval', $request->posts_ids); 
+    }
 
     $display->load([
       'posts' => function (BelongsToMany $query) {
