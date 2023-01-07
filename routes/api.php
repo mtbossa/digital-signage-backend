@@ -4,7 +4,6 @@ use App\Http\Controllers\DisplayController;
 use App\Http\Controllers\DisplayOption;
 use App\Http\Controllers\DisplayPostController;
 use App\Http\Controllers\DisplayPostsSyncController;
-use App\Http\Controllers\DisplaysCodesController;
 use App\Http\Controllers\DisplayUpdatesController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MediaController;
@@ -82,8 +81,6 @@ Route::middleware('auth:sanctum')->group(function () {
   });
 });
 
-Route::apiResource('displays-codes', DisplaysCodesController::class,
-  ['only' => ['store']]);
 Route::get('invitations/{token}', [InvitationController::class, 'show'])
   ->name('invitations.show');
 Route::patch('invitations/{token}', [InvitationController::class, 'update'])
