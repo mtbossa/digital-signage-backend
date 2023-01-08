@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ExpirePairingCode;
 use App\Models\PairingCode;
 use App\Services\PairingCodeGeneratorService;
 use Exception;
@@ -25,7 +26,10 @@ class PairingCodeController extends Controller
             $foundOrNot = PairingCode::query()->where('code', $generated_code)->count();
 
             if ($foundOrNot === 0) {
-                return PairingCode::create(['code' => $generated_code]);
+                $pairing_code = PairingCode::create(['code' => $generated_code]);
+                $delay = now()->addMinutes(5);
+                ExpirePairingCode::dispatch($pairing_code)->delay($delay);
+                return $pairing_code;
             }
         } while ($tries <= 100);
 
