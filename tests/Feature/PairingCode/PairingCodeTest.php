@@ -2,14 +2,11 @@
 
 namespace Tests\Feature\PairingCode;
 
-use App\Models\Display;
 use App\Models\PairingCode;
 use App\Services\PairingCodeGeneratorService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Mockery\MockInterface;
-use Tests\Feature\Display\Traits\DisplayTestsTrait;
-use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
 class PairingCodeTest extends TestCase
 {
