@@ -27,8 +27,7 @@ class PairingCodeController extends Controller
 
             if ($foundOrNot === 0) {
                 $pairing_code = PairingCode::create(['code' => $generated_code]);
-                $delay = now()->addMinutes(5);
-                ExpirePairingCode::dispatch($pairing_code)->delay($delay);
+                ExpirePairingCode::dispatch($pairing_code)->delay(now()->addMinutes(5));
                 return $pairing_code;
             }
         } while ($tries <= 100);
