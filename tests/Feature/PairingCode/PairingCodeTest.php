@@ -45,5 +45,20 @@ class PairingCodeTest extends TestCase
     $this->postJson(route('pairing-codes.store'))->assertCreated();
     $this->assertDatabaseHas('pairing_codes', ['code' => $new_generated]);
   }
+
+    /** @test */
+    public function if_tried_more_then_100_times_should_return_503_response()
+    {
+        $already_generated = Str::repeat('a', 6);
+
+        PairingCode::create(["code" => $already_generated]);
+
+        $this->partialMock(PairingCodeGeneratorService::class, function (MockInterface $mock) use ($already_generated) {
+            $mock->shouldReceive('generate')->andReturn($already_generated);
+        });
+
+        $this->postJson(route('pairing-codes.store'))->assertStatus(503);
+        $this->assertDatabaseCount('pairing_codes', 1);
+    }
   
 }
