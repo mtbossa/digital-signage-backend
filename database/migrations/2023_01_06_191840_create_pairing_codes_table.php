@@ -13,9 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('displays_codes', function (Blueprint $table) {
+        Schema::create('pairing_codes', function (Blueprint $table) {
             $table->id();
-            $table->integer('code');
+            
+            $table->string('code', 6)->unique();
+            
             $table->timestamps();
         });
     }

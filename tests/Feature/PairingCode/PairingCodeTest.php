@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\DisplayCode;
+namespace Tests\Feature\PairingCode;
 
 use App\Models\Display;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -8,7 +8,7 @@ use Tests\Feature\Display\Traits\DisplayTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
 
-class DisplayCodeTest extends TestCase
+class PairingCodeTest extends TestCase
 {
   use RefreshDatabase;
 
@@ -20,10 +20,10 @@ class DisplayCodeTest extends TestCase
   /** @test */
   public function should_generate_code_when_requested()
   {
-    $response = $this->postJson(route('displays-codes.store'));
+    $response = $this->postJson(route('pairing-codes.store'));
     $response->assertCreated();
     $generated_code = $response->json('code');
-    $this->assertDatabaseHas('displays_codes', ['code' => $generated_code]);
+    $this->assertDatabaseHas('pairing_codes', ['code' => $generated_code]);
   }
   
   

@@ -4,13 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class DisplaysCodes extends Model
+class PairingCode extends Model
 {
     use HasFactory;
 
-    protected $table = 'displays_codes';
+    protected $table = 'pairing_codes';
   
     protected $fillable = ['code'];
 }

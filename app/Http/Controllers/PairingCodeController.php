@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DisplaysCodes;
+use App\Models\PairingCode;
 use Exception;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class DisplaysCodesController extends Controller
+class PairingCodeController extends Controller
 {
   /**
    * @throws Exception
@@ -15,6 +14,6 @@ class DisplaysCodesController extends Controller
   public function store(Request $request)
   {
       $code = random_int(100000, 999999);
-      return DisplaysCodes::create(['code' => $code]);
+      return PairingCode::create(['code' => $code]);
     }
 }
