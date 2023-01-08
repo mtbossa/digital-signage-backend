@@ -32,7 +32,7 @@ class StoreDisplayAction
       $display->store()->associate($store);
     }
     
-//    $pairing_code->delete();
+    $pairing_code->delete();
 
     return $display;
   }

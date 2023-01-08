@@ -3,6 +3,7 @@
 namespace Tests\Feature\Display;
 
 use App\Models\Display;
+use App\Models\PairingCode;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\Display\Traits\DisplayTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
@@ -23,15 +24,28 @@ class DisplayTest extends TestCase
   /** @test */
   public function create_display()
   {
+      $pairing_code = PairingCode::factory()->create();
+      
     $display_data = $this->_makeDisplay()->toArray();
 
-    $response = $this->postJson(route('displays.store'), $display_data);
+    $response = $this->postJson(route('displays.store'), [...$display_data, 'pairing_code' => $pairing_code->code]);
 
     $this->assertDatabaseHas('displays', $display_data);
 
     $display = Display::find($response->json()['id']);
     $response->assertCreated()->assertJson($display->toArray());
   }
+
+    /** @test */
+    public function ensure_pairing_code_is_deleted_after_display_creation()
+    {
+        $pairing_code = PairingCode::factory()->create();
+        $display_data = $this->_makeDisplay()->toArray();
+        
+        $this->postJson(route('displays.store'), [...$display_data, 'pairing_code' => $pairing_code->code])->assertCreated();
+        
+        $this->assertModelMissing($pairing_code);
+    }
 
   /** @test */
   public function update_display()

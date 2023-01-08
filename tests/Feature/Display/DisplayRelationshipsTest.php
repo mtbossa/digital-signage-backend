@@ -4,6 +4,7 @@ namespace Tests\Feature\Display;
 
 use App\Models\Display;
 use App\Models\Media;
+use App\Models\PairingCode;
 use App\Models\Post;
 use App\Models\Raspberry;
 use App\Models\Store;
@@ -70,10 +71,11 @@ class DisplayRelationshipsTest extends TestCase
     public function create_display_and_relation_to_raspberry()
     {
         $raspberry = Raspberry::factory()->create();
+        $pairing_code = PairingCode::factory()->create();
         $display_data = $this->_makeDisplay()->toArray();
 
         $response = $this->postJson(route('displays.store',
-            ['raspberry_id' => $raspberry->id]), $display_data);
+            ['raspberry_id' => $raspberry->id]), [...$display_data, 'pairing_code' => $pairing_code->code]);
         $new_display_id = $response->json()['id'];
 
         $this->assertDatabaseHas('displays', ['id' => $new_display_id]);
@@ -88,10 +90,11 @@ class DisplayRelationshipsTest extends TestCase
     public function create_display_and_relation_to_store()
     {
         $store = Store::factory()->create();
+        $pairing_code = PairingCode::factory()->create();
         $display_data = $this->_makeDisplay(['store_id' => $store->id])
             ->toArray();
 
-        $response = $this->postJson(route('displays.store'), $display_data);
+        $response = $this->postJson(route('displays.store'), [...$display_data, 'pairing_code' => $pairing_code->code]);
         $new_display_id = $response->json()['id'];
 
         $this->assertDatabaseHas('displays',
