@@ -69,4 +69,11 @@ class DisplayTest extends TestCase
     $this->getJson(route('displays.index'))->assertOk()->assertJsonCount(2,
       'data')->assertJsonFragment(['id' => $display->id]);
   }
+
+    /** @test */
+    public function ensure_422_when_trying_to_create_display_with_not_existing_pairing_code()
+    {
+        $display_data = $this->_makeDisplay()->toArray();
+        $this->postJson(route('displays.store'), [...$display_data, 'pairing_code' => 'aaaaaa'])->assertUnprocessable();
+    }
 }

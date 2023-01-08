@@ -50,7 +50,7 @@ class DisplayValidationTest extends TestCase
   public function invalidDisplays(): array
   {
     $display_data = [
-      'name' => 'teste', 'size' => 42, 'width' => 1920, 'height' => 1080, 'observation' => 'a'
+      'name' => 'teste', 'size' => 42, 'width' => 1920, 'height' => 1080, 'observation' => 'a', 'pairing_code' => 'aaaaaa'
     ];
     return [
       'name greater than 100 char' => [[...$display_data, 'name' => Str::random(101)], ['name']],
@@ -71,6 +71,9 @@ class DisplayValidationTest extends TestCase
       'height as string' => [[...$display_data, 'height' => 'a'], ['height']],
       'height 0' => [[...$display_data, 'height' => 0], ['height']],
       'height greater then 20000' => [[...$display_data, 'height' => 20001], ['height']],
+        'pairing_code as null' => [[...$display_data, 'pairing_code' => null], ['pairing_code']],
+        'pairing_code as empty string' => [[...$display_data, 'pairing_code' => ''], ['pairing_code']],
+        
     ];
   }
 

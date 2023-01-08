@@ -8,6 +8,7 @@ use App\Http\Requests\Display\StoreDisplayRequest;
 use App\Http\Requests\Display\UpdateDisplayRequest;
 use App\Models\Display;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class DisplayController extends Controller
@@ -18,7 +19,7 @@ class DisplayController extends Controller
     return Display::query()->paginate($request->size);
   }
 
-  public function store(StoreDisplayRequest $request, StoreDisplayAction $action): Display
+  public function store(StoreDisplayRequest $request, StoreDisplayAction $action): Display|JsonResponse
   {
     return $action->handle($request);
   }

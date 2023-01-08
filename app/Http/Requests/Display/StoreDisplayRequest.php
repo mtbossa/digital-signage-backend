@@ -29,7 +29,8 @@ class StoreDisplayRequest extends FormRequest
       'width' => 'required|numeric|min:1|max:20000',
       'height' => 'required|numeric|min:1|max:20000',
       'observation' => 'nullable|string',
-      'raspberry_id' => 'nullable|numeric'
+      'raspberry_id' => 'nullable|numeric', 
+        'pairing_code' => 'required|string'
     ];
   }
 }
