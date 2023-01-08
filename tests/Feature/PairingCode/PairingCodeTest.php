@@ -3,11 +3,14 @@
 namespace Tests\Feature\PairingCode;
 
 use App\Models\Display;
+use App\Models\PairingCode;
+use App\Services\PairingCodeGeneratorService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Mockery\MockInterface;
 use Tests\Feature\Display\Traits\DisplayTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
 use Tests\TestCase;
-
 class PairingCodeTest extends TestCase
 {
   use RefreshDatabase;
@@ -25,6 +28,22 @@ class PairingCodeTest extends TestCase
     $generated_code = $response->json('code');
     $this->assertDatabaseHas('pairing_codes', ['code' => $generated_code]);
   }
-  
+
+  /** @test */
+  public function should_generate_new_code_if_generated_an_already_existing_one()
+  {
+    $already_generated = Str::repeat('a', 6);
+    $new_generated = Str::repeat('b', 6);
+    
+    PairingCode::create(["code" => $already_generated]);
+
+    $this->partialMock(PairingCodeGeneratorService::class, function (MockInterface $mock) use ($already_generated, $new_generated) {
+      $mock->shouldReceive('generate')->once()->andReturn($already_generated);
+      $mock->shouldReceive('generate')->once()->andReturn($new_generated);
+    });
+    
+    $this->postJson(route('pairing-codes.store'))->assertCreated();
+    $this->assertDatabaseHas('pairing_codes', ['code' => $new_generated]);
+  }
   
 }
