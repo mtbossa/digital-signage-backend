@@ -29,22 +29,38 @@ class DisplayTest extends TestCase
     $display_data = $this->_makeDisplay()->toArray();
 
     $response = $this->postJson(route('displays.store'), [...$display_data, 'pairing_code' => $pairing_code->code]);
+    $created_display_id = $response->json()['id'];
+    $this->assertDatabaseHas('displays', ['id' => $created_display_id, 'pairing_code_id' => $pairing_code->id]);
 
-    $this->assertDatabaseHas('displays', $display_data);
-
-    $display = Display::find($response->json()['id']);
+    $display = Display::find($created_display_id);
     $response->assertCreated()->assertJson($display->toArray());
   }
 
     /** @test */
-    public function ensure_pairing_code_is_deleted_after_display_creation()
+    public function ensure_display_is_deleted_if_still_has_pairing_code_id_and_it_gets_deleted()
     {
         $pairing_code = PairingCode::factory()->create();
         $display_data = $this->_makeDisplay()->toArray();
+
+        $response = $this->postJson(route('displays.store'), [...$display_data, 'pairing_code' => $pairing_code->code]);
+        $response->assertCreated();
+        $display_id = $response->json('id');
         
-        $this->postJson(route('displays.store'), [...$display_data, 'pairing_code' => $pairing_code->code])->assertCreated();
+        $created_display = Display::find($display_id);
+        $this->assertModelExists($created_display);
+        $pairing_code->delete();
+        $this->assertModelMissing($created_display);
+    }
+
+    /** @test */
+    public function ensure_display_is_not_deleted_if_pairing_code_id_is_null_and_pairing_code_get_deleted()
+    {
+        $pairing_code = PairingCode::factory()->create();
+        $display = Display::factory()->create();
         
-        $this->assertModelMissing($pairing_code);
+        $pairing_code->delete();
+
+        $this->assertModelExists($display);
     }
 
   /** @test */

@@ -16,12 +16,17 @@ class Display extends Model
   protected $fillable
     = [
       'name', 'size', 'width', 'height', 'observation',
-      'store_id'
+      'store_id', 'pairing_code_id'
     ];
 
   public function raspberry(): HasOne
   {
     return $this->hasOne(Raspberry::class);
+  }
+  
+  public function pairing_code(): BelongsTo
+  {
+      return $this->belongsTo(PairingCode::class);
   }
 
   public function posts(): BelongsToMany

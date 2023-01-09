@@ -21,7 +21,8 @@ class StoreDisplayAction
       }
       
     $display = Display::create($request->except(['raspberry_id']));
-
+    $display->pairing_code()->associate($pairing_code);
+    
     if ($request->raspberry_id) {
       $raspberry = Raspberry::findOrFail($request->raspberry_id);
       $display->raspberry()->save($raspberry);
@@ -32,8 +33,8 @@ class StoreDisplayAction
       $display->store()->associate($store);
     }
     
-    $pairing_code->delete();
-
+    $display->save();
+    
     return $display;
   }
 }

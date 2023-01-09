@@ -23,7 +23,7 @@ class PairingCodeFactory extends Factory
         // This could lead to problems if it generates duplicates...
         return [
             'code' => $generated['code'],
-            'expires_at' => $generated['expires_at']
+            'expires_at' => $generated['expires_at']->format('Y-m-d H:i:s')
         ];
     }
 }
