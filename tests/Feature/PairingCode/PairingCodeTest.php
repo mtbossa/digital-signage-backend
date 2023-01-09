@@ -94,7 +94,7 @@ class PairingCodeTest extends TestCase
             return $pairing_code->id === $job->pairing_code->id;
         });
         Bus::assertDispatched(ExpirePairingCode::class, function (ExpirePairingCode $job) use ($pairing_code) {
-            return $job->delay === $pairing_code->expires_at;
+            return $job->delay->format('Y-m-d H:i:s') === $pairing_code->expires_at;
         });
     }
 

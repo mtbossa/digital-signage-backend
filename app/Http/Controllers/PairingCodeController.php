@@ -28,9 +28,8 @@ class PairingCodeController extends Controller
             $foundOrNot = PairingCode::query()->where('code', $generated['code'])->count();
 
             if ($foundOrNot === 0) {
-                $expires_at = $generated['expires_at']->format('Y-m-d H:i:s');
-                $pairing_code = PairingCode::create(['code' => $generated['code'], 'expires_at' => $expires_at]);
-                ExpirePairingCode::dispatch($pairing_code)->delay($expires_at);
+                $pairing_code = PairingCode::create(['code' => $generated['code'], 'expires_at' => $generated['expires_at']->format('Y-m-d H:i:s')]);
+                ExpirePairingCode::dispatch($pairing_code)->delay($generated['expires_at']);
                 return $pairing_code;
             }
         } while ($tries <= 100);
