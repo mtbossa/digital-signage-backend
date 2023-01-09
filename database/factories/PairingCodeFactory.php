@@ -19,9 +19,11 @@ class PairingCodeFactory extends Factory
     public function definition()
     {
         $generator = new PairingCodeGeneratorService();
+        $generated = $generator->generate();
         // This could lead to problems if it generates duplicates...
         return [
-            'code' => $generator->generate(),
+            'code' => $generated['code'],
+            'expires_at' => $generated['expires_at']
         ];
     }
 }

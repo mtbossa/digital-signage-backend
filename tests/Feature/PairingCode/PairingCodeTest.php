@@ -3,7 +3,6 @@
 namespace Tests\Feature\PairingCode;
 
 use App\Jobs\ExpirePairingCode;
-use App\Jobs\ExpirePost;
 use App\Models\PairingCode;
 use App\Services\PairingCodeGeneratorService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -11,6 +10,7 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
 use Mockery\MockInterface;
 use Tests\TestCase;
+
 class PairingCodeTest extends TestCase
 {
   use RefreshDatabase;
@@ -44,29 +44,33 @@ class PairingCodeTest extends TestCase
   /** @test */
   public function should_generate_new_code_if_generated_an_already_existing_one()
   {
-    $already_generated = Str::repeat('a', 6);
-    $new_generated = Str::repeat('b', 6);
-    
-    PairingCode::create(["code" => $already_generated]);
+      $already_generated = Str::repeat('a', 6);
+      $new_generated = Str::repeat('b', 6);
+      $expires_at = now()->addMinutes(5);
 
-    $this->partialMock(PairingCodeGeneratorService::class, function (MockInterface $mock) use ($already_generated, $new_generated) {
-      $mock->shouldReceive('generate')->once()->andReturn($already_generated);
-      $mock->shouldReceive('generate')->once()->andReturn($new_generated);
-    });
-    
-    $this->postJson(route('pairing-codes.store'))->assertCreated();
-    $this->assertDatabaseHas('pairing_codes', ['code' => $new_generated]);
+      PairingCode::create(["code" => $already_generated, 'expires_at' => $expires_at]);
+
+      $this->partialMock(PairingCodeGeneratorService::class,
+          function (MockInterface $mock) use ($already_generated, $new_generated, $expires_at) {
+              $mock->shouldReceive('generate')->times(2)->andReturn([
+                  'code' => $already_generated, 'expires_at' => $expires_at
+              ], ['code' => $new_generated, 'expires_at' => $expires_at]);
+          });
+
+      $this->postJson(route('pairing-codes.store'))->assertCreated();
+      $this->assertDatabaseHas('pairing_codes', ['code' => $new_generated]);
   }
 
     /** @test */
     public function if_tried_more_then_100_times_should_return_503_response()
     {
         $already_generated = Str::repeat('a', 6);
+        $expires_at = now()->addMinutes(5);
 
-        PairingCode::create(["code" => $already_generated]);
+        PairingCode::create(["code" => $already_generated, 'expires_at' => $expires_at]);
 
-        $this->partialMock(PairingCodeGeneratorService::class, function (MockInterface $mock) use ($already_generated) {
-            $mock->shouldReceive('generate')->andReturn($already_generated);
+        $this->partialMock(PairingCodeGeneratorService::class, function (MockInterface $mock) use ($already_generated, $expires_at) {
+            $mock->shouldReceive('generate')->andReturn(['code' => $already_generated, 'expires_at' => $expires_at]);
         });
 
         $this->postJson(route('pairing-codes.store'))->assertStatus(503);
@@ -74,7 +78,7 @@ class PairingCodeTest extends TestCase
     }
     
     /** @test */
-    public function should_schedule_expire_five_minutes_after_creation()
+    public function should_schedule_expire_with_expires_at_datetime()
     {
         Bus::fake([ExpirePairingCode::class]);
         
@@ -89,7 +93,7 @@ class PairingCodeTest extends TestCase
             return $pairing_code->id === $job->pairing_code->id;
         });
         Bus::assertDispatched(ExpirePairingCode::class, function (ExpirePairingCode $job) use ($pairing_code) {
-            return $job->delay->format("Y-m-d H:i:s") === now()->addMinutes(5)->format("Y-m-d H:i:s");
+            return $job->delay === $pairing_code->expires_at;
         });
     }
   

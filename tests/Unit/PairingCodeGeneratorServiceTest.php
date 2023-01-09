@@ -12,7 +12,16 @@ class PairingCodeGeneratorServiceTest extends TestCase
     {
         $service = new PairingCodeGeneratorService();
         $code = $service->generate();
-        $this->assertIsString($code);
-        $this->assertEquals(6, strlen($code));
+        $this->assertIsString($code['code']);
+        $this->assertEquals(6, strlen($code['code']));
+    }
+
+    /** @test */
+    public function should_return_expires_at_with_datetime_five_minutes_from_now()
+    {
+        $expected_datetime = now()->addMinutes(5)->toIso8601String();
+        $service = new PairingCodeGeneratorService();
+        $result = $service->generate();
+        $this->assertEquals($expected_datetime, $result['expires_at']->toIso8601String());
     }
 }

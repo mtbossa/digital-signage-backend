@@ -2,12 +2,24 @@
 
 namespace App\Services;
 
-use Illuminate\Foundation\Testing\WithFaker;
+use Carbon\Carbon;
 
 class PairingCodeGeneratorService
 {
-  use WithFaker;
-  public function generate(): string {
-    return str_shuffle(substr(md5(microtime()), 2,6));
-  }
+    public function generate(): array
+    {
+        $code = $this->makeRandomCode();
+        $expires_at = $this->expiresWhen();
+        return ['code' => $code, 'expires_at' => $expires_at];
+    }
+
+    private function makeRandomCode(): string
+    {
+        return str_shuffle(substr(md5(microtime()), 2, 6));
+    }
+
+    private function expiresWhen(): Carbon
+    {
+        return now()->addMinutes(5);
+    }
 }
