@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             
             $table->string('code', 6)->unique();
+            $table->dateTime('expires_at');
             
             $table->timestamps();
         });

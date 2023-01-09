@@ -18,6 +18,8 @@ class PairingCodeTest extends TestCase
   public function setUp(): void
   {
     parent::setUp();
+    
+    Bus::fake([ExpirePairingCode::class]);
   }
 
   /** @test */
@@ -28,6 +30,16 @@ class PairingCodeTest extends TestCase
     $generated_code = $response->json('code');
     $this->assertDatabaseHas('pairing_codes', ['code' => $generated_code]);
   }
+
+    /** @test */
+    public function should_have_expire_at_with_five_minutes_from_now()
+    {
+        $response = $this->postJson(route('pairing-codes.store'));
+        $response->assertCreated();
+        $pairing_code = $response->json();
+        $expected_expires_at = now()->addMinutes(5)->toIso8601String();
+        $this->assertDatabaseHas('pairing_codes', ['code' => $pairing_code['code'], 'expires_at' => $expected_expires_at]);
+    }
 
   /** @test */
   public function should_generate_new_code_if_generated_an_already_existing_one()

@@ -26,7 +26,7 @@ class PairingCodeController extends Controller
             $foundOrNot = PairingCode::query()->where('code', $generated_code)->count();
 
             if ($foundOrNot === 0) {
-                $pairing_code = PairingCode::create(['code' => $generated_code]);
+                $pairing_code = PairingCode::create(['code' => $generated_code, 'expires_at' => now()->addMinutes(5)->toIso8601String()]);
                 ExpirePairingCode::dispatch($pairing_code)->delay(now()->addMinutes(5));
                 return $pairing_code;
             }

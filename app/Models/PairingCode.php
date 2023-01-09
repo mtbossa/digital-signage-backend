@@ -11,5 +11,5 @@ class PairingCode extends Model
 
     protected $table = 'pairing_codes';
   
-    protected $fillable = ['code'];
+    protected $fillable = ['code', 'expires_at'];
 }
