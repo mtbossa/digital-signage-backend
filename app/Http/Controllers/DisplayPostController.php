@@ -28,6 +28,7 @@ class DisplayPostController extends Controller
         $query->where('expired', $expired);
         $query->with('media');
         $query->with('recurrence');
+        $query->orderBy('id');
       },
     ]);
 

@@ -32,6 +32,7 @@ class RaspberryDisplayPostsController extends Controller
         $query->where('expired', false);
         $query->with('media');
         $query->with('recurrence');
+        $query->orderBy('id');
       },
     ]);
 
