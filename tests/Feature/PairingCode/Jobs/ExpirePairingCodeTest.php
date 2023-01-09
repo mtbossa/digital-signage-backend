@@ -5,6 +5,7 @@ namespace Tests\Feature\PairingCode\Jobs;
 
 use App\Jobs\ExpirePairingCode;
 use App\Jobs\ExpirePost;
+use App\Models\Display;
 use App\Models\PairingCode;
 use App\Models\Post;
 use Carbon\Carbon;
@@ -34,4 +35,15 @@ class ExpirePairingCodeTest extends TestCase
     ExpirePairingCode::dispatch($pairing_code);
     $this->assertModelMissing($pairing_code);
   }
+
+    /**
+     * @test
+     */
+    public function if_pairing_code_has_a_display_should_delete_display_after_expired()
+    {
+        $pairing_code = PairingCode::factory()->create();
+        $display = Display::factory()->create(['pairing_code_id' => $pairing_code]);
+        ExpirePairingCode::dispatch($pairing_code);
+        $this->assertModelMissing($display);
+    }
 }

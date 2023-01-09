@@ -36,23 +36,7 @@ class DisplayTest extends TestCase
     $response->assertCreated()->assertJson($display->toArray());
   }
 
-    /** @test */
-    public function ensure_display_is_deleted_if_still_has_pairing_code_id_and_it_gets_deleted()
-    {
-        $pairing_code = PairingCode::factory()->create();
-        $display_data = $this->_makeDisplay()->toArray();
-
-        $response = $this->postJson(route('displays.store'), [...$display_data, 'pairing_code' => $pairing_code->code]);
-        $response->assertCreated();
-        $display_id = $response->json('id');
-        
-        $created_display = Display::find($display_id);
-        $this->assertModelExists($created_display);
-        $pairing_code->delete();
-        $this->assertModelMissing($created_display);
-    }
-
-    /** @test */
+      /** @test */
     public function ensure_display_is_not_deleted_if_pairing_code_id_is_null_and_pairing_code_get_deleted()
     {
         $pairing_code = PairingCode::factory()->create();

@@ -3,6 +3,7 @@
 namespace Tests\Feature\PairingCode;
 
 use App\Jobs\ExpirePairingCode;
+use App\Models\Display;
 use App\Models\PairingCode;
 use App\Services\PairingCodeGeneratorService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -96,5 +97,46 @@ class PairingCodeTest extends TestCase
             return $job->delay === $pairing_code->expires_at;
         });
     }
-  
+
+    /** @test */
+    public function should_generate_api_token_for_display()
+    {
+        $pairing_code = PairingCode::factory()->create();
+        $display = Display::factory()->create(['pairing_code_id' => $pairing_code->id]);
+
+        $response = $this->patchJson(route('pairing-codes.update', ['pairing_code' => $pairing_code->code]));
+        $response->assertOk()->assertJsonStructure(['api_token', 'display_id']);
+        
+        $token = $response->json('api_token');
+        $display_id = $response->json('display_id');
+        
+        $this->assertIsString($token);
+        $this->assertEquals($display->id, $display_id);
+    }
+
+    /** @test */
+    public function should_delete_pairing_code_after_generating_api_token()
+    {
+        $pairing_code = PairingCode::factory()->create();
+        $display = Display::factory()->create(['pairing_code_id' => $pairing_code->id]);
+
+        $response = $this->patchJson(route('pairing-codes.update', ['pairing_code' => $pairing_code->code]));
+        $response->assertOk();
+        
+        $this->assertModelMissing($pairing_code);
+        $this->assertDatabaseHas('displays', ['id' => $display->id, 'pairing_code_id' => null]);
+    }
+
+    /** @test */
+    public function expect_404_to_be_returned_if_cant_find_pairing_code()
+    {
+        $this->patchJson(route('pairing-codes.update', ['pairing_code' => 'aaaaaa']))->assertNotFound();
+    }
+
+    /** @test */
+    public function expect_422_to_be_returned_if_pairing_code_doesnt_have_a_display_yet()
+    {
+        $pairing_code = PairingCode::factory()->create();
+        $this->patchJson(route('pairing-codes.update', ['pairing_code' => $pairing_code->code]))->assertUnprocessable();
+    }
 }

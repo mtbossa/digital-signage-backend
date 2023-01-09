@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ExpirePairingCode;
+use App\Models\Display;
 use App\Models\PairingCode;
 use App\Services\PairingCodeGeneratorService;
 use Carbon\Carbon;
@@ -35,5 +36,21 @@ class PairingCodeController extends Controller
         } while ($tries <= 100);
 
         return response()->json(['error' => 'Service unavailable.'], Response::HTTP_SERVICE_UNAVAILABLE);
+    }
+    
+    public function update(Request $request, string $pairing_code): JsonResponse
+    {
+        $pairing_code_model = PairingCode::query()->where('code', $pairing_code)->with('display')->firstOrFail();
+        $display = $pairing_code_model->display;
+        
+        if (is_null($display)) {
+            return response()->json(['error' => 'Display not created yet.'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $new_token = $display->createToken('display_access_token')->plainTextToken;
+        
+        $pairing_code_model->delete();
+        
+        return response()->json(['api_token' => $new_token, 'display_id' => $display->id], Response::HTTP_OK);
     }
 }

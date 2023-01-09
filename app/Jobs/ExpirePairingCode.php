@@ -23,6 +23,9 @@ class ExpirePairingCode implements ShouldQueue
 
   public function handle()
   {
+      if ($this->pairing_code->display) {
+          $this->pairing_code->display->delete();
+      }
     $this->pairing_code->delete();
   }
 }

@@ -83,7 +83,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::apiResource('pairing-codes', PairingCodeController::class,
-  ['only' => ['store']]);
+  ['only' => ['store', 'update']]);
 Route::get('invitations/{token}', [InvitationController::class, 'show'])
   ->name('invitations.show');
 Route::patch('invitations/{token}', [InvitationController::class, 'update'])
