@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Display;
 use App\Models\Raspberry;
 use Closure;
 use Illuminate\Http\JsonResponse;
@@ -20,7 +21,7 @@ class IsNotRaspberry
    */
   public function handle(Request $request, Closure $next)
   {
-    if ($request->user() instanceof Raspberry) {
+    if ($request->user() instanceof Raspberry || $request->user() instanceof Display) {
       return response()->json(['message' => 'Unauthenticated.'], 401);
     }
 

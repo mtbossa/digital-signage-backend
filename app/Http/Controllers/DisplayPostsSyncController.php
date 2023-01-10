@@ -10,12 +10,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class DisplayPostsSyncController extends Controller
 {
-  public function __invoke(Request $request, Display $display): \Illuminate\Http\JsonResponse
+  public function __invoke(Request $request): \Illuminate\Http\JsonResponse
   {
     if (!$request->has("posts_ids")) {
       return response()->json(["error" => "You must pass current locally stores posts_ids"],
@@ -28,6 +29,13 @@ class DisplayPostsSyncController extends Controller
       // When there aren't any posts stored, the request will come as ?posts_ids=[]
       // which will be transform in an array [null]
       $locallyStoredPostsIds = array_map('intval', $request->posts_ids); 
+    }
+    
+    $display = Auth::user();
+    $isDisplay = $display instanceof Display; 
+    
+    if (!$isDisplay) {
+        return response()->json(['message' => 'Not Found!'], 404);
     }
 
     $display->load([

@@ -70,7 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('invitations', InvitationController::class,
       ['except' => ['update', 'show']]);
   });
-  Route::get('display/{display}/posts/sync', DisplayPostsSyncController::class);
+  Route::get('display/posts/sync', DisplayPostsSyncController::class);
   Route::get("raspberry/display/posts", RaspberryDisplayPostsController::class)->name('raspberry.display.posts');
   Route::get('media/{filename}/download', MediaDownloadController::class)
     ->name('media.download');
