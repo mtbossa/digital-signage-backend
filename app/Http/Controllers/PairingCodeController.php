@@ -28,14 +28,10 @@ class PairingCodeController extends Controller
             $foundOrNot = PairingCode::query()->where('code', $generated['code'])->count();
 
             if ($foundOrNot === 0) {
-//                dd(now()->toIso8601String(),
-//                now()->toIso8601String(),
-//                now()->toISOString(false),
-//                now()->toISOString(true),
-//                now()->toIso8601ZuluString());
-                
                 $pairing_code = PairingCode::create(['code' => $generated['code'], 'expires_at' => $generated['expires_at']]);
+                
                 ExpirePairingCode::dispatch($pairing_code)->delay($generated['expires_at']->setMicro(0));
+                
                 return $pairing_code;
             }
         } while ($tries <= 100);
