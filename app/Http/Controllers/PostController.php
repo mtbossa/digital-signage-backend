@@ -62,6 +62,8 @@ class PostController extends Controller
 
       if ($display->raspberry) {
         $display->raspberry->notify($notification);
+      } else {
+          $display->notify($notification);
       }
     }
     return $post->delete();

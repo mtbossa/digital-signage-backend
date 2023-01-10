@@ -2,10 +2,15 @@
 
 namespace Tests\Feature\Media;
 
+use App\Models\Display;
 use App\Models\Media;
+use App\Models\Post;
+use App\Models\Raspberry;
+use App\Notifications\DisplayPost\PostDeleted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Tests\Feature\Media\Traits\MediaTestsTrait;
 use Tests\Feature\Traits\AuthUserTrait;
@@ -160,6 +165,64 @@ class MediaTest extends TestCase
     $this->assertDatabaseMissing('medias', ['id' => $this->media->id]);
     $response->assertOk();
   }
+
+    /** @test */
+    public function ensure_all_medias_posts_are_deleted_when_media_is_deleted()
+    {
+        $posts = Post::factory(2)->create(['media_id' => $this->media->id]);
+        $this->deleteJson(route('medias.destroy', $this->media->id))->assertOk();
+        foreach ($posts as $post) {
+            $this->assertModelMissing($post);
+        }        
+    }
+
+    /** @test */
+    public function ensure_all_posts_displays_are_notified_when_media_posts_are_deleted()
+    {
+        Notification::fake();
+        Display::factory()->create();
+        
+        $displays = Display::factory(2)->create();
+        $posts = Post::factory(3)->create(['media_id' => $this->media->id]);
+
+        foreach ($posts as $post) {
+            $post->displays()->attach($displays->pluck('id'));
+        }
+        
+        $this->deleteJson(route('medias.destroy', $this->media->id))->assertOk();
+        
+        foreach ($displays as $display) {
+            Notification::assertSentTo($display, PostDeleted::class);
+        }
+
+        Notification::assertTimesSent(count($displays) * count($posts), PostDeleted::class);
+    }
+
+    /** @test */
+    public function ensure_all_posts_displays_raspberries_are_notified_when_media_posts_are_deleted_and_display_has_raspberry()
+    {
+        Notification::fake();
+        Display::factory()->create();
+
+        $displays = Display::factory(2)->create();
+        $rasps = [];
+        foreach ($displays as $display) {
+            $rasps[] = Raspberry::factory()->create((["display_id" => $display->id]));
+        }
+        $posts = Post::factory(3)->create(['media_id' => $this->media->id]);
+
+        foreach ($posts as $post) {
+            $post->displays()->attach($displays->pluck('id'));
+        }
+
+        $this->deleteJson(route('medias.destroy', $this->media->id))->assertOk();
+
+        foreach ($rasps as $rasp) {
+            Notification::assertSentTo($rasp, PostDeleted::class);
+        }
+
+        Notification::assertTimesSent(count($rasps) * count($posts), PostDeleted::class);
+    }
 
   /** @test */
   public function media_file_must_be_deleted_when_media_is_deleted()

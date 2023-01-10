@@ -368,6 +368,24 @@ class PostTest extends TestCase
 
   }
 
+    /** @test */
+    public function when_post_is_deleted_should_dispatch_post_deleted_notification_for_displays_that_dont_have_raspberry()
+    {
+        Notification::fake(PostDeleted::class);
+        Display::factory()->create();
+        
+        $displays = Display::factory(2)->create();
+        $displaysIds = $displays->pluck('id')->toArray();
+        
+        $this->post->displays()->sync($displaysIds);
+        $this->deleteJson(route('posts.destroy', $this->post->id))->assertOk();
+
+        foreach ($displays as $display) {
+            Notification::assertSentTo($display, PostDeleted::class);
+        }
+        Notification::assertTimesSent(count($displays), PostDeleted::class);
+    }
+
   /** @test */
   public function when_post_is_created_with_displays_should_cache_post_create_cache_for_each_display_with_post_id()
   {

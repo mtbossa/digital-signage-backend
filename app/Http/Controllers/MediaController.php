@@ -48,7 +48,11 @@ class MediaController extends Controller
         foreach ($post->displays as $display) {
           $notification = new PostDeleted($display, $post->id, $post->media->id);
 
-          $display->notify($notification);
+          if ($display->raspberry) {
+            $display->raspberry->notify($notification);
+          } else {
+              $display->notify($notification);
+          }
         }
       }
 

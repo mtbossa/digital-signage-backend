@@ -49,6 +49,8 @@ class BroadcastToRaspberry
 
     if ($display->raspberry) {
       $display->raspberry->notify($notification);
+    } else {
+        $display->notify($notification);
     }
   }
 }
