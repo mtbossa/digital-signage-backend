@@ -2,7 +2,7 @@
 
 return [
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Filename & Format
   |--------------------------------------------------------------------------
@@ -11,9 +11,9 @@ return [
   |
   */
 
-  'filename' => '_ide_helper.php',
+    'filename' => '_ide_helper.php',
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Models filename
   |--------------------------------------------------------------------------
@@ -22,9 +22,9 @@ return [
   |
   */
 
-  'models_filename' => '_ide_helper_models.php',
+    'models_filename' => '_ide_helper_models.php',
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Where to write the PhpStorm specific meta file
   |--------------------------------------------------------------------------
@@ -34,9 +34,9 @@ return [
   | `.phpstorm.meta.php/laravel_ide_Helper.php'.
   |
   */
-  'meta_filename' => '.phpstorm.meta.php',
+    'meta_filename' => '.phpstorm.meta.php',
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Fluent helpers
   |--------------------------------------------------------------------------
@@ -45,9 +45,9 @@ return [
   |
   */
 
-  'include_fluent' => false,
+    'include_fluent' => false,
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Factory Builders
   |--------------------------------------------------------------------------
@@ -59,9 +59,9 @@ return [
   |
   */
 
-  'include_factory_builders' => false,
+    'include_factory_builders' => false,
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Write Model Magic methods
   |--------------------------------------------------------------------------
@@ -70,9 +70,9 @@ return [
   |
   */
 
-  'write_model_magic_where' => true,
+    'write_model_magic_where' => true,
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Write Model External Eloquent Builder methods
   |--------------------------------------------------------------------------
@@ -81,9 +81,9 @@ return [
   |
   */
 
-  'write_model_external_builder_methods' => true,
+    'write_model_external_builder_methods' => true,
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Write Model relation count properties
   |--------------------------------------------------------------------------
@@ -92,9 +92,9 @@ return [
   |
   */
 
-  'write_model_relation_count_properties' => true,
+    'write_model_relation_count_properties' => true,
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Write Eloquent Model Mixins
   |--------------------------------------------------------------------------
@@ -107,9 +107,9 @@ return [
   |
   */
 
-  'write_eloquent_model_mixins' => false,
+    'write_eloquent_model_mixins' => false,
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Helper files to include
   |--------------------------------------------------------------------------
@@ -119,13 +119,13 @@ return [
   |
   */
 
-  'include_helpers' => false,
+    'include_helpers' => false,
 
-  'helper_files' => [
-    base_path().'/vendor/laravel/framework/src/Illuminate/Support/helpers.php',
-  ],
+    'helper_files' => [
+        base_path().'/vendor/laravel/framework/src/Illuminate/Support/helpers.php',
+    ],
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Model locations to include
   |--------------------------------------------------------------------------
@@ -138,11 +138,11 @@ return [
   |
   */
 
-  'model_locations' => [
-    'app',
-  ],
+    'model_locations' => [
+        'app',
+    ],
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Models to ignore
   |--------------------------------------------------------------------------
@@ -151,11 +151,11 @@ return [
   |
   */
 
-  'ignored_models' => [
+    'ignored_models' => [
 
-  ],
+    ],
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Models hooks
   |--------------------------------------------------------------------------
@@ -166,11 +166,11 @@ return [
   |
   */
 
-  'model_hooks' => [
-    // App\Support\IdeHelper\MyModelHook::class
-  ],
+    'model_hooks' => [
+        // App\Support\IdeHelper\MyModelHook::class
+    ],
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Extra classes
   |--------------------------------------------------------------------------
@@ -179,14 +179,14 @@ return [
   |
   */
 
-  'extra' => [
-    'Eloquent' => ['Illuminate\Database\Eloquent\Builder', 'Illuminate\Database\Query\Builder'],
-    'Session' => ['Illuminate\Session\Store'],
-  ],
+    'extra' => [
+        'Eloquent' => ['Illuminate\Database\Eloquent\Builder', 'Illuminate\Database\Query\Builder'],
+        'Session' => ['Illuminate\Session\Store'],
+    ],
 
-  'magic' => [],
+    'magic' => [],
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Interface implementations
   |--------------------------------------------------------------------------
@@ -196,11 +196,11 @@ return [
   |
   */
 
-  'interfaces' => [
+    'interfaces' => [
 
-  ],
+    ],
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Support for custom DB types
   |--------------------------------------------------------------------------
@@ -226,11 +226,11 @@ return [
   |  ),
   |
   */
-  'custom_db_types' => [
+    'custom_db_types' => [
 
-  ],
+    ],
 
-  /*
+    /*
    |--------------------------------------------------------------------------
    | Support for camel cased models
    |--------------------------------------------------------------------------
@@ -254,9 +254,9 @@ return [
    | Note, it is currently an all-or-nothing option.
    |
    */
-  'model_camel_case_properties' => false,
+    'model_camel_case_properties' => false,
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Property Casts
   |--------------------------------------------------------------------------
@@ -264,12 +264,12 @@ return [
   | Cast the given "real type" to the given "type".
   |
   */
-  'type_overrides' => [
-    'integer' => 'int',
-    'boolean' => 'bool',
-  ],
+    'type_overrides' => [
+        'integer' => 'int',
+        'boolean' => 'bool',
+    ],
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Include DocBlocks from classes
   |--------------------------------------------------------------------------
@@ -278,9 +278,9 @@ return [
   | magic methods and properties.
   |
   */
-  'include_class_docblocks' => false,
+    'include_class_docblocks' => false,
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Force FQN usage
   |--------------------------------------------------------------------------
@@ -290,9 +290,9 @@ return [
   | or there is an import (use className) of a given class
   |
   */
-  'force_fqn' => false,
+    'force_fqn' => false,
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Additional relation types
   |--------------------------------------------------------------------------
@@ -302,9 +302,9 @@ return [
   | name of the Relationship, e.g. `'relationName' => RelationShipClass::class`.
   |
   */
-  'additional_relation_types' => [],
+    'additional_relation_types' => [],
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Run artisan commands after migrations to generate model helpers
   |--------------------------------------------------------------------------
@@ -312,8 +312,8 @@ return [
   | The specified commands should run after migrations are finished running.
   |
   */
-  'post_migrate' => [
-    // 'ide-helper:models --nowrite',
-  ],
+    'post_migrate' => [
+        // 'ide-helper:models --nowrite',
+    ],
 
 ];

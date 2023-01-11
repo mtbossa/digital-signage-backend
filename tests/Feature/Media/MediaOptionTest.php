@@ -11,33 +11,33 @@ use Tests\TestCase;
 
 class MediaOptionTest extends TestCase
 {
-  use RefreshDatabase, MediaTestsTrait, WithFaker, AuthUserTrait;
+    use RefreshDatabase, MediaTestsTrait, WithFaker, AuthUserTrait;
 
-  public function setUp(): void
-  {
-    parent::setUp();
+    public function setUp(): void
+    {
+        parent::setUp();
 
-    $this->_authUser();
-  }
+        $this->_authUser();
+    }
 
-  /** @test */
-  public function ensure_post_media_options_is_returning_correct_amount()
-  {
-    $amount = 10;
-    Media::factory($amount)->create();
+    /** @test */
+    public function ensure_post_media_options_is_returning_correct_amount()
+    {
+        $amount = 10;
+        Media::factory($amount)->create();
 
-    $this->getJson(route('medias.options'))->assertOk()->assertJsonCount($amount);
-  }
+        $this->getJson(route('medias.options'))->assertOk()->assertJsonCount($amount);
+    }
 
-  /** @test */
-  public function ensure_post_media_options_structure_is_correct()
-  {
-    $medias = Media::factory(2)->create();
+    /** @test */
+    public function ensure_post_media_options_structure_is_correct()
+    {
+        $medias = Media::factory(2)->create();
 
-    $correctStructure = $medias->map(function (Media $media) {
-      return ['id' => $media->id, 'description' => $media->description, 'path' => $media->path, 'type' => $media->type];
-    });
+        $correctStructure = $medias->map(function (Media $media) {
+            return ['id' => $media->id, 'description' => $media->description, 'path' => $media->path, 'type' => $media->type];
+        });
 
-    $this->getJson(route('medias.options'))->assertExactJson($correctStructure->toArray());
-  }
+        $this->getJson(route('medias.options'))->assertExactJson($correctStructure->toArray());
+    }
 }

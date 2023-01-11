@@ -13,75 +13,77 @@ use Tests\TestCase;
 
 class PostDeletedTest extends TestCase
 {
-  use RefreshDatabase, AuthUserTrait;
+    use RefreshDatabase, AuthUserTrait;
 
-  private Display $display;
-  private Raspberry $raspberry;
-  private Media $media;
+    private Display $display;
 
-  public function setUp(): void
-  {
-    parent::setUp();
+    private Raspberry $raspberry;
 
-    $this->_authUser();
-    $this->display = Display::factory()->create();
-    $this->raspberry = Raspberry::factory()->create(["display_id" => $this->display->id]);
-    $this->media = Media::factory()->create();
-  }
+    private Media $media;
 
-  /** @test */
-  public function ensure_send_data_is_with_correct_structure()
-  {
-    $removedPost = Post::factory()->create(['media_id' => $this->media->id]);
-    $correctStructure = [
-      'post_id' => $removedPost->id,
-      'media_id' => $this->media->id,
-      'canDeleteMedia' => true,
-    ];
+    public function setUp(): void
+    {
+        parent::setUp();
 
-    $notification = new PostDeleted($this->display, $removedPost->id, $removedPost->media->id);
-    $sendData = $notification->toBroadcast($this->raspberry)->data;
+        $this->_authUser();
+        $this->display = Display::factory()->create();
+        $this->raspberry = Raspberry::factory()->create(['display_id' => $this->display->id]);
+        $this->media = Media::factory()->create();
+    }
 
-    $this->assertEquals($sendData, $correctStructure);
-  }
+    /** @test */
+    public function ensure_send_data_is_with_correct_structure()
+    {
+        $removedPost = Post::factory()->create(['media_id' => $this->media->id]);
+        $correctStructure = [
+            'post_id' => $removedPost->id,
+            'media_id' => $this->media->id,
+            'canDeleteMedia' => true,
+        ];
 
-  /** @test */
-  public function ensure_can_delete_media_is_false_when_other_post_on_same_display_depends_on_the_deleted_post_media()
-  {
-    $randomMedia = Media::factory()->create();
-    $randomPost = Post::factory()->create(['media_id' => $randomMedia->id]);
-    $randomPost->displays()->attach($this->display->id);
+        $notification = new PostDeleted($this->display, $removedPost->id, $removedPost->media->id);
+        $sendData = $notification->toBroadcast($this->raspberry)->data;
 
-    $removedPost = Post::factory()->create(['media_id' => $this->media->id]);
-    $keptPost = Post::factory()->create(['media_id' => $this->media->id]);
-    $keptPost->displays()->attach($this->display->id);
+        $this->assertEquals($sendData, $correctStructure);
+    }
 
-    $removedPost->displays()->detach($this->display->id);
+    /** @test */
+    public function ensure_can_delete_media_is_false_when_other_post_on_same_display_depends_on_the_deleted_post_media()
+    {
+        $randomMedia = Media::factory()->create();
+        $randomPost = Post::factory()->create(['media_id' => $randomMedia->id]);
+        $randomPost->displays()->attach($this->display->id);
 
-    $notification = new PostDeleted($this->display, $removedPost->id, $removedPost->media->id);
-    $sendData = $notification->toBroadcast($this->raspberry)->data;
+        $removedPost = Post::factory()->create(['media_id' => $this->media->id]);
+        $keptPost = Post::factory()->create(['media_id' => $this->media->id]);
+        $keptPost->displays()->attach($this->display->id);
 
-    $this->assertFalse($sendData['canDeleteMedia']);
-  }
+        $removedPost->displays()->detach($this->display->id);
 
-  /** @test */
-  public function ensure_can_delete_media_is_true_when_no_other_post_on_display_depends_on_the_media()
-  {
-    $randomDisplay = Display::factory()->create();
-    $randomMedia = Media::factory()->create();
+        $notification = new PostDeleted($this->display, $removedPost->id, $removedPost->media->id);
+        $sendData = $notification->toBroadcast($this->raspberry)->data;
 
-    $randomPost = Post::factory()->create(['media_id' => $randomMedia->id]);
-    $randomPost->displays()->attach($this->display->id);
+        $this->assertFalse($sendData['canDeleteMedia']);
+    }
 
-    $keptPost = Post::factory()->create(['media_id' => $randomMedia->id]);
-    $keptPost->displays()->attach($this->display->id);
+    /** @test */
+    public function ensure_can_delete_media_is_true_when_no_other_post_on_display_depends_on_the_media()
+    {
+        $randomDisplay = Display::factory()->create();
+        $randomMedia = Media::factory()->create();
 
-    $removedPost = Post::factory()->create(['media_id' => $this->media->id]);
-    $removedPost->displays()->attach($randomDisplay->id);
+        $randomPost = Post::factory()->create(['media_id' => $randomMedia->id]);
+        $randomPost->displays()->attach($this->display->id);
 
-    $notification = new PostDeleted($this->display, $removedPost->id, $removedPost->media->id);
-    $sendData = $notification->toBroadcast($this->raspberry)->data;
+        $keptPost = Post::factory()->create(['media_id' => $randomMedia->id]);
+        $keptPost->displays()->attach($this->display->id);
 
-    $this->assertTrue($sendData['canDeleteMedia']);
-  }
+        $removedPost = Post::factory()->create(['media_id' => $this->media->id]);
+        $removedPost->displays()->attach($randomDisplay->id);
+
+        $notification = new PostDeleted($this->display, $removedPost->id, $removedPost->media->id);
+        $sendData = $notification->toBroadcast($this->raspberry)->data;
+
+        $this->assertTrue($sendData['canDeleteMedia']);
+    }
 }

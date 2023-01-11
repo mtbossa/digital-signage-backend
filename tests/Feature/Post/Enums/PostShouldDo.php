@@ -4,6 +4,6 @@ namespace Tests\Feature\Post\Enums;
 
 enum PostShouldDo
 {
-  case Queue;
-  case Event;
+    case Queue;
+    case Event;
 }

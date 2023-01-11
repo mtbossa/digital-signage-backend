@@ -15,10 +15,10 @@ return new class extends Migration
     {
         Schema::create('pairing_codes', function (Blueprint $table) {
             $table->id();
-            
+
             $table->string('code', 6)->unique();
             $table->dateTime('expires_at');
-            
+
             $table->timestamps();
         });
     }

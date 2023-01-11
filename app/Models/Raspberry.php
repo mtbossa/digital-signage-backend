@@ -12,22 +12,23 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Raspberry extends Authenticatable
 {
-  use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens;
 
-  protected $fillable
-    = [
-      'mac_address', 'short_name', 'serial_number', 'last_boot',
-      'observation', 'display_id'
-    ];
+    protected $fillable
+      = [
+          'mac_address', 'short_name', 'serial_number', 'last_boot',
+          'observation', 'display_id',
+      ];
 
-  public function display(): BelongsTo
-  {
-    return $this->belongsTo(Display::class);
-  }
+    public function display(): BelongsTo
+    {
+        return $this->belongsTo(Display::class);
+    }
 
-  public function generateInstallationUrl(): string|UrlGenerator|Application
-  {
-    $apiUrl = config('app.url');
-    return url("{$apiUrl}/api/raspberry/installer/download");
-  }
+    public function generateInstallationUrl(): string|UrlGenerator|Application
+    {
+        $apiUrl = config('app.url');
+
+        return url("{$apiUrl}/api/raspberry/installer/download");
+    }
 }

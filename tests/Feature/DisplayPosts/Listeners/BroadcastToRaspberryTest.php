@@ -1,6 +1,5 @@
 <?php
 
-
 namespace DisplayPosts\Listeners;
 
 use App\Events\DisplayPost\DisplayPostCreated;
@@ -20,48 +19,22 @@ use Tests\TestCase;
 
 class BroadcastToRaspberryTest extends TestCase
 {
-  use RefreshDatabase, PostTestsTrait, AuthUserTrait;
+    use RefreshDatabase, PostTestsTrait, AuthUserTrait;
 
-  public function setUp(): void
-  {
-    parent::setUp();
+    public function setUp(): void
+    {
+        parent::setUp();
 
-    $this->_authUser();
-    $this->media = $this->_createMedia();
-    $this->post = Post::factory()->nonRecurrent()
-      ->create(['media_id' => $this->media->id]);
-  }
-
-  /**
-   * @test
-   */
-  public function when_event_is_DisplayPostCreated_should_notify_raspberry_with_PostCreated_notification()
-  {
-    Notification::fake();
-
-    $displaysWithThisPost = Display::factory(3)->create();
-    $displaysNoPost = Display::factory(2)->create();
-
-    foreach (
-      $displaysWithThisPost as $display
-    ) {
-      $raspberry = Raspberry::factory()->create(["display_id" => $display->id]);
-      $this->post->displays()->attach($display->id);
-
-      event(new DisplayPostCreated($display, $this->post));
-
-      Notification::assertSentTo(
-        $raspberry,
-        PostCreated::class
-      );
+        $this->_authUser();
+        $this->media = $this->_createMedia();
+        $this->post = Post::factory()->nonRecurrent()
+          ->create(['media_id' => $this->media->id]);
     }
 
-      Notification::assertTimesSent(count($displaysWithThisPost), PostCreated::class);
-  }
     /**
      * @test
      */
-    public function when_display_dont_have_raspberry_and_event_is_DisplayPostCreated_should_notify_display_with_PostCreated_notification()
+    public function when_event_is_DisplayPostCreated_should_notify_raspberry_with_PostCreated_notification()
     {
         Notification::fake();
 
@@ -71,12 +44,13 @@ class BroadcastToRaspberryTest extends TestCase
         foreach (
             $displaysWithThisPost as $display
         ) {
+            $raspberry = Raspberry::factory()->create(['display_id' => $display->id]);
             $this->post->displays()->attach($display->id);
 
             event(new DisplayPostCreated($display, $this->post));
 
             Notification::assertSentTo(
-                $display,
+                $raspberry,
                 PostCreated::class
             );
         }
@@ -84,90 +58,87 @@ class BroadcastToRaspberryTest extends TestCase
         Notification::assertTimesSent(count($displaysWithThisPost), PostCreated::class);
     }
 
-    /**
-     * @test
-     */
-    public function when_event_is_DisplayPostUpdated_should_notify_raspberry_with_PostUpdated_notification()
-    {
-        Notification::fake();
+      /**
+       * @test
+       */
+      public function when_display_dont_have_raspberry_and_event_is_DisplayPostCreated_should_notify_display_with_PostCreated_notification()
+      {
+          Notification::fake();
 
-        $displaysWithThisPost = Display::factory(3)->create();
-        $displaysNoPost = Display::factory(2)->create();
+          $displaysWithThisPost = Display::factory(3)->create();
+          $displaysNoPost = Display::factory(2)->create();
 
-        foreach (
-            $displaysWithThisPost as $display
-        ) {
-            $raspberry = Raspberry::factory()->create(["display_id" => $display->id]);
-            $this->post->displays()->attach($display->id);
+          foreach (
+              $displaysWithThisPost as $display
+          ) {
+              $this->post->displays()->attach($display->id);
 
-            event(new DisplayPostUpdated($display, $this->post));
+              event(new DisplayPostCreated($display, $this->post));
 
-            Notification::assertSentTo(
-                $raspberry,
-                PostUpdated::class
-            );
-        }
-        Notification::assertTimesSent(count($displaysWithThisPost), PostUpdated::class);
-    }
+              Notification::assertSentTo(
+                  $display,
+                  PostCreated::class
+              );
+          }
 
-    /**
-     * @test
-     */
-    public function when_display_dont_have_raspberry_and_event_is_DisplayPostUpdated_should_notify_display_with_PostUpdated_notification()
-    {
-        Notification::fake();
+          Notification::assertTimesSent(count($displaysWithThisPost), PostCreated::class);
+      }
 
-        $displaysWithThisPost = Display::factory(3)->create();
-        $displaysNoPost = Display::factory(2)->create();
+      /**
+       * @test
+       */
+      public function when_event_is_DisplayPostUpdated_should_notify_raspberry_with_PostUpdated_notification()
+      {
+          Notification::fake();
 
-        foreach (
-            $displaysWithThisPost as $display
-        ) {
-            $this->post->displays()->attach($display->id);
+          $displaysWithThisPost = Display::factory(3)->create();
+          $displaysNoPost = Display::factory(2)->create();
 
-            event(new DisplayPostUpdated($display, $this->post));
+          foreach (
+              $displaysWithThisPost as $display
+          ) {
+              $raspberry = Raspberry::factory()->create(['display_id' => $display->id]);
+              $this->post->displays()->attach($display->id);
 
-            Notification::assertSentTo(
-                $display,
-                PostUpdated::class
-            );
-        }
-        Notification::assertTimesSent(count($displaysWithThisPost), PostUpdated::class);
-    }
+              event(new DisplayPostUpdated($display, $this->post));
 
-  /**
-   * @test
-   */
-  public function when_event_is_DisplayPostDeleted_should_notify_raspberry_with_PostDeleted_notification()
-  {
-    Notification::fake();
+              Notification::assertSentTo(
+                  $raspberry,
+                  PostUpdated::class
+              );
+          }
+          Notification::assertTimesSent(count($displaysWithThisPost), PostUpdated::class);
+      }
 
-    $displaysNoPost = Display::factory(2)->create();
-    $displaysWithThisPost = Display::factory(3)->create();
-    $displaysWithPostIds = $displaysWithThisPost->pluck('id')->toArray();
+      /**
+       * @test
+       */
+      public function when_display_dont_have_raspberry_and_event_is_DisplayPostUpdated_should_notify_display_with_PostUpdated_notification()
+      {
+          Notification::fake();
 
-    $newDisplaysPost = Display::factory(4)->create();
-    $newDisplaysPostIds = $newDisplaysPost->pluck('id')->toArray();
+          $displaysWithThisPost = Display::factory(3)->create();
+          $displaysNoPost = Display::factory(2)->create();
 
-    $this->post->displays()->attach($displaysWithPostIds);
+          foreach (
+              $displaysWithThisPost as $display
+          ) {
+              $this->post->displays()->attach($display->id);
 
-    $this->post->displays()->sync($newDisplaysPostIds);
+              event(new DisplayPostUpdated($display, $this->post));
 
-    foreach ($displaysWithThisPost as $removedDisplay) {
-      $raspberry = Raspberry::factory()->create(["display_id" => $removedDisplay->id]);
-      event(new DisplayPostDeleted($removedDisplay, $this->post));
-      Notification::assertSentTo(
-        $raspberry,
-        PostDeleted::class
-      );
-    }
-      Notification::assertTimesSent(count($displaysWithThisPost), PostDeleted::class);
-  }
+              Notification::assertSentTo(
+                  $display,
+                  PostUpdated::class
+              );
+          }
+          Notification::assertTimesSent(count($displaysWithThisPost), PostUpdated::class);
+      }
 
     /**
      * @test
      */
-    public function when_display_dont_have_raspberry_and_event_is_DisplayPostDeleted_should_notify_raspberry_with_PostDeleted_notification()
+    public function when_event_is_DisplayPostDeleted_should_notify_raspberry_with_PostDeleted_notification()
     {
         Notification::fake();
 
@@ -182,13 +153,42 @@ class BroadcastToRaspberryTest extends TestCase
 
         $this->post->displays()->sync($newDisplaysPostIds);
 
-        foreach ($displaysWithThisPost as $displayWithThisPost) {
-            event(new DisplayPostDeleted($displayWithThisPost, $this->post));
+        foreach ($displaysWithThisPost as $removedDisplay) {
+            $raspberry = Raspberry::factory()->create(['display_id' => $removedDisplay->id]);
+            event(new DisplayPostDeleted($removedDisplay, $this->post));
             Notification::assertSentTo(
-                $displayWithThisPost,
+                $raspberry,
                 PostDeleted::class
             );
         }
         Notification::assertTimesSent(count($displaysWithThisPost), PostDeleted::class);
     }
+
+      /**
+       * @test
+       */
+      public function when_display_dont_have_raspberry_and_event_is_DisplayPostDeleted_should_notify_raspberry_with_PostDeleted_notification()
+      {
+          Notification::fake();
+
+          $displaysNoPost = Display::factory(2)->create();
+          $displaysWithThisPost = Display::factory(3)->create();
+          $displaysWithPostIds = $displaysWithThisPost->pluck('id')->toArray();
+
+          $newDisplaysPost = Display::factory(4)->create();
+          $newDisplaysPostIds = $newDisplaysPost->pluck('id')->toArray();
+
+          $this->post->displays()->attach($displaysWithPostIds);
+
+          $this->post->displays()->sync($newDisplaysPostIds);
+
+          foreach ($displaysWithThisPost as $displayWithThisPost) {
+              event(new DisplayPostDeleted($displayWithThisPost, $this->post));
+              Notification::assertSentTo(
+                  $displayWithThisPost,
+                  PostDeleted::class
+              );
+          }
+          Notification::assertTimesSent(count($displaysWithThisPost), PostDeleted::class);
+      }
 }

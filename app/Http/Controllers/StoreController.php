@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 class StoreController extends Controller
 {
-
     public function index()
     {
         return Store::all();
@@ -17,10 +16,11 @@ class StoreController extends Controller
     {
         $request->validate([
             'name' => [
-                'required', 'string', 'max:255', 'unique:stores'
-            ]
+                'required', 'string', 'max:255', 'unique:stores',
+            ],
         ]);
-      return Store::create(['name' => $request->name]);
+
+        return Store::create(['name' => $request->name]);
     }
 
     public function show(Request $request, Store $store)
@@ -30,14 +30,14 @@ class StoreController extends Controller
 
     public function update(Request $request, Store $store): Store
     {
-      $request->validate([
-        'name' => [
-          'required', 'string', 'max:255', 'unique:stores'
-        ]
-      ]);
-      $store->update(['name' => $request->name]);
+        $request->validate([
+            'name' => [
+                'required', 'string', 'max:255', 'unique:stores',
+            ],
+        ]);
+        $store->update(['name' => $request->name]);
 
-      return $store;
+        return $store;
     }
 
     public function destroy(Store $store)

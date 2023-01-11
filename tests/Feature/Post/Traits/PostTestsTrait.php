@@ -13,11 +13,12 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Tests\Feature\Post\Enums\PostShouldDo;
 
-
 trait PostTestsTrait
 {
     private Post $post;
+
     private Media $media;
+
     private Recurrence $recurrence;
 
     private function _createPost(array $data = null): Post
@@ -46,14 +47,16 @@ trait PostTestsTrait
             $nowDateTime, $amountOfDisplays);
 
         switch ($shouldShowOrQueue) {
-          case PostShouldDo::Event:
-            Event::assertDispatched(PostMustStart::class, 1);
-            Bus::assertNotDispatched(StartPost::class);
-            return;
-          case PostShouldDo::Queue:
-            Bus::assertDispatched(StartPost::class, 1);
-            Event::assertNotDispatched(PostMustStart::class);
-            return;
+            case PostShouldDo::Event:
+                Event::assertDispatched(PostMustStart::class, 1);
+                Bus::assertNotDispatched(StartPost::class);
+
+                return;
+            case PostShouldDo::Queue:
+                Bus::assertDispatched(StartPost::class, 1);
+                Event::assertNotDispatched(PostMustStart::class);
+
+                return;
         }
     }
 
@@ -72,10 +75,10 @@ trait PostTestsTrait
         $displays_ids
             = $this->createDisplaysAndReturnIds($amountOfDisplays);
         $post_data = $this->_makePost([
-            'start_date'   => $startDate, 'start_time' => $startTime,
-            'end_date'     => $endDate, 'end_time' => $endTime,
+            'start_date' => $startDate, 'start_time' => $startTime,
+            'end_date' => $endDate, 'end_time' => $endTime,
             'displays_ids' => $displays_ids,
-            'media_id'     => $media->id
+            'media_id' => $media->id,
         ], false)->toArray();
 
         $response = $this->postJson(route('posts.store'), $post_data);
@@ -105,5 +108,4 @@ trait PostTestsTrait
         $this->assertTrue($scheduled->isSameHour($correct));
         $this->assertTrue($scheduled->isSameMinute($correct));
     }
-
 }

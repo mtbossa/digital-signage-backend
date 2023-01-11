@@ -14,38 +14,38 @@ use App\Services\PostSchedulerService;
 
 class StorePostAction
 {
-  public function __construct(private readonly DisplayUpdatesCacheService $display_updates_cache_service)
-  {
-  }
+    public function __construct(private readonly DisplayUpdatesCacheService $display_updates_cache_service)
+    {
+    }
 
-  public function handle(
+    public function handle(
     StorePostRequest $request,
   ): Post {
-    $media = Media::findOrFail($request->media_id);
-    $post = $media->posts()->create($request->safe()->except(['media_id']));
+        $media = Media::findOrFail($request->media_id);
+        $post = $media->posts()->create($request->safe()->except(['media_id']));
 
-    if ($request->has('recurrence_id')) {
-      $recurrence = Recurrence::findOrFail($request->recurrence_id);
-      $post->recurrence()->associate($recurrence);
-      $post->save();
-    } else {
-      PostSchedulerService::schedulePostExpiredEvent($post);
+        if ($request->has('recurrence_id')) {
+            $recurrence = Recurrence::findOrFail($request->recurrence_id);
+            $post->recurrence()->associate($recurrence);
+            $post->save();
+        } else {
+            PostSchedulerService::schedulePostExpiredEvent($post);
+        }
+
+        if (! is_null($request->displays_ids)) {
+            $displays_ids = $request->displays_ids;
+            $post->displays()->attach($displays_ids);
+
+            foreach ($displays_ids as $display_id) {
+                $display = Display::query()->find($display_id);
+                DisplayPostCreated::dispatch($display, $post);
+
+                $this->display_updates_cache_service->setCurrentCache(DisplayUpdatesCacheKeysEnum::DisplayUpdatesPostCreated, $display_id, $post->id);
+            }
+
+            $post->load('displays');
+        }
+
+        return $post;
     }
-
-    if (!is_null($request->displays_ids)) {
-      $displays_ids = $request->displays_ids;
-      $post->displays()->attach($displays_ids);
-
-      foreach ($displays_ids as $display_id) {
-        $display = Display::query()->find($display_id);
-        DisplayPostCreated::dispatch($display, $post);
-        
-        $this->display_updates_cache_service->setCurrentCache(DisplayUpdatesCacheKeysEnum::DisplayUpdatesPostCreated, $display_id, $post->id);
-      }
-
-      $post->load('displays');
-    }
-
-    return $post;
-  }
 }

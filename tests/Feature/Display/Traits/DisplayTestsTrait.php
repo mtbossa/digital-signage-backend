@@ -9,7 +9,9 @@ use App\Models\Raspberry;
 trait DisplayTestsTrait
 {
     private Display $display;
+
     private Raspberry $raspberry;
+
     private Media $media;
 
     private function _makeDisplay(array $data = null): Display

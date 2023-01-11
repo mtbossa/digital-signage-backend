@@ -12,54 +12,55 @@ use Illuminate\Support\Facades\DB;
 
 class MediaController extends Controller
 {
-  public function index(Request $request): LengthAwarePaginator
-  {
-    return Media::query()->paginate($request->size);
-  }
+    public function index(Request $request): LengthAwarePaginator
+    {
+        return Media::query()->paginate($request->size);
+    }
 
-  public function store(Request $request, StoreMediaAction $action): Media
-  {
-    $request->validate([
-      'description' => ['required', 'string', 'max:50'],
-      'file' => ['required', 'file', 'max:150000', 'mimes:png,jpg,jpeg,mp4,avi']
-    ]);
-    return $action->handle($request);
-  }
+    public function store(Request $request, StoreMediaAction $action): Media
+    {
+        $request->validate([
+            'description' => ['required', 'string', 'max:50'],
+            'file' => ['required', 'file', 'max:150000', 'mimes:png,jpg,jpeg,mp4,avi'],
+        ]);
 
-  public function show(Media $media): Media
-  {
-    return $media;
-  }
+        return $action->handle($request);
+    }
 
-  public function update(UpdateMediaRequest $request, Media $media): Media
-  {
-    $media->update($request->validated());
-    return $media;
-  }
+    public function show(Media $media): Media
+    {
+        return $media;
+    }
 
-  public function destroy(Media $media)
-  {
-    $media->load("posts.displays");
+    public function update(UpdateMediaRequest $request, Media $media): Media
+    {
+        $media->update($request->validated());
 
-    DB::transaction(function () use ($media) {
-      $posts = $media->posts;
+        return $media;
+    }
 
-      foreach ($posts as $post) {
-        foreach ($post->displays as $display) {
-          $notification = new PostDeleted($display, $post->id, $post->media->id);
+    public function destroy(Media $media)
+    {
+        $media->load('posts.displays');
 
-          if ($display->raspberry) {
-            $display->raspberry->notify($notification);
-          } else {
-              $display->notify($notification);
-          }
-        }
-      }
+        DB::transaction(function () use ($media) {
+            $posts = $media->posts;
 
-      $media->delete();
-    });
+            foreach ($posts as $post) {
+                foreach ($post->displays as $display) {
+                    $notification = new PostDeleted($display, $post->id, $post->media->id);
 
+                    if ($display->raspberry) {
+                        $display->raspberry->notify($notification);
+                    } else {
+                        $display->notify($notification);
+                    }
+                }
+            }
 
-    return response("", 200);
-  }
+            $media->delete();
+        });
+
+        return response('', 200);
+    }
 }

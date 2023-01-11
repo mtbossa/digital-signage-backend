@@ -17,122 +17,121 @@ use Tests\TestCase;
 
 class InvitationTest extends TestCase
 {
-  use RefreshDatabase, InvitationTestsTrait, AuthUserTrait, WithFaker;
+    use RefreshDatabase, InvitationTestsTrait, AuthUserTrait, WithFaker;
 
-  public function setUp(): void
-  {
-    parent::setUp();
-    $this->_authUser();
-    $this->invitation = $this->_createWithTokenInvitation([
-      'inviter' => $this->user->id, 'is_admin' => $this->user->is_admin
-    ]);
-  }
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->_authUser();
+        $this->invitation = $this->_createWithTokenInvitation([
+            'inviter' => $this->user->id, 'is_admin' => $this->user->is_admin,
+        ]);
+    }
 
-  /** @test */
-  public function create_user_without_store_invitation()
-  {
-    Mail::fake();
-    $email_data = ['email' => $this->faker->email(), 'is_admin' => false];
-    $response = $this->postJson(route('invitations.store'), $email_data)->assertCreated()->assertJson($email_data);
-    $this->assertDatabaseHas('invitations', $response->json());
-    Mail::assertQueued(UserInvitation::class);
-  }
+    /** @test */
+    public function create_user_without_store_invitation()
+    {
+        Mail::fake();
+        $email_data = ['email' => $this->faker->email(), 'is_admin' => false];
+        $response = $this->postJson(route('invitations.store'), $email_data)->assertCreated()->assertJson($email_data);
+        $this->assertDatabaseHas('invitations', $response->json());
+        Mail::assertQueued(UserInvitation::class);
+    }
 
-  /** @test */
-  public function create_user_with_store_invitation()
-  {
-    Mail::fake();
-    $store = Store::factory()->create();
-    $invitation_data = ['email' => $this->faker->email(), 'store_id' => $store->id, 'is_admin' => false];
-    $response = $this->postJson(route('invitations.store'),
-      $invitation_data)->assertCreated()->assertJson($invitation_data);
-    $this->assertDatabaseHas('invitations', $response->json());
-    Mail::assertQueued(UserInvitation::class);
-  }
+    /** @test */
+    public function create_user_with_store_invitation()
+    {
+        Mail::fake();
+        $store = Store::factory()->create();
+        $invitation_data = ['email' => $this->faker->email(), 'store_id' => $store->id, 'is_admin' => false];
+        $response = $this->postJson(route('invitations.store'),
+            $invitation_data)->assertCreated()->assertJson($invitation_data);
+        $this->assertDatabaseHas('invitations', $response->json());
+        Mail::assertQueued(UserInvitation::class);
+    }
 
-  /** @test */
-  public function create_invitation_to_admin_user_with_store()
-  {
-    Mail::fake();
-    $store = Store::factory()->create();
-    $invitation_data = ['email' => $this->faker->email(), 'is_admin' => true, 'store_id' => $store->id];
-    $response = $this->postJson(route('invitations.store'),
-      $invitation_data)->assertCreated()->assertJson($invitation_data);
-    $this->assertDatabaseHas('invitations', [
-      'id' => $response['id'], 'is_admin' => $invitation_data['is_admin'], 'store_id' => $invitation_data['store_id']
-    ]);
-    Mail::assertQueued(UserInvitation::class);
-  }
+    /** @test */
+    public function create_invitation_to_admin_user_with_store()
+    {
+        Mail::fake();
+        $store = Store::factory()->create();
+        $invitation_data = ['email' => $this->faker->email(), 'is_admin' => true, 'store_id' => $store->id];
+        $response = $this->postJson(route('invitations.store'),
+            $invitation_data)->assertCreated()->assertJson($invitation_data);
+        $this->assertDatabaseHas('invitations', [
+            'id' => $response['id'], 'is_admin' => $invitation_data['is_admin'], 'store_id' => $invitation_data['store_id'],
+        ]);
+        Mail::assertQueued(UserInvitation::class);
+    }
 
-  /** @test */
-  public function create_invitation_to_admin_user_without_store()
-  {
-    Mail::fake();
-    $store = Store::factory()->create();
-    $invitation_data = ['email' => $this->faker->email(), 'is_admin' => true];
-    $response = $this->postJson(route('invitations.store'),
-      $invitation_data)->assertCreated()->assertJson($invitation_data);
-    $this->assertDatabaseHas('invitations',
-      ['id' => $response['id'], 'is_admin' => $invitation_data['is_admin'], 'store_id' => null]);
-    Mail::assertQueued(UserInvitation::class);
-  }
+    /** @test */
+    public function create_invitation_to_admin_user_without_store()
+    {
+        Mail::fake();
+        $store = Store::factory()->create();
+        $invitation_data = ['email' => $this->faker->email(), 'is_admin' => true];
+        $response = $this->postJson(route('invitations.store'),
+            $invitation_data)->assertCreated()->assertJson($invitation_data);
+        $this->assertDatabaseHas('invitations',
+            ['id' => $response['id'], 'is_admin' => $invitation_data['is_admin'], 'store_id' => null]);
+        Mail::assertQueued(UserInvitation::class);
+    }
 
-  /** @test */
-  public function fetch_single_invitation_by_token()
-  {
-    $this->getJson(route('invitations.show',
-      $this->invitation->token))->assertOk()->assertJson($this->invitation->toArray());
-  }
+    /** @test */
+    public function fetch_single_invitation_by_token()
+    {
+        $this->getJson(route('invitations.show',
+            $this->invitation->token))->assertOk()->assertJson($this->invitation->toArray());
+    }
 
-  /** @test */
-  public function ensure_auth_user_can_fetch_single_accepted_invitation()
-  {
-    $invitation = $this->_createWithTokenInvitation([
-      'inviter' => $this->user->id, 'registered_at' => Carbon::now()->format('Y-m-d H:i:s')
-    ]);
-    $this->getJson(route('invitations.show',
-      $invitation->token))->assertOk()->assertJson($invitation->toArray());
-  }
+    /** @test */
+    public function ensure_auth_user_can_fetch_single_accepted_invitation()
+    {
+        $invitation = $this->_createWithTokenInvitation([
+            'inviter' => $this->user->id, 'registered_at' => Carbon::now()->format('Y-m-d H:i:s'),
+        ]);
+        $this->getJson(route('invitations.show',
+            $invitation->token))->assertOk()->assertJson($invitation->toArray());
+    }
 
-  /** @test */
-  public function fetch_all_invitations()
-  {
-    $this->_createWithTokenInvitation(['inviter' => $this->user->id, 'is_admin' => false]);
+    /** @test */
+    public function fetch_all_invitations()
+    {
+        $this->_createWithTokenInvitation(['inviter' => $this->user->id, 'is_admin' => false]);
 
-    $this->getJson(route('invitations.index'))->assertOk()->assertJsonCount(2,
-      'data')->assertJsonFragment($this->invitation->toArray());
-  }
+        $this->getJson(route('invitations.index'))->assertOk()->assertJsonCount(2,
+            'data')->assertJsonFragment($this->invitation->toArray());
+    }
 
-  /** @test */
-  public function delete_invitation()
-  {
-    $response = $this->deleteJson(route('invitations.destroy', $this->invitation->id));
-    $this->assertDatabaseMissing('invitations', ['id' => $this->invitation->id]);
-    $response->assertOk();
-  }
+    /** @test */
+    public function delete_invitation()
+    {
+        $response = $this->deleteJson(route('invitations.destroy', $this->invitation->id));
+        $this->assertDatabaseMissing('invitations', ['id' => $this->invitation->id]);
+        $response->assertOk();
+    }
 
-  /** @test */
-  public function ensure_delete_expired_invitations_is_running_every_five_minutes()
-  {
-    Event::fake();
-    $this->travelTo(now()->startOfDay());
-    $this->travelTo(now()->addMinutes(5));
-    $this->artisan('schedule:run');
+    /** @test */
+    public function ensure_delete_expired_invitations_is_running_every_five_minutes()
+    {
+        Event::fake();
+        $this->travelTo(now()->startOfDay());
+        $this->travelTo(now()->addMinutes(5));
+        $this->artisan('schedule:run');
 
-    Event::assertDispatched(ScheduledTaskFinished::class);
-  }
+        Event::assertDispatched(ScheduledTaskFinished::class);
+    }
 
-  /** @test */
-  public function ensure_delete_expired_invitations_is_deleting_all_invitations_created_on_the_day_before()
-  {
-    $this->travelTo(now()->startOfDay());
-    $shouldDeleteInvitation = Invitation::factory()->withToken()->create(["inviter" => $this->user->id]);
-    $this->travelTo(now()->addDay()->addMinutes(5));
-    $notDeletedInvitation = Invitation::factory()->withToken()->create(["inviter" => $this->user->id]);
-    $this->artisan('schedule:run');
+    /** @test */
+    public function ensure_delete_expired_invitations_is_deleting_all_invitations_created_on_the_day_before()
+    {
+        $this->travelTo(now()->startOfDay());
+        $shouldDeleteInvitation = Invitation::factory()->withToken()->create(['inviter' => $this->user->id]);
+        $this->travelTo(now()->addDay()->addMinutes(5));
+        $notDeletedInvitation = Invitation::factory()->withToken()->create(['inviter' => $this->user->id]);
+        $this->artisan('schedule:run');
 
-    $this->assertDatabaseMissing("invitations", ["id" => $shouldDeleteInvitation->id]);
-    $this->assertDatabaseHas("invitations", ["id" => $notDeletedInvitation->id]);
-  }
-
+        $this->assertDatabaseMissing('invitations', ['id' => $shouldDeleteInvitation->id]);
+        $this->assertDatabaseHas('invitations', ['id' => $notDeletedInvitation->id]);
+    }
 }

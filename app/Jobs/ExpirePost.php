@@ -11,18 +11,18 @@ use Illuminate\Queue\SerializesModels;
 
 class ExpirePost implements ShouldQueue
 {
-  use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-  public bool $deleteWhenMissingModels = true;
+    public bool $deleteWhenMissingModels = true;
 
-  public function __construct(public Post $post)
-  {
+    public function __construct(public Post $post)
+    {
     //
-  }
+    }
 
-  public function handle()
-  {
-    $this->post->expired = true;
-    $this->post->save();
-  }
+    public function handle()
+    {
+        $this->post->expired = true;
+        $this->post->save();
+    }
 }

@@ -9,31 +9,31 @@ use Illuminate\Queue\SerializesModels;
 
 class InstallationLink extends Mailable
 {
-  use Queueable, SerializesModels;
+    use Queueable, SerializesModels;
 
-  public string $url;
+    public string $url;
 
-  /**
-   * Create a new message instance.
-   *
-   * @return void
-   */
-  public function __construct(private readonly Raspberry $raspberry)
-  {
-    $this->afterCommit();
-    $this->url = $this->raspberry->generateInstallationUrl();
-  }
+    /**
+     * Create a new message instance.
+     *
+     * @return void
+     */
+    public function __construct(private readonly Raspberry $raspberry)
+    {
+        $this->afterCommit();
+        $this->url = $this->raspberry->generateInstallationUrl();
+    }
 
-  /**
-   * Build the message.
-   *
-   * @return $this
-   */
-  public function build()
-  {
-    return $this->markdown('emails.raspberries.installation-link')
-      ->with([
-        'installerUrl' => $this->url,
-      ]);
-  }
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        return $this->markdown('emails.raspberries.installation-link')
+          ->with([
+              'installerUrl' => $this->url,
+          ]);
+    }
 }

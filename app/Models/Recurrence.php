@@ -22,7 +22,7 @@ class Recurrence extends Model
     public static function getOnlyNotNullRecurrenceValues(Recurrence $recurrence
     ): Collection {
         return Collection::make($recurrence->getAttributes())
-            ->filter(fn($item, $key) => $item
+            ->filter(fn ($item, $key) => $item
                 && ($key === 'isoweekday' || $key === 'day'
                     || $key === 'month'
                     || $key === 'year')
@@ -40,15 +40,13 @@ class Recurrence extends Model
             get: function ($value, $attributes) {
                 return array_filter([
                     'isoweekday' => $attributes['isoweekday'],
-                    'day'        => $attributes['day'],
-                    'month'      => $attributes['month'],
-                    'year'       => $attributes['year'],
+                    'day' => $attributes['day'],
+                    'month' => $attributes['month'],
+                    'year' => $attributes['year'],
                 ], function ($val) {
-                    return !is_null($val);
+                    return ! is_null($val);
                 });
-
             }
         );
     }
-
 }

@@ -13,29 +13,28 @@ use Illuminate\Http\Request;
 
 class DisplayController extends Controller
 {
+    public function index(Request $request): LengthAwarePaginator
+    {
+        return Display::query()->paginate($request->size);
+    }
 
-  public function index(Request $request): LengthAwarePaginator
-  {
-    return Display::query()->paginate($request->size);
-  }
+    public function store(StoreDisplayRequest $request, StoreDisplayAction $action): Display|JsonResponse
+    {
+        return $action->handle($request);
+    }
 
-  public function store(StoreDisplayRequest $request, StoreDisplayAction $action): Display|JsonResponse
-  {
-    return $action->handle($request);
-  }
+    public function show(Display $display): Display
+    {
+        return $display;
+    }
 
-  public function show(Display $display): Display
-  {
-    return $display;
-  }
+    public function update(UpdateDisplayRequest $request, Display $display, UpdateDisplayAction $action): Display
+    {
+        return $action->handle($request, $display);
+    }
 
-  public function update(UpdateDisplayRequest $request, Display $display, UpdateDisplayAction $action): Display
-  {
-    return $action->handle($request, $display);
-  }
-
-  public function destroy(Display $display): ?bool
-  {
-    return $display->delete();
-  }
+    public function destroy(Display $display): ?bool
+    {
+        return $display->delete();
+    }
 }

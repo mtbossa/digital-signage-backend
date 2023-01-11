@@ -38,8 +38,7 @@ class DisplayRelationshipsTest extends TestCase
 
     /** @test */
     public function check_if_display_belongs_to_many_posts_relationship_is_working(
-    )
-    {
+    ) {
         $media = Media::factory()->create();
         $display = Display::factory()->create();
         $posts_ids = Post::factory(2)->create(['media_id' => $media->id])
@@ -104,33 +103,33 @@ class DisplayRelationshipsTest extends TestCase
     /** @test */
     public function update_displays_raspberry()
     {
-      $display = Display::factory()->create();
-      $rasp1 = Raspberry::factory()
-        ->create(['display_id' => $display->id]);
-      $rasp2 = Raspberry::factory()->create();
+        $display = Display::factory()->create();
+        $rasp1 = Raspberry::factory()
+          ->create(['display_id' => $display->id]);
+        $rasp2 = Raspberry::factory()->create();
 
-      $response = $this->putJson(route('displays.update', $display->id),
-        [...$display->toArray(), 'raspberry_id' => $rasp2->id]);
+        $response = $this->putJson(route('displays.update', $display->id),
+            [...$display->toArray(), 'raspberry_id' => $rasp2->id]);
 
-      $this->assertDatabaseHas('raspberries',
-        ['id' => $rasp2->id, 'display_id' => $display->id]);
-      $this->assertDatabaseHas('raspberries',
-        ['id' => $rasp1->id, 'display_id' => null]);
+        $this->assertDatabaseHas('raspberries',
+            ['id' => $rasp2->id, 'display_id' => $display->id]);
+        $this->assertDatabaseHas('raspberries',
+            ['id' => $rasp1->id, 'display_id' => null]);
 
-      $response->assertOk();
+        $response->assertOk();
     }
 
     /** @test */
     public function remove_displays_raspberry()
     {
-      $display = $this->_createDisplay();
-      $raspberry = Raspberry::factory()->create(['display_id' => $display->id]);
+        $display = $this->_createDisplay();
+        $raspberry = Raspberry::factory()->create(['display_id' => $display->id]);
 
-      $response = $this->putJson(route('displays.update', $display->id),
-        [...$display->toArray(), 'raspberry_id' => null]);
+        $response = $this->putJson(route('displays.update', $display->id),
+            [...$display->toArray(), 'raspberry_id' => null]);
 
-      $this->assertDatabaseHas('raspberries', ['id' => $raspberry->id, 'display_id' => null]);
+        $this->assertDatabaseHas('raspberries', ['id' => $raspberry->id, 'display_id' => null]);
 
-      $response->assertOk();
+        $response->assertOk();
     }
 }

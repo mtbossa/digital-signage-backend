@@ -8,14 +8,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Media extends Model
 {
-  use HasFactory;
+    use HasFactory;
 
-  protected $table = 'medias';
+    protected $table = 'medias';
 
-  protected $fillable = ['description', 'type', 'filename', 'extension', 'path', 'size_kb'];
+    protected $fillable = ['description', 'type', 'filename', 'extension', 'path', 'size_kb'];
 
-  public function posts(): HasMany
-  {
-    return $this->hasMany(Post::class);
-  }
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
 }

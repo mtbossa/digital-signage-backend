@@ -10,44 +10,45 @@ use Illuminate\Support\Str;
 
 class StoreMediaAction
 {
-  private UploadedFile $file;
+    private UploadedFile $file;
 
-  public function handle(Request $request): Media
-  {
-    $this->file = $request->file;
+    public function handle(Request $request): Media
+    {
+        $this->file = $request->file;
 
-    $file_info = $this->_getFileInfo();
-    $saved_path = $this->_storeFile($file_info);
+        $file_info = $this->_getFileInfo();
+        $saved_path = $this->_storeFile($file_info);
 
-    return Media::create([...$file_info, 'description' => $request->description, 'path' => $saved_path]);
-  }
+        return Media::create([...$file_info, 'description' => $request->description, 'path' => $saved_path]);
+    }
 
-  private function _getFileInfo(): array
-  {
-    $filename = $this->file->hashName();
-    $extension = $this->file->extension();
-    $type = $this->_getType($this->file->getMimeType());
+    private function _getFileInfo(): array
+    {
+        $filename = $this->file->hashName();
+        $extension = $this->file->extension();
+        $type = $this->_getType($this->file->getMimeType());
 
-    return [
-      'type' => $type,
-      'extension' => $extension,
-      'filename' => $filename,
-      'size_kb' => $this->file->getSize(),
-    ];
-  }
+        return [
+            'type' => $type,
+            'extension' => $extension,
+            'filename' => $filename,
+            'size_kb' => $this->file->getSize(),
+        ];
+    }
 
-  /**
-   * @param  string  $mime_type
-   * @return string Either images or videos
-   */
-  private function _getType(string $mime_type): string
-  {
-    return Str::of(explode('/', $mime_type)[0])->toString();
-  }
+    /**
+     * @param  string  $mime_type
+     * @return string Either images or videos
+     */
+    private function _getType(string $mime_type): string
+    {
+        return Str::of(explode('/', $mime_type)[0])->toString();
+    }
 
-  private function _storeFile(array $file_info): string
-  {
-    $type = $file_info['type'];
-    return Storage::putFileAs("medias/$type", $this->file, $file_info['filename']);
-  }
+    private function _storeFile(array $file_info): string
+    {
+        $type = $file_info['type'];
+
+        return Storage::putFileAs("medias/$type", $this->file, $file_info['filename']);
+    }
 }

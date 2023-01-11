@@ -15,7 +15,9 @@ class StoreDisplaysTest extends TestCase
     use RefreshDatabase, AuthUserTrait;
 
     private Display $display;
+
     private Raspberry $raspberry;
+
     private Media $media;
 
     public function setUp(): void
@@ -47,12 +49,11 @@ class StoreDisplaysTest extends TestCase
             ->create(['store_id' => $this->store->id]);
 
         $response = $this->getJson(route('stores.displays.index',
-                ['store' => $this->store->id])
+            ['store' => $this->store->id])
         )->assertOk();
 
         foreach ($displays as $key => $display) {
             $response->assertJsonFragment(['id' => $display->id]);
         }
     }
-
 }

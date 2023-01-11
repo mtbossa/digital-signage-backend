@@ -11,23 +11,23 @@ use Tests\TestCase;
 
 class UserRelationshipsTest extends TestCase
 {
-  use RefreshDatabase, UserTestsTrait, AuthUserTrait;
+    use RefreshDatabase, UserTestsTrait, AuthUserTrait;
 
-  public function setUp(): void
-  {
-    parent::setUp();
+    public function setUp(): void
+    {
+        parent::setUp();
 
-    $this->_authUser();
-  }
+        $this->_authUser();
+    }
 
-  /** @test */
-  public function a_user_might_belong_to_a_store()
-  {
-    $store = Store::factory()->create();
-    $user = User::factory()->create(['store_id' => $store->id]);
+    /** @test */
+    public function a_user_might_belong_to_a_store()
+    {
+        $store = Store::factory()->create();
+        $user = User::factory()->create(['store_id' => $store->id]);
 
-    $this->assertInstanceOf(Store::class, $user->store);
-    $this->assertEquals(1, $user->store->count());
-    $this->assertDatabaseHas('users', ['id' => $user->id, 'store_id' => $store->id]);
-  }
+        $this->assertInstanceOf(Store::class, $user->store);
+        $this->assertEquals(1, $user->store->count());
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'store_id' => $store->id]);
+    }
 }

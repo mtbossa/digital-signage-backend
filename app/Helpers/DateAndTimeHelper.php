@@ -2,7 +2,6 @@
 
 namespace App\Helpers;
 
-
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 
@@ -18,6 +17,7 @@ class DateAndTimeHelper
         if (is_string($endTime)) {
             $endTime = Carbon::createFromTimeString($endTime);
         }
+
         return $startTime->isAfter($endTime);
     }
 }

@@ -11,35 +11,34 @@ class RaspberryPostsResource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  Request  $request
-     *
      * @return array
      */
     public function toArray($request)
     {
         return [
-            'id'          => $this->id,
-            'start_date'  => $this->start_date,
-            'end_date'    => $this->end_date,
-            'start_time'  => $this->start_time,
-            'end_time'    => $this->end_time,
+            'id' => $this->id,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
+            'start_time' => $this->start_time,
+            'end_time' => $this->end_time,
             'expose_time' => $this->expose_time,
-            'showing'     => $this->showing,
+            'showing' => $this->showing,
             $this->mergeWhen($this->whenLoaded('medias'), [
                 'media' => [
-                    'id'       => $this->media->id,
-                    'path'     => $this->media->path,
-                    'type'     => $this->media->type,
-                    'filename' => $this->media->filename
+                    'id' => $this->media->id,
+                    'path' => $this->media->path,
+                    'type' => $this->media->type,
+                    'filename' => $this->media->filename,
                 ],
             ]),
             $this->mergeWhen($this->whenLoaded('recurrence')
                 && (bool) $this->recurrence_id, [
-                'recurrence' => [
-                    'isoweekday' => $this->recurrence?->isoweekday,
-                    'day'        => $this->recurrence?->day,
-                    'month'      => $this->recurrence?->month,
-                ],
-            ]),
+                    'recurrence' => [
+                        'isoweekday' => $this->recurrence?->isoweekday,
+                        'day' => $this->recurrence?->day,
+                        'month' => $this->recurrence?->month,
+                    ],
+                ]),
         ];
     }
 }

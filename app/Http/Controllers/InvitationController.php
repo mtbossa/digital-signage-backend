@@ -14,53 +14,53 @@ use Illuminate\Support\Facades\Auth;
 
 class InvitationController extends Controller
 {
-
-  public function index(Request $request): LengthAwarePaginator
-  {
-    return Invitation::query()->paginate($request->size);
-  }
-
-  public function store(StoreInvitationRequest $request, StoreInvitationAction $action): Invitation
-  {
-    return $action->handle($request);
-  }
-
-  public function show(Request $request, string $token): Invitation
-  {
-    $is_guest = Auth::guest();
-    $invitation = Invitation::query()
-      ->where('token', $token)
-      ->when($is_guest, function ($query, $is_guest) {
-        $query->where('registered_at', null);
-      })
-      ->firstOrFail();
-    return $invitation;
-  }
-
-  public function update(Request $request, string $token, CreateNewUser $action): User
-  {
-    if (Auth::user()) {
-      abort(404);
+    public function index(Request $request): LengthAwarePaginator
+    {
+        return Invitation::query()->paginate($request->size);
     }
-    
-    $invitation = Invitation::query()
-      ->where('token', $token)
-      ->whereNull('registered_at')
-      ->firstOrFail();
-    $user = $action->create([
-      "name" => $request->name, "password" => $request->password,
-      "password_confirmation" => $request->password_confirmation, 'email' => $invitation->email,
-      'store_id' => $invitation->store_id,
-      'is_admin' => $invitation->is_admin
-    ]);
-    $invitation->registered_at = Carbon::now()->format('Y-m-d H:i:s');
-    $invitation->save();
 
-    return $user;
-  }
+    public function store(StoreInvitationRequest $request, StoreInvitationAction $action): Invitation
+    {
+        return $action->handle($request);
+    }
 
-  public function destroy(Invitation $invitation): bool
-  {
-    return $invitation->delete();
-  }
+    public function show(Request $request, string $token): Invitation
+    {
+        $is_guest = Auth::guest();
+        $invitation = Invitation::query()
+          ->where('token', $token)
+          ->when($is_guest, function ($query, $is_guest) {
+              $query->where('registered_at', null);
+          })
+          ->firstOrFail();
+
+        return $invitation;
+    }
+
+    public function update(Request $request, string $token, CreateNewUser $action): User
+    {
+        if (Auth::user()) {
+            abort(404);
+        }
+
+        $invitation = Invitation::query()
+          ->where('token', $token)
+          ->whereNull('registered_at')
+          ->firstOrFail();
+        $user = $action->create([
+            'name' => $request->name, 'password' => $request->password,
+            'password_confirmation' => $request->password_confirmation, 'email' => $invitation->email,
+            'store_id' => $invitation->store_id,
+            'is_admin' => $invitation->is_admin,
+        ]);
+        $invitation->registered_at = Carbon::now()->format('Y-m-d H:i:s');
+        $invitation->save();
+
+        return $user;
+    }
+
+    public function destroy(Invitation $invitation): bool
+    {
+        return $invitation->delete();
+    }
 }

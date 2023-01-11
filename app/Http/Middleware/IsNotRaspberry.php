@@ -12,19 +12,19 @@ use Illuminate\Http\Response;
 
 class IsNotRaspberry
 {
-  /**
-   * Handle an incoming request.
-   *
-   * @param  Request  $request
-   * @param  Closure(Request): (Response|RedirectResponse)  $next
-   * @return JsonResponse
-   */
-  public function handle(Request $request, Closure $next)
-  {
-    if ($request->user() instanceof Raspberry || $request->user() instanceof Display) {
-      return response()->json(['message' => 'Unauthenticated.'], 401);
-    }
+    /**
+     * Handle an incoming request.
+     *
+     * @param  Request  $request
+     * @param  Closure(Request): (Response|RedirectResponse)  $next
+     * @return JsonResponse
+     */
+    public function handle(Request $request, Closure $next)
+    {
+        if ($request->user() instanceof Raspberry || $request->user() instanceof Display) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
 
-    return $next($request);
-  }
+        return $next($request);
+    }
 }

@@ -15,7 +15,6 @@ class PairingCodeFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    
     public function definition()
     {
         $generator = new PairingCodeGeneratorService();
@@ -23,7 +22,7 @@ class PairingCodeFactory extends Factory
         // This could lead to problems if it generates duplicates...
         return [
             'code' => $generated['code'],
-            'expires_at' => $generated['expires_at']->format('Y-m-d H:i:s')
+            'expires_at' => $generated['expires_at']->format('Y-m-d H:i:s'),
         ];
     }
 }

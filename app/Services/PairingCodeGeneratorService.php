@@ -10,6 +10,7 @@ class PairingCodeGeneratorService
     {
         $code = $this->makeRandomCode();
         $expires_at = $this->expiresWhen();
+
         return ['code' => $code, 'expires_at' => $expires_at];
     }
 

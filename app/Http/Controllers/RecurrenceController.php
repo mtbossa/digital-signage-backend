@@ -12,46 +12,46 @@ use Illuminate\Support\Facades\DB;
 
 class RecurrenceController extends Controller
 {
-  public function index(Request $request): LengthAwarePaginator
-  {
-    return Recurrence::query()->paginate($request->size);
-  }
+    public function index(Request $request): LengthAwarePaginator
+    {
+        return Recurrence::query()->paginate($request->size);
+    }
 
-  public function store(StoreRecurrenceRequest $request): Recurrence
-  {
-    return Recurrence::create($request->validated());
-  }
+    public function store(StoreRecurrenceRequest $request): Recurrence
+    {
+        return Recurrence::create($request->validated());
+    }
 
-  public function show(Recurrence $recurrence): Recurrence
-  {
-    return $recurrence;
-  }
+    public function show(Recurrence $recurrence): Recurrence
+    {
+        return $recurrence;
+    }
 
-  public function update(UpdateRecurrenceRequest $request, Recurrence $recurrence): Recurrence
-  {
-    $recurrence->update($request->validated());
-    return $recurrence;
-  }
+    public function update(UpdateRecurrenceRequest $request, Recurrence $recurrence): Recurrence
+    {
+        $recurrence->update($request->validated());
 
-  public function destroy(Recurrence $recurrence)
-  {
-    $recurrence->load("posts.displays");
+        return $recurrence;
+    }
 
-    DB::transaction(function () use ($recurrence) {
-      $posts = $recurrence->posts;
+    public function destroy(Recurrence $recurrence)
+    {
+        $recurrence->load('posts.displays');
 
-      foreach ($posts as $post) {
-        foreach ($post->displays as $display) {
-          $notification = new PostDeleted($display, $post->id, $post->media->id);
+        DB::transaction(function () use ($recurrence) {
+            $posts = $recurrence->posts;
 
-          $display->notify($notification);
-        }
-      }
+            foreach ($posts as $post) {
+                foreach ($post->displays as $display) {
+                    $notification = new PostDeleted($display, $post->id, $post->media->id);
 
-      $recurrence->delete();
-    });
+                    $display->notify($notification);
+                }
+            }
 
+            $recurrence->delete();
+        });
 
-    return response("", 200);
-  }
+        return response('', 200);
+    }
 }

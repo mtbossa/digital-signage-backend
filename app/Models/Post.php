@@ -9,30 +9,30 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Post extends Model
 {
-  use HasFactory;
+    use HasFactory;
 
-  protected $fillable = [
-    'description',
-    'start_date',
-    'end_date',
-    'start_time',
-    'end_time',
-    'expose_time',
-    'expired'
-  ];
+    protected $fillable = [
+        'description',
+        'start_date',
+        'end_date',
+        'start_time',
+        'end_time',
+        'expose_time',
+        'expired',
+    ];
 
-  public function media(): BelongsTo
-  {
-    return $this->belongsTo(Media::class);
-  }
+    public function media(): BelongsTo
+    {
+        return $this->belongsTo(Media::class);
+    }
 
-  public function recurrence(): BelongsTo
-  {
-    return $this->belongsTo(Recurrence::class);
-  }
+    public function recurrence(): BelongsTo
+    {
+        return $this->belongsTo(Recurrence::class);
+    }
 
-  public function displays(): BelongsToMany
-  {
-    return $this->belongsToMany(Display::class);
-  }
+    public function displays(): BelongsToMany
+    {
+        return $this->belongsToMany(Display::class);
+    }
 }
