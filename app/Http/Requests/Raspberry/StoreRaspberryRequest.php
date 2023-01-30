@@ -25,9 +25,10 @@ class StoreRaspberryRequest extends FormRequest
   {
     return [
       'short_name' => ['required', 'string', 'max:30'],
-      'mac_address' => ['required', 'mac_address'],
+      'mac_address' => ['required', 'mac_address', 'unique:raspberries'],
       'serial_number' => ['required', 'string', 'max:50'],
-      'observation' => ['nullable', 'string']
+      'observation' => ['nullable', 'string'],
+      'display_id' => ['nullable', 'unique:raspberries,display_id']
     ];
   }
 }

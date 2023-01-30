@@ -5,6 +5,7 @@ namespace App\Actions\Display;
 use App\Http\Requests\Display\StoreDisplayRequest;
 use App\Models\Display;
 use App\Models\Raspberry;
+use App\Models\Store;
 
 class StoreDisplayAction
 {
@@ -15,6 +16,11 @@ class StoreDisplayAction
     if ($request->raspberry_id) {
       $raspberry = Raspberry::findOrFail($request->raspberry_id);
       $display->raspberry()->save($raspberry);
+    }
+
+    if ($request->store_id) {
+      $store = Store::findOrFail($request->store_id);
+      $display->store()->associate($store);
     }
 
     return $display;

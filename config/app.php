@@ -69,7 +69,7 @@ return [
   |
   */
 
-  'timezone' => 'UTC',
+  'timezone' => env('APP_TIMEZONE', 'UTC'),
 
   /*
   |--------------------------------------------------------------------------
@@ -194,5 +194,16 @@ return [
   'aliases' => Facade::defaultAliases()->merge([
     // ...
   ])->toArray(),
+
+  /*
+  |--------------------------------------------------------------------------
+  | App needed variables
+  |--------------------------------------------------------------------------
+  |
+  */
+  'app_front_url' => env('APP_FRONT_URL'),
+  'pusher_app_key' => env('PUSHER_APP_KEY'),
+  'pusher_app_cluster' => env('PUSHER_APP_CLUSTER'),
+  'app_github_repo_url' => env('APP_GITHUB_REPO_URL'),
 
 ];

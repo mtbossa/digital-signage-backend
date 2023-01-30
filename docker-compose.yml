@@ -4,7 +4,7 @@ services:
     laravel.test:
         container_name: laravel
         build:
-            context: ./docker/8.1
+            context: ./vendor/laravel/sail/runtimes/8.1
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
@@ -25,6 +25,8 @@ services:
             - sail
         depends_on:
             - pgsql
+            - mailhog
+            - minio
     pgsql:
         image: 'postgres:13'
         ports:
@@ -47,6 +49,29 @@ services:
         ports:
             - '${FORWARD_MAILHOG_PORT:-1025}:1025'
             - '${FORWARD_MAILHOG_DASHBOARD_PORT:-8025}:8025'
+        networks:
+            - sail
+    minio:
+        image: 'minio/minio:latest'
+        ports:
+            - '9002:9000'
+            - '9004:9004'
+        volumes:
+            - ./storage/minio:/data
+        environment:
+            MINIO_ROOT_USER: "minio"
+            MINIO_ROOT_PASSWORD: "minio123"
+        command: server --address 0.0.0.0:9000 /data --console-address ":9004"
+        networks:
+            - sail
+    soketi:
+        image: 'quay.io/soketi/soketi:latest-16-alpine'
+        environment:
+            SOKETI_DEBUG: '1'
+            SOKETI_METRICS_SERVER_PORT: '9601'
+        ports:
+            - '${SOKETI_PORT:-6001}:6001'
+            - '${SOKETI_METRICS_SERVER_PORT:-9601}:9601'
         networks:
             - sail
 networks:

@@ -47,9 +47,9 @@ class RaspberryRelationshipsTest extends TestCase
   public function create_raspberry_with_display()
   {
     $display = Display::factory()->create();
-    $raspberry_data = $this->_makeRaspberry()->toArray();
+    $raspberry_data = $this->_makeRaspberry(['display_id' => $display->id])->toArray();
 
-    $response = $this->postJson(route('raspberries.store', ['display_id' => $display->id]), $raspberry_data);
+    $response = $this->postJson(route('raspberries.store'), $raspberry_data);
 
     $this->assertDatabaseHas('raspberries', ['id' => $response['id'], 'display_id' => $display->id]);
 
@@ -65,7 +65,7 @@ class RaspberryRelationshipsTest extends TestCase
     $last_display = Display::all()->last();
 
     $response = $this->putJson(route('raspberries.update', $this->raspberry->id),
-      ['display_id' => $last_display->id]);
+      [...$this->raspberry->toArray(), 'display_id' => $last_display->id]);
 
     $this->assertDatabaseHas('raspberries', ['id' => $this->raspberry->id, 'display_id' => $last_display->id]);
 
@@ -78,7 +78,8 @@ class RaspberryRelationshipsTest extends TestCase
     Display::factory()->create();
     $this->raspberry = $this->_createRaspberry(['display_id' => Display::first()->id]);
 
-    $response = $this->putJson(route('raspberries.update', $this->raspberry->id), ['display_id' => null]);
+    $response = $this->putJson(route('raspberries.update', $this->raspberry->id),
+      [...$this->raspberry->toArray(), 'display_id' => null]);
 
     $this->assertDatabaseHas('raspberries', ['id' => $this->raspberry->id, 'display_id' => null]);
 

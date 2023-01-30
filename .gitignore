@@ -2,6 +2,7 @@
 /public/hot
 /public/storage
 /storage/*.key
+/storage/minio
 /vendor
 .env
 .env.backup

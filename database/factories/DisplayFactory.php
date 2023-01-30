@@ -22,8 +22,8 @@ class DisplayFactory extends Factory
       'size' => $this->faker->randomElement($this->screen_sizes),
       'width' => $this->faker->randomElement($this->screen_widths),
       'height' => $this->faker->randomElement($this->screen_heights),
-      'touch' => $this->faker->boolean(20),
       'observation' => $this->faker->boolean ? $this->faker->text(50) : null,
+      'store_id' => null,
     ];
   }
 }

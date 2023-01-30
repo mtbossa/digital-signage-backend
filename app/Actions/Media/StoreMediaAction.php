@@ -6,12 +6,11 @@ use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Str;
+use Illuminate\Support\Str;
 
 class StoreMediaAction
 {
   private UploadedFile $file;
-  private string $default_path = 'intus/caxias';
 
   public function handle(Request $request): Media
   {
@@ -49,6 +48,6 @@ class StoreMediaAction
   private function _storeFile(array $file_info): string
   {
     $type = $file_info['type'];
-    return Storage::putFileAs("$this->default_path/$type", $this->file, $file_info['filename']);
+    return Storage::putFileAs("medias/$type", $this->file, $file_info['filename']);
   }
 }

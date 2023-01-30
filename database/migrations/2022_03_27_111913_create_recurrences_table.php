@@ -18,7 +18,6 @@ return new class extends Migration {
       $table->tinyInteger('isoweekday')->nullable();
       $table->tinyInteger('day')->nullable();
       $table->tinyInteger('month')->nullable();
-      $table->year('year')->nullable();
       $table->timestamps();
     });
   }

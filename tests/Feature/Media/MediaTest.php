@@ -21,8 +21,8 @@ class MediaTest extends TestCase
 
     $this->_authUser();
     $this->defaultLocation = [
-      'image' => 'intus/caxias/image',
-      'video' => 'intus/caxias/video'
+      'image' => 'medias/image',
+      'video' => 'medias/video'
     ];
 
     $this->media = $this->_createMedia();
@@ -39,7 +39,7 @@ class MediaTest extends TestCase
     $hash_name = $file->hashName();
     $response = $this->postJson(route('medias.store'), ['description' => $description, 'file' => $file]);
 
-    Storage::disk('local')->assertExists($this->defaultLocation['image'].'/'.$response['filename']);
+    Storage::disk('s3')->assertExists($this->defaultLocation['image'].'/'.$response['filename']);
     $this->assertDatabaseHas('medias', ['id' => $response['id'], 'filename' => $hash_name]);
   }
 
@@ -55,13 +55,19 @@ class MediaTest extends TestCase
 
     $response_data = $response->json();
 
-    Storage::disk('local')->assertExists($this->defaultLocation['image'].'/'.$response_data['filename']);
+    Storage::disk('s3')->assertExists($this->defaultLocation['image'].'/'.$response_data['filename']);
 
     $this->assertDatabaseHas('medias', $response_data);
 
     $response->assertCreated()->assertJson($response_data);
 
     $this->getJson(route('media.download', $response_data['filename']))->assertDownload($response_data['filename']);
+  }
+
+  /** @test */
+  public function when_trying_to_download_media_file_should_return_404_if_media_not_found_by_filename()
+  {
+    $this->getJson(route('media.download', 'randomfilename.jpg'))->assertNotFound();
   }
 
   /** @test */
@@ -76,7 +82,7 @@ class MediaTest extends TestCase
 
     $response_data = $response->json();
 
-    Storage::disk('local')->assertExists($this->defaultLocation['video'].'/'.$response_data['filename']);
+    Storage::disk('s3')->assertExists($this->defaultLocation['video'].'/'.$response_data['filename']);
 
     $this->assertDatabaseHas('medias', $response_data);
 
@@ -121,6 +127,18 @@ class MediaTest extends TestCase
   }
 
   /** @test */
+  public function media_file_must_be_deleted_when_media_is_deleted()
+  {
+    Storage::fake();
+    Storage::putFileAs($this->defaultLocation[$this->media->type], UploadedFile::fake()->image($this->media->filename),
+      $this->media->filename);
+    Storage::assertExists($this->media->path);
+    $this->deleteJson(route('medias.destroy', $this->media->id))->assertOk();
+
+    Storage::assertMissing($this->media->path);
+  }
+
+  /** @test */
   public function fetch_single_media()
   {
     $this->getJson(route('medias.show',
@@ -132,6 +150,7 @@ class MediaTest extends TestCase
   {
     $this->_createMedia();
 
-    $this->getJson(route('medias.index'))->assertOk()->assertJsonCount(2)->assertJsonFragment($this->media->toArray());
+    $this->getJson(route('medias.index'))->assertOk()->assertJsonCount(2,
+      'data')->assertJsonFragment($this->media->toArray());
   }
 }

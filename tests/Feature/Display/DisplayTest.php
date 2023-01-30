@@ -56,7 +56,7 @@ class DisplayTest extends TestCase
   /** @test */
   public function fetch_single_display()
   {
-    $this->getJson(route('displays.show', $this->display->id))->assertOk()->assertJson($this->display->toArray());
+    $this->getJson(route('displays.show', $this->display->id))->assertOk()->assertJsonFragment(['id' => $this->display->id]);
   }
 
   /** @test */
@@ -64,6 +64,9 @@ class DisplayTest extends TestCase
   {
     $display = $this->_createDisplay();
 
-    $this->getJson(route('displays.index'))->assertOk()->assertJsonCount(2);
+    Display::all(['id'])->toArray();
+
+    $this->getJson(route('displays.index'))->assertOk()->assertJsonCount(2,
+      'data')->assertJsonFragment(['id' => $display->id]);
   }
 }

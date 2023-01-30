@@ -16,12 +16,14 @@ class RecurrenceFactory extends Factory
    */
   public function definition()
   {
-    return [
+    $recurrence = [
       'description' => $this->faker->text(50),
       'isoweekday' => $this->faker->boolean(50) ? rand(1, 7) : null,
       'day' => $this->faker->boolean(80) ? rand(1, 31) : null,
       'month' => $this->faker->boolean(50) ? rand(1, 12) : null,
-      'year' => $this->faker->boolean(50) ? rand(2021, 2025) : null,
     ];
+
+
+    return $recurrence;
   }
 }

@@ -1,3 +1,7 @@
 *
+!app-installation/startup-script-production.sh
+!app-installation/startup-script-development.sh
+!app-installation/startup-script-staging.sh
+!app-installation/default-install-script.sh.sh
 !public/
 !.gitignore
