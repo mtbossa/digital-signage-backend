@@ -3,6 +3,7 @@
 use App\Http\Controllers\DisplayController;
 use App\Http\Controllers\DisplayOption;
 use App\Http\Controllers\DisplayPostController;
+use App\Http\Controllers\DisplayUpdatesController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\MediaDownloadController;
@@ -41,6 +42,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('displays.posts', DisplayPostController::class)
       ->only('index');
+    
+   Route::get('displays/{display}/updates', DisplayUpdatesController::class)
+      ->name('displays.updates');
 
     Route::apiResource('stores.displays', StoreDisplaysController::class)
       ->only('index');
