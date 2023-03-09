@@ -1,3 +1,22 @@
+
+# Laravel Digital Signage App API
+
+Create image and video **posts**, choose which **displays** to show, **schedule** them and show the content!
+
+## How it works
+
+ - This repository contains the backend API, written in PHP using
+   Laravel.
+ - An Angular frontend that communicates with this API is located at:
+   [github.com/mtbossa/digital-signage-frontend](https://github.com/mtbossa/digital-signage-frontend).
+   You can use the API directly, or this web app.
+ - A client software for showing the posts as been created, and its
+   repository is located at: 
+   [github.com/mtbossa/digital-signage-raspberry-app](https://github.com/mtbossa/digital-signage-raspberry-app).
+   It uses NodeJS and generates an executable that can be executed in a
+   Raspberry Pi. Then, the application connects to the API via a
+   websocket connection, which will download necessary files and store them locally in order to work offline.
+
 ### Setting Laravel Sanctum:
 
 * Must set .env variables to the frontend domain with port, for example, for local Angular applications:
