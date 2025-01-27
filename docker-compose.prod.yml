@@ -1,0 +1,53 @@
+# For more information: https://laravel.com/docs/sail
+version: '3'
+services:
+    php-fpm:
+      image: jkaninda/laravel-php-fpm
+      container_name: php-fpm
+      restart: unless-stopped
+      volumes:
+        - ./:/var/www/html
+        - storage:/var/www/html/storage
+      networks:
+        - default
+    
+    nginx-server:
+      image: jkaninda/nginx-fpm:alpine
+      container_name: nginx-server
+      restart: unless-stopped
+      ports:
+        - '80:80'
+      volumes:
+        - ./:/var/www/html
+      environment:
+        - DOCUMENT_ROOT=/var/www/html/public
+        - CLIENT_MAX_BODY_SIZE=20M
+        - PHP_FPM_HOST=php-fpm:9000
+      networks:
+        - default
+      
+    pgsql:
+        image: 'postgres:13'
+        ports:
+            - '${FORWARD_DB_PORT:-5432}:5432'
+        environment:
+            PGPASSWORD: '${DB_PASSWORD:-secret}'
+            POSTGRES_DB: '${DB_DATABASE}'
+            POSTGRES_USER: '${DB_USERNAME}'
+            POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
+        volumes:
+            - 'sail-pgsql:/var/lib/postgresql/data'
+        networks:
+            - sail
+        healthcheck:
+            test: [ "CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}" ]
+            retries: 3
+            timeout: 5s
+networks:
+    default:
+        driver: bridge
+volumes:
+    pgsql:
+        driver: local
+    storage:
+        driver: local
