@@ -84,3 +84,6 @@ Route::get('invitations/{token}', [InvitationController::class, 'show'])
 Route::patch('invitations/{token}', [InvitationController::class, 'update'])
   ->name('invitations.update');
 
+Route::get('/up', function () {
+  return response()->json(['status' => 'up']);
+});
