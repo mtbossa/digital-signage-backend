@@ -4,7 +4,7 @@ ENV WWWUSER=www-data
 ENV WWWGROUP=www-data
 
 # Copy Laravel project files
-COPY . /var/www/html
+COPY .. /var/www/html
 VOLUME /var/www/html/storage
 WORKDIR /var/www/html
 
