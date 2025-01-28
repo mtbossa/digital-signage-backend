@@ -39,10 +39,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY . /var/www
 
 # Copy the existing application directory permissions to the working directory
-COPY --chown=www-data:www-data . /var/www
+COPY --chown=${WWWUSER}:${WWWGROUP} . /var/www
 
 # Change current user to www
-USER www-data
+USER ${WWWUSER}
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
