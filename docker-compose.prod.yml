@@ -1,31 +1,31 @@
 services:
-    php-fpm:
+    app:
       build:
-        context: ..
+        context: .
         dockerfile: Prod.Dockerfile
-        args:
-          WWWUSER: '${WWWUSER}'
-          WWWGROUP: '${WWWGROUP}'
-      container_name: php-fpm
+      image: laravel-app
+      container_name: laravel-app
       restart: unless-stopped
+      tty: true
+      env_file:
+        - .env
+      working_dir: /var/www
       volumes:
-        - ./:/var/www/html
-        - storage:/var/www/html/storage
+        - .:/var/www
+        - ./deployment/php/local.ini:/usr/local/etc/php/conf.d/local.ini
       networks:
         - default
     
-    nginx-server:
-      image: jkaninda/nginx-fpm:alpine
-      container_name: nginx-server
+    webserver:
+      image: nginx:alpine
+      container_name: nginx-webserver
       restart: unless-stopped
       ports:
-        - '80:80'
+        - "80:80"
+        - "443:443"
       volumes:
-        - ./:/var/www/html
-      environment:
-        - DOCUMENT_ROOT=/var/www/html/public
-        - CLIENT_MAX_BODY_SIZE=20M
-        - PHP_FPM_HOST=php-fpm:9000
+        - .:/var/www
+        - ./deployment/nginx:/etc/nginx/conf.d/
       networks:
         - default
       
