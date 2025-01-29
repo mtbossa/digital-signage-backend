@@ -34,13 +34,9 @@ class RaspberryInstallerDownloadController extends Controller
       "**NODE_ENV**" => $correctAppEnv, "**RASPBERRY_API_TOKEN**" => $request->bearerToken(),
       "**RASPBERRY_ID**" => $authenticated->id, "**APP_GITHUB_REPO_URL**" => config("app.app_github_repo_url"),
     ];
-
-    if ($correctAppEnv === "development") {
-      // Appended necessary variables for development
-      $findAndReplace["**API_URL**"] = config("app.url");
-      $findAndReplace["**PUSHER_CLUSTER**"] = config("broadcasting.connections.pusher.options.cluster");
-      $findAndReplace["**PUSHER_APP_KEY**"] = config("broadcasting.connections.pusher.key");
-    }
+    $findAndReplace["**API_URL**"] = config("app.url");
+    $findAndReplace["**PUSHER_CLUSTER**"] = config("broadcasting.connections.pusher.options.cluster");
+    $findAndReplace["**PUSHER_APP_KEY**"] = config("broadcasting.connections.pusher.key");
     
     foreach ($findAndReplace as $find => $replace) {
       $installScript = Str::replace($find, $replace, $installScript);
