@@ -35,7 +35,7 @@ class RaspberryInstallerDownloadController extends Controller
       "**RASPBERRY_ID**" => $authenticated->id, "**APP_GITHUB_REPO_URL**" => config("app.app_github_repo_url"),
     ];
     $findAndReplace["**API_URL**"] = config("app.url");
-    $findAndReplace["**PUSHER_CLUSTER**"] = config("broadcasting.connections.pusher.options.cluster");
+    $findAndReplace["**PUSHER_CLUSTER**"] = env("PUSHER_APP_CLUSTER", 'sa1');
     $findAndReplace["**PUSHER_APP_KEY**"] = config("broadcasting.connections.pusher.key");
     
     foreach ($findAndReplace as $find => $replace) {
