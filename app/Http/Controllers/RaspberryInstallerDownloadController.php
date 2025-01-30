@@ -37,6 +37,8 @@ class RaspberryInstallerDownloadController extends Controller
     $findAndReplace["**API_URL**"] = config("app.url");
     $findAndReplace["**PUSHER_CLUSTER**"] = env("PUSHER_APP_CLUSTER", 'sa1');
     $findAndReplace["**PUSHER_APP_KEY**"] = config("broadcasting.connections.pusher.key");
+    $findAndReplace["**PUSHER_HOST**"] = config("broadcasting.connections.pusher.options.host");
+    $findAndReplace["**PUSHER_PORT**"] = config("broadcasting.connections.pusher.options.port");
     
     foreach ($findAndReplace as $find => $replace) {
       $installScript = Str::replace($find, $replace, $installScript);
@@ -47,7 +49,7 @@ class RaspberryInstallerDownloadController extends Controller
 
   private function getCorrectAppEnv(): string
   {
-    return 'development';
+    return 'production';
 //    $appEnv = config("app.env");
 //
 //    if ($appEnv === "production") {
