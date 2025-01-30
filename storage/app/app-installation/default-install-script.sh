@@ -27,7 +27,7 @@ mkdir -p "$LOGS_FOLDER"
 mkdir -p "$INSTALLATION_FOLDER" 
 # shellcheck disable=SC2164
 cd "$INSTALLATION_FOLDER"
-git clone --depth 1 -b staging "${APP_GITHUB_REPO_URL}" intus
+git clone --depth 1 -b main "${APP_GITHUB_REPO_URL}" intus
 
 # Step 2 - Update deps
 echo ""
