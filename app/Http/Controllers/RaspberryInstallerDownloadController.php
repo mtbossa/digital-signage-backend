@@ -47,16 +47,17 @@ class RaspberryInstallerDownloadController extends Controller
 
   private function getCorrectAppEnv(): string
   {
-    $appEnv = config("app.env");
-
-    if ($appEnv === "production") {
-      return "production";
-    } else {
-      if ($appEnv === "staging") {
-        return "staging";
-      } else {
-        return "development";
-      }
-    }
+    return 'development';
+//    $appEnv = config("app.env");
+//
+//    if ($appEnv === "production") {
+//      return "production";
+//    } else {
+//      if ($appEnv === "staging") {
+//        return "staging";
+//      } else {
+//        return "development";
+//      }
+//    }
   }
 }
