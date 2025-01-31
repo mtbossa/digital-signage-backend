@@ -34,7 +34,10 @@ services:
         - pgsql
     
     webserver:
-      image: nginx:alpine
+      build:
+        context: .
+        dockerfile: Prod.Nginx.Dockerfile
+      image: nginx
       container_name: nginx-webserver
       restart: unless-stopped
       ports:
@@ -43,6 +46,7 @@ services:
       volumes:
         - .:/var/www
         - ./deployment/nginx:/etc/nginx/conf.d/
+        - ./deployment/nginx/letsencrypt:/etc/letsencrypt
       networks:
         - default
       
