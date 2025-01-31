@@ -37,7 +37,6 @@ services:
       build:
         context: .
         dockerfile: Prod.Nginx.Dockerfile
-      image: nginx
       container_name: nginx-webserver
       restart: unless-stopped
       ports:
