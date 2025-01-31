@@ -68,3 +68,6 @@ In production, eg.:
 
 <a href="https://i.ibb.co/Bw4t2p7/intus-er.jpg" target="_blank"><img width="70%" src="https://i.ibb.co/Bw4t2p7/intus-er.jpg"></a>
 
+## Generating Let's Encrypt SSL certificates inside Nginx container
+
+We use a NGINX image that install `certbox` and then just run `certbot --nginx` inside it.
