@@ -1,14 +1,12 @@
-# Use the official PHP image as a base image
+# Use the official Nginx image as a base image
 FROM nginx:alpine
 
-# Atualiza e instala os pacotes necessários
-# certbot certbot-nginx são os responsáveis pela geração de HTTPS
+# Update and install necessary packages
 RUN apk update && apk upgrade && \
-    apk --update add logrotate openssl bash && \
-    apk add --no-cache certbot certbot-nginx 
+    apk --update add logrotate openssl bash
 
-# Limpeza: Remove pacotes não utilizados para reduzir o tamanho da imagem
-RUN apk del --no-cache
-    
-# Inicia o NGINX quando o contêiner é executado
+# Clean up to reduce image size
+RUN rm -rf /var/cache/apk/*
+
+# Start Nginx when the container runs
 CMD ["nginx", "-g", "daemon off;"]

@@ -40,12 +40,11 @@ services:
       container_name: nginx-webserver
       restart: unless-stopped
       ports:
-        - "80:80"
-        - "443:443"
+        - "2053:2053"
       volumes:
         - .:/var/www
         - ./deployment/nginx:/etc/nginx/conf.d/
-        - ./deployment/nginx/letsencrypt:/etc/letsencrypt
+        - ./deployment/nginx/certs:/etc/nginx/certs
       networks:
         - default
       
