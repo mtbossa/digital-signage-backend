@@ -11,7 +11,9 @@ services:
         - .env
       working_dir: /var/www
       volumes:
-        - .:/var/www
+        # Only mount writable directories from host, not entire source
+        - ./storage:/var/www/storage
+        - ./bootstrap/cache:/var/www/bootstrap/cache
         - ./deployment/php/local.ini:/usr/local/etc/php/conf.d/local.ini
       depends_on:
         - pgsql
@@ -26,7 +28,9 @@ services:
         - .env
       working_dir: /var/www
       volumes:
-        - .:/var/www
+        # Only mount writable directories, not the entire source
+        - ./storage:/var/www/storage
+        - ./bootstrap/cache:/var/www/bootstrap/cache
       command: [ "php", "artisan", "queue:work", "--tries=3" ]
       networks:
         - default
@@ -42,11 +46,14 @@ services:
       ports:
         - "2053:2053"
       volumes:
-        - .:/var/www
         - ./deployment/nginx:/etc/nginx/conf.d/
         - ./deployment/nginx/certs:/etc/nginx/certs
+      volumes_from:
+        - app
       networks:
         - default
+      depends_on:
+        - app
       
     pgsql:
         image: 'postgres:13'

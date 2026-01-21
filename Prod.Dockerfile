@@ -32,28 +32,32 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy composer files first for better layer caching
-COPY composer.json composer.lock ./
+# Copy application files first (vendor excluded via .dockerignore)
+COPY --chown=www-data:www-data . /var/www
 
-# Install production dependencies (as root for proper permissions)
+# Install production dependencies
+# This creates vendor/ directory inside the image
 RUN composer install \
     --no-dev \
     --no-interaction \
     --no-progress \
     --no-scripts \
     --prefer-dist \
-    --optimize-autoloader
+    --optimize-autoloader \
+    && composer dump-autoload --optimize --no-dev
 
-# Copy application files
-COPY --chown=www-data:www-data . /var/www
-
-# Run post-install scripts
-RUN composer dump-autoload --optimize --no-dev
+# Create necessary Laravel directories if they don't exist
+RUN mkdir -p /var/www/storage/app/public \
+    /var/www/storage/framework/cache \
+    /var/www/storage/framework/sessions \
+    /var/www/storage/framework/views \
+    /var/www/storage/logs \
+    /var/www/bootstrap/cache
 
 # Set proper permissions for Laravel directories
 RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage \
-    && chmod -R 755 /var/www/bootstrap/cache
+    && chmod -R 775 /var/www/storage \
+    && chmod -R 775 /var/www/bootstrap/cache
 
 # Switch to non-root user for security
 USER www-data

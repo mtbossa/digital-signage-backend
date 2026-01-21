@@ -174,6 +174,17 @@ docker-compose -f docker-compose.prod.yml up -d --build
 # - pgsql (PostgreSQL database)
 ```
 
+**Important**: In production, your application code (including vendor directory) is **baked into the Docker image**. The containers do NOT mount your source code from the host. Only writable directories (`storage` and `bootstrap/cache`) are mounted. This ensures:
+- Vendor directory and dependencies are always present
+- Code is immutable and version-controlled
+- No permission conflicts between host and container
+
+To verify vendor exists:
+```bash
+docker exec laravel-app ls -la /var/www/vendor
+# Should show all composer packages
+```
+
 ### 5.3 Initialize the Application
 
 ```bash
@@ -266,11 +277,14 @@ docker restart laravel-worker
 
 ### Deploy New Changes
 
+Since your application code is baked into the Docker image, you **must rebuild** the images to deploy code changes.
+
 ```bash
-# Pull latest changes
+# Pull latest changes from repository
 git pull origin main
 
-# Rebuild and restart containers
+# Rebuild images with new code and restart containers
+# The --build flag is ESSENTIAL - it rebuilds the images with your new code
 docker-compose -f docker-compose.prod.yml up -d --build
 
 # Run migrations (if any)
@@ -285,6 +299,8 @@ docker exec laravel-app php artisan view:cache
 # Restart queue worker to load new code
 docker restart laravel-worker
 ```
+
+**Note**: The `--build` flag ensures Docker rebuilds the image with your latest code changes. Without it, containers will use the old image with old code.
 
 ---
 

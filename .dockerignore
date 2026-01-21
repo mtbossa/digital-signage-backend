@@ -1,0 +1,13 @@
+# Don't copy these to Docker image
+vendor/
+node_modules/
+.git/
+.env
+.env.backup
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
+bootstrap/cache/*
+.phpunit.result.cache
+*.log
