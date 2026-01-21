@@ -1,0 +1,12 @@
+# Ignore all certificate files for security
+*.pem
+*.key
+*.crt
+*.cert
+
+# But track this .gitignore file
+!.gitignore
+
+# Example: You should have files like:
+# cloudflare-paroquia-piox.app.br.pem
+# cloudflare-paroquia-piox.app.br.key

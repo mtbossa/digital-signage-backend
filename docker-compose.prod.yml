@@ -45,11 +45,11 @@ services:
       restart: unless-stopped
       ports:
         - "2053:2053"
+      environment:
+        - SSL_CERT_NAME=${SSL_CERT_NAME:-cloudflare-paroquia-piox.app.br}
       volumes:
         - ./deployment/nginx:/etc/nginx/conf.d/
         - ./deployment/nginx/certs:/etc/nginx/certs
-      volumes_from:
-        - app
       networks:
         - default
       depends_on:

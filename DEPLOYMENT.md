@@ -48,50 +48,49 @@ This guide covers deploying the Laravel backend and Angular frontend to producti
 
 ---
 
-## Step 2: Generate Cloudflare Origin Certificates
+## Step 2: Generate Cloudflare Origin Certificate
 
-Origin Certificates encrypt traffic between Cloudflare and your server.
+Origin Certificates encrypt traffic between Cloudflare and your server. We'll create a **single wildcard certificate** that covers both API and App subdomains.
 
 1. **Navigate to Cloudflare Dashboard**:
    - Go to: **SSL/TLS** → **Origin Server**
 
-2. **Create Certificate for API domain**:
+2. **Create Wildcard Certificate**:
    - Click **"Create Certificate"**
-   - Hostnames: `api.paroquia-piox.app.br`
+   - Hostnames: Enter both domains (or use wildcard):
+     - `*.paroquia-piox.app.br` (wildcard - covers all subdomains)
+     - `paroquia-piox.app.br` (root domain)
    - Certificate Validity: **15 years** (recommended)
    - Private Key Type: **RSA (2048)**
    - Click **"Create"**
 
-3. **Save API Certificate Files**:
+3. **Save Certificate Files**:
    - Copy the **Origin Certificate** content
-   - Save it as: `deployment/nginx/certs/api.paroquia-piox.app.br.pem`
+   - Save it as: `deployment/nginx/certs/cloudflare-paroquia-piox.app.br.pem`
 
    - Copy the **Private Key** content
-   - Save it as: `deployment/nginx/certs/api.paroquia-piox.app.br.key`
+   - Save it as: `deployment/nginx/certs/cloudflare-paroquia-piox.app.br.key`
 
-4. **Create Certificate for App domain**:
-   - Click **"Create Certificate"** again
-   - Hostnames: `app.paroquia-piox.app.br`
-   - Certificate Validity: **15 years**
-   - Private Key Type: **RSA (2048)**
-   - Click **"Create"**
-
-5. **Save App Certificate Files**:
-   - Copy the **Origin Certificate** content
-   - Save it as: `deployment/nginx/certs/app.paroquia-piox.app.br.pem`
-
-   - Copy the **Private Key** content
-   - Save it as: `deployment/nginx/certs/app.paroquia-piox.app.br.key`
+**Note**: The default certificate name is `cloudflare-paroquia-piox.app.br`, but you can customize it by setting `SSL_CERT_NAME` in your `.env` file (without the .pem/.key extension).
 
 ### Example file structure:
 ```
 deployment/nginx/certs/
 ├── .gitignore
-├── api.paroquia-piox.app.br.pem
-├── api.paroquia-piox.app.br.key
-├── app.paroquia-piox.app.br.pem
-└── app.paroquia-piox.app.br.key
+├── cloudflare-paroquia-piox.app.br.pem
+└── cloudflare-paroquia-piox.app.br.key
 ```
+
+### Custom Certificate Name (Optional)
+
+To use a different certificate name, add to your `.env`:
+```env
+SSL_CERT_NAME=my-custom-cert-name
+```
+
+Then save your certificates as:
+- `deployment/nginx/certs/my-custom-cert-name.pem`
+- `deployment/nginx/certs/my-custom-cert-name.key`
 
 ---
 
