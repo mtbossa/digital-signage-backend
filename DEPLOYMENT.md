@@ -174,15 +174,22 @@ docker-compose -f docker-compose.prod.yml up -d --build
 # - pgsql (PostgreSQL database)
 ```
 
-**Important**: In production, your application code (including vendor directory) is **baked into the Docker image**. The containers do NOT mount your source code from the host. Only writable directories (`storage` and `bootstrap/cache`) are mounted. This ensures:
-- Vendor directory and dependencies are always present
-- Code is immutable and version-controlled
-- No permission conflicts between host and container
+**Important**: In production, your application code (including vendor directory) is **baked into the Docker image**. The containers do NOT mount your source code from the host.
+
+**Storage Strategy**:
+- Application code is in the image (immutable)
+- Writable directories (`storage/` and `bootstrap/cache/`) use **Docker named volumes**
+- Data persists between container restarts
+- No permission conflicts (volumes owned by www-data)
 
 To verify vendor exists:
 ```bash
 docker exec laravel-app ls -la /var/www/vendor
 # Should show all composer packages
+
+# Check volume permissions
+docker exec laravel-app ls -la /var/www/storage
+# Should be owned by www-data
 ```
 
 ### 5.3 Initialize the Application
@@ -460,12 +467,32 @@ cat backup-20261119.sql | docker exec -i pgsql psql -U your_username -d your_dat
 
 ### Application Files Backup
 
+Since `storage/` uses a Docker volume, backup from the running container:
+
 ```bash
-# Backup uploads and important files
-tar -czf storage-backup-$(date +%Y%m%d).tar.gz storage/app/public
+# Backup storage volume (uploads, logs, etc.)
+docker run --rm \
+  --volumes-from laravel-app \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/storage-backup-$(date +%Y%m%d).tar.gz -C /var/www storage
+
+# Restore storage volume
+docker run --rm \
+  --volumes-from laravel-app \
+  -v $(pwd):/backup \
+  alpine tar xzf /backup/storage-backup-20261119.tar.gz -C /var/www
 
 # Backup .env file
 cp .env .env.backup
+```
+
+**Alternative**: Access volume directly:
+```bash
+# View volume contents
+docker exec laravel-app ls -la /var/www/storage
+
+# Copy specific files out
+docker cp laravel-app:/var/www/storage/app/public ./storage-backup
 ```
 
 ### Automated Backups

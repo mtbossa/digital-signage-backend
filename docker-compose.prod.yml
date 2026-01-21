@@ -11,9 +11,9 @@ services:
         - .env
       working_dir: /var/www
       volumes:
-        # Only mount writable directories from host, not entire source
-        - ./storage:/var/www/storage
-        - ./bootstrap/cache:/var/www/bootstrap/cache
+        # Use Docker volumes for persistent storage (better permissions)
+        - app-storage:/var/www/storage
+        - app-cache:/var/www/bootstrap/cache
         - ./deployment/php/local.ini:/usr/local/etc/php/conf.d/local.ini
       depends_on:
         - pgsql
@@ -28,9 +28,9 @@ services:
         - .env
       working_dir: /var/www
       volumes:
-        # Only mount writable directories, not the entire source
-        - ./storage:/var/www/storage
-        - ./bootstrap/cache:/var/www/bootstrap/cache
+        # Use same volumes as app container
+        - app-storage:/var/www/storage
+        - app-cache:/var/www/bootstrap/cache
       command: [ "php", "artisan", "queue:work", "--tries=3" ]
       networks:
         - default
@@ -78,5 +78,7 @@ networks:
 volumes:
     pgsql:
         driver: local
-    storage:
+    app-storage:
+        driver: local
+    app-cache:
         driver: local
