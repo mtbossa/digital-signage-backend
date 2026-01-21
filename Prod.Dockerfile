@@ -1,9 +1,6 @@
 # Use the official PHP image as a base image
 FROM php:8.1-fpm
 
-ENV WWWUSER=www-data
-ENV WWWGROUP=www-data
-
 # Set working directory
 WORKDIR /var/www
 
@@ -35,14 +32,31 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy the existing application directory contents to the working directory
-COPY . /var/www
+# Copy composer files first for better layer caching
+COPY composer.json composer.lock ./
 
-# Copy the existing application directory permissions to the working directory
-COPY --chown=${WWWUSER}:${WWWGROUP} . /var/www
+# Install production dependencies (as root for proper permissions)
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --no-progress \
+    --no-scripts \
+    --prefer-dist \
+    --optimize-autoloader
 
-# Change current user to www
-USER ${WWWUSER}
+# Copy application files
+COPY --chown=www-data:www-data . /var/www
+
+# Run post-install scripts
+RUN composer dump-autoload --optimize --no-dev
+
+# Set proper permissions for Laravel directories
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/storage \
+    && chmod -R 755 /var/www/bootstrap/cache
+
+# Switch to non-root user for security
+USER www-data
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
